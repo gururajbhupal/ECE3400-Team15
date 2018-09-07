@@ -10,7 +10,7 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
 
 ### Blinking the LEDs
  
-[Blink Internal LED Code](https://drive.google.com/open?id=1VXzrV8xOCHk6iW_8hf9UKCkTyVfF0ulo)
+![Blink Internal LED Code](internalLED.png)
 
 [Internal LED Blinking](https://drive.google.com/open?id=1s798_o5yCjsTz_mb4PZyGyMj7zKIiFBO)
 
