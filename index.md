@@ -4,7 +4,7 @@
 You can view the contract here [contract](https://github.com/gururajbhupal/ECE3400-Team15/blob/master/contract.pdf) 
 
 # Team Contract
-Report here --> [Lab1](/home/Lab1) 
+Check here --> [Lab1](/ECE3400-Team15/Lab1) 
 
 
 
