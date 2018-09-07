@@ -10,9 +10,9 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
 
 ### Blinking the LEDs
  
-![Blink Internal LED Code](https://drive.google.com/open?id=1VXzrV8xOCHk6iW_8hf9UKCkTyVfF0ulo)
+[Blink Internal LED Code](https://drive.google.com/open?id=1VXzrV8xOCHk6iW_8hf9UKCkTyVfF0ulo)
 
-![Internal LED Blinking](https://drive.google.com/open?id=1s798_o5yCjsTz_mb4PZyGyMj7zKIiFBO)
+[Internal LED Blinking](https://drive.google.com/open?id=1s798_o5yCjsTz_mb4PZyGyMj7zKIiFBO)
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
 
