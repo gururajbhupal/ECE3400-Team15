@@ -46,7 +46,7 @@ The range of values read from the potentiometer [0, 1024] is four times the rang
 
 In order to scale the potentiometer range [0, 1024] to the servo range [0, 180], we multiplied the input by 180/1024.
 
-![Potentiometer-controlled LED Code](ECE3400-Team15/Lab1/Servo and Potentiometer Code.png)
+![Potentiometer-controlled LED Code](ServoandPotentiometerCode.png)
 
 [![Potentiometer-controlled LED](http://img.youtube.com/vi/Mvg55Toar-s/0.jpg)](http://www.youtube.com/watch?v=Mvg55Toar-s)
 
