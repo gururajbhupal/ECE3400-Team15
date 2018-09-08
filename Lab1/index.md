@@ -12,7 +12,7 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
  
 ![Blink Internal LED Code](internalLED.PNG)
 
-[![InternalLEDThumbnail](http://img.youtube.com/vi/f-JlQTHOgZI/0.jpg)](http://www.youtube.com/watch?v=f-JlQTHOgZI)
+[![Internal LED Blinking](http://img.youtube.com/vi/f-JlQTHOgZI/0.jpg)](http://www.youtube.com/watch?v=f-JlQTHOgZI)
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
 
@@ -20,7 +20,7 @@ This is the code we used to blink the external LED, starting with the same base 
 
 ![Blink External LED Code](externalLED.PNG)
 
-![External LED Blinking](BlinkingLEDonBreadboard.MOV)
+[![External LED Blinking](http://img.youtube.com/vi/LyfdBQj4Ypk/0.jpg)](http://www.youtube.com/watch?v=LyfdBQj4Ypk)
 
 ### Reading and Printing Potentiometer Serial Data
 
@@ -32,7 +32,7 @@ The code we used to read from the potentiometer first declared pin A0 as an inpu
 
 ![Printing Serial Data Code](potRead.PNG)
 
-![Printing Serial Data](IMG_1075 compressed.mov)
+[![Printing Serial Data](http://img.youtube.com/vi/7JXkB8mXXx0/0.jpg)](http://www.youtube.com/watch?v=7JXkB8mXXx0)
 
 ### Mapping Values from Potentiometer to LED
 
@@ -40,7 +40,7 @@ The range of values read from the potentiometer [0, 1024] is four times the rang
 
 ![Potentiometer-controlled LED Code](analogLED.PNG)
 
-![Potentiometer-controlled LED](IMG_1076. compressed.mov)
+[![Potentiometer-controlled LED](http://img.youtube.com/vi/rfy2OAFVIig/0.jpg)](http://www.youtube.com/watch?v=rfy2OAFVIig)
 
 ### Mapping Values from Potentiometer to Servo
 
@@ -48,7 +48,7 @@ In order to scale the potentiometer range [0, 1024] to the servo range [0, 180],
 
 ![Potentiometer-controlled LED Code](ECE3400-Team15/Lab1/Servo and Potentiometer Code.png)
 
-![Potentiometer-controlled LED](IMG_1078 compressed.mov)
+[![Potentiometer-controlled LED](http://img.youtube.com/vi/Mvg55Toar-s/0.jpg)](http://www.youtube.com/watch?v=Mvg55Toar-s)
 
 ### Assembly and Autonomous Driving
 
@@ -60,7 +60,7 @@ Movement around a square can be broken down into two components: moving forward 
 
 ![Square Movement Code](movementCode.PNG)
 
-![Square Movement](autonomous movement compressed.mp4)
+[![Square Movement](http://img.youtube.com/vi/cwXXq-iTddo/0.jpg)](http://www.youtube.com/watch?v=cwXXq-iTddo)
 
 
 
