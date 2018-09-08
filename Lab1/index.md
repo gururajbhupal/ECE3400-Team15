@@ -38,29 +38,29 @@ The code we used to read from the potentiometer first declared pin A0 as an inpu
 
 The range of values read from the potentiometer [0, 1024] is four times the range of values able to be written to the LED [0, 255]. In order to be fed to the LED output pin, the serial data read from the potentiometer is divided by four.
 
-[Potentiometer-controlled LED Code](analogLED.PNG)
+![Potentiometer-controlled LED Code](analogLED.PNG)
 
-[Potentiometer-controlled LED](IMG_1076. compressed.mov)
+![Potentiometer-controlled LED](IMG_1076. compressed.mov)
 
 ### Mapping Values from Potentiometer to Servo
 
 In order to scale the potentiometer range [0, 1024] to the servo range [0, 180], we multiplied the input by 180/1024.
 
-[Potentiometer-controlled LED Code](https://drive.google.com/file/d/1UlS2F76yrtKdlOtKW4hvMmh0pRREfRwj/view?usp=sharing)
+![Potentiometer-controlled LED Code](https://drive.google.com/file/d/1UlS2F76yrtKdlOtKW4hvMmh0pRREfRwj/view?usp=sharing)
 
-[Potentiometer-controlled LED](IMG_1078 compressed.mov)
+![Potentiometer-controlled LED](IMG_1078 compressed.mov)
 
 ### Assembly and Autonomous Driving
 
 The design of our robot was very simplistic. It had a flat top as its body where the Uno and breadboard rested and servos connected to wheels on either side of it. To balance, it had a leg on the front with a ball bearing on the bottom to reduce friction against the floor. Brackets were screwed underneath the body to hold the 5V battery pack.
 
-[Robot Design](https://drive.google.com/open?id=1FNIjnO272lHN6oyB70LbesjHuCTMaNmW)
+![Robot Design](https://drive.google.com/open?id=1FNIjnO272lHN6oyB70LbesjHuCTMaNmW)
 
 Movement around a square can be broken down into two components: moving forward and turning 90 degrees. To direct the bot to move forward, the right servo rotates clockwise and the left servo rotates counterclockwise. To complete a 90 degree turn, both servos are set to rotate clockwise so that the right wheel moves forward and the left wheel moves backwards, turning to the left. Through testing we found that a 90 degree turn took about 0.72 seconds so a delay of 720 ms was added. The size of the square path is set by the duration that the robot is directed to move forwards, in this case two seconds.
 
-[Square Movement Code](https://drive.google.com/open?id=1UIISgadbKqfCWAMBEwo01OG4wmP3MAGK)
+![Square Movement Code](https://drive.google.com/open?id=1UIISgadbKqfCWAMBEwo01OG4wmP3MAGK)
 
-[Square Movement](https://drive.google.com/open?id=1XjeqLACJnd0eaeUd9steV6Jl7xiMIBm9)
+![Square Movement](https://drive.google.com/open?id=1XjeqLACJnd0eaeUd9steV6Jl7xiMIBm9)
 
 
 
