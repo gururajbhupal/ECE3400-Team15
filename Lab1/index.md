@@ -12,7 +12,7 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
  
 ![Blink Internal LED Code](internalLED.PNG)
 
-![Internal LED Blinking](Blinking%LED%on%Board.MOV)
+![Internal LED Blinking](BlinkingLEDonBoard.MOV)
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
 
@@ -20,7 +20,7 @@ This is the code we used to blink the external LED, starting with the same base 
 
 ![Blink External LED Code](externalLED.PNG)
 
-![External LED Blinking](Blinking LED onBreadboard.MOV)
+![External LED Blinking](BlinkingLEDonBreadboard.MOV)
 
 ### Reading and Printing Potentiometer Serial Data
 
