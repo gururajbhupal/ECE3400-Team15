@@ -12,8 +12,6 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
  
 ![Blink Internal LED Code](internalLED.PNG)
 
-[![Test](http://img.youtube.com/vi/Fm12ep-CsNI/0.jpg)](http://www.youtube.com/watch?v=Fm12ep-CsNI)
-
 [![InternalLEDThumbnail](http://img.youtube.com/vi/f-JIQTHOgZI/0.jpg)](http://www.youtube.com/watch?v=f-JIQTHOgZI)
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
