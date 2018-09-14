@@ -12,8 +12,7 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
  
 ![Blink Internal LED Code](internalLED.PNG)
 
-[![Internal LED Blinking](http://img.youtube.com/vi/f-JlQTHOgZI/0.jpg)](http://www.youtube.com/watch?v=f-JlQTHOgZI)
-[![Internal LED Blinking New](http://img.youtube.com/vi/gtsBVHqelFk/0.jpg)](http://www.youtube.com/watch?v=gtsBVHqelFk)
+[![Internal LED Blinking](http://img.youtube.com/vi/gtsBVHqelFk/0.jpg)](http://www.youtube.com/watch?v=gtsBVHqelFk)
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
 
@@ -21,8 +20,7 @@ This is the code we used to blink the external LED, starting with the same base 
 
 ![Blink External LED Code](externalLED.PNG)
 
-[![External LED Blinking](http://img.youtube.com/vi/LyfdBQj4Ypk/0.jpg)](http://www.youtube.com/watch?v=LyfdBQj4Ypk)
-[![External LED Blinking New](http://img.youtube.com/vi/lo2UhQs6UsQ/0.jpg)](http://www.youtube.com/watch?v=lo2UhQs6UsQ)
+[![External LED Blinking](http://img.youtube.com/vi/lo2UhQs6UsQ/0.jpg)](http://www.youtube.com/watch?v=lo2UhQs6UsQ)
 
 ### Reading and Printing Potentiometer Serial Data
 
