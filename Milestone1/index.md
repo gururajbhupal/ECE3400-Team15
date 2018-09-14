@@ -2,22 +2,22 @@
 
 ## Setting Up Sensors
 
-![SensorCalibrationCode](SensorCalibrationCode.PNG)
+![SensorCalibrationCode](SensorCalibrationCode.png)
 
 ## Following Line
 
-![FollowLineCode](FollowLineCode.PNG)
+![FollowLineCode](FollowLineCode.png)
 
-![MoveCommandCode](MoveCommandCode.PNG)
+![MoveCommandCode](MoveCommandCode.png)
 
-FollowLine.MOV
+[![FollowLine](http://img.youtube.com/vi/6EOPY7VUni4/0.jpg)](http://www.youtube.com/watch?v=6EOPY7VUni4)
 
 ## Traversing Grid in a Figure 8
 
-![FigureEightCode](FigureEightCode.PNG)
+![FigureEightCode](FigureEightCode.png)
 
-![TurnLeftCode](TurnLeftCode.PNG)
+![TurnLeftCode](TurnLeftCode.png)
 
-![TurnRightCode](TurnRightCode.PNG)
+![TurnRightCode](TurnRightCode.png)
 
-FigureEight.MOV
+[![FigureEight](http://img.youtube.com/vi/swSXyXTXP5s/0.jpg)](http://www.youtube.com/watch?v=swSXyXTXP5s)
