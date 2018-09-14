@@ -3,8 +3,8 @@
 # Team Contract
 You can view the contract here [contract](https://github.com/gururajbhupal/ECE3400-Team15/blob/master/contract.pdf) 
 
-# Lab 1 Report
-Check here --> [Lab1](/ECE3400-Team15/Lab1) 
+# Labs
+[Lab 1](/ECE3400-Team15/Lab1) 
 
-# Milestone 1
-Check here --> [Milestone 1](/ECE3400-Team15/Milestone1) 
+# Milestones
+[Milestone 1](/ECE3400-Team15/Milestone1) 
