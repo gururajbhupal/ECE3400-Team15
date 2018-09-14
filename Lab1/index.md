@@ -54,7 +54,7 @@ In order to scale the potentiometer range [0, 1024] to the servo range [0, 180],
 
 The design of our robot was very simplistic. It had a flat top as its body where the Uno and breadboard rested and servos connected to wheels on either side of it. To balance, it had a leg on the front with a ball bearing on the bottom to reduce friction against the floor. Brackets were screwed underneath the body to hold the 5V battery pack.
 
-![Robot Design](RobotDesign-fixed.JPG)
+![Robot Design](RobotDesign2.JPG)
 
 Movement around a square can be broken down into two components: moving forward and turning 90 degrees. To direct the bot to move forward, the right servo rotates clockwise and the left servo rotates counterclockwise. To complete a 90 degree turn, both servos are set to rotate clockwise so that the right wheel moves forward and the left wheel moves backwards, turning to the left. Through testing we found that a 90 degree turn took about 0.72 seconds so a delay of 720 ms was added. The size of the square path is set by the duration that the robot is directed to move forwards, in this case two seconds.
 
