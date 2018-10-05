@@ -1,21 +1,20 @@
 # Lab 2 Report
 
 ## Introduction
-![Gain](ECE3400-Team15/Lab2/Media/Gain.JPG)
-![Gain](Gain.jpg)
+
 
 
 ## Implementation
 ![AmpSchematic](Media/AmpSchematic.PNG)
 
 
+![Gain](Gain.png)
 
 
+![660Hz Audio with AMP](Media/660Hz Audio with AMP.png)
 
-![660Hz Audio with AMP](Media/660Hz Audio with AMP.bmp)
 
-
-![6kHz IR with AMP](Media/6kHz IR with AMP.jpg)
+![6kHz IR with AMP](Media/6kHz IR with AMP.png)
 
 ## Testing
 Audio only
