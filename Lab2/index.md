@@ -2,6 +2,8 @@
 
 ## Introduction
 ![Gain](Media/Gain.jpg)
+![Gain](Gain.jpg)
+
 
 ## Implementation
 ![AmpSchematic](Media/AmpSchematic.PNG)
