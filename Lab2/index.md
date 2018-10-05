@@ -7,15 +7,13 @@
 ![AmpSchematic](Media/AmpSchematic.PNG)
 
 
-Gain demonstration
+
 ![Gain](Media/Gain.jpg)
 
 
-Audio
 ![660Hz Audio with AMP](Media/660Hz Audio with AMP.bmp)
 
 
-IR
 ![6kHz IR with AMP](Media/6kHz IR with AMP.jpg)
 
 ## Testing
