@@ -2,7 +2,21 @@
 
 ## Introduction
 
+
 ## Implementation
+![AmpSchematic](AmpSchematic.PNG)
+
+
+Gain demonstration
+![Gain](Gain.jpg)
+
+
+Audio
+![660Hz Audio with AMP](660Hz Audio with AMP.bmp)
+
+
+IR
+![6kHz IR with AMP](6kHz IR with AMP.jpg)
 
 ## Testing
 Audio only
