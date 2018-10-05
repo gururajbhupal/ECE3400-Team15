@@ -8,7 +8,7 @@
 ![AmpSchematic](Media/AmpSchematic.PNG)
 
 
-![Gain](Gain.png)
+![Gain](Media/Gain.png)
 
 
 ![660Hz Audio with AMP](Media/660Hz Audio with AMP.png)
