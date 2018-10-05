@@ -1,14 +1,13 @@
 # Lab 2 Report
 
 ## Introduction
-
+![Gain](Media/Gain.jpg)
 
 ## Implementation
 ![AmpSchematic](Media/AmpSchematic.PNG)
 
 
 
-![Gain](Media/Gain.jpg)
 
 
 ![660Hz Audio with AMP](Media/660Hz Audio with AMP.bmp)
