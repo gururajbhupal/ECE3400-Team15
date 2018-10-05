@@ -14,7 +14,7 @@
 ![660Hz Audio with AMP](Media/660HzAudiowithAMP.png)
 
 
-![6kHz IR with AMP](Media/6kHzIRwithAMP.png)
+![6kHz IR with AMP](Media/6kHzIRwithAmp.png)
 
 ## Testing
 Audio only
