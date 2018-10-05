@@ -1,7 +1,7 @@
 # Lab 2 Report
 
 ## Introduction
-![Gain](Media/Gain.jpg)
+![Gain](ECE3400-Team15/Lab2/Media/Gain.JPG)
 ![Gain](Gain.jpg)
 
 
