@@ -8,15 +8,15 @@
 
 
 Gain demonstration
-![Gain](Gain.jpg)
+![Gain](Media/Gain.jpg)
 
 
 Audio
-![660Hz Audio with AMP](660Hz Audio with AMP.bmp)
+![660Hz Audio with AMP](Media/660Hz Audio with AMP.bmp)
 
 
 IR
-![6kHz IR with AMP](6kHz IR with AMP.jpg)
+![6kHz IR with AMP](Media/6kHz IR with AMP.jpg)
 
 ## Testing
 Audio only
