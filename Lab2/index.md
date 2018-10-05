@@ -6,7 +6,7 @@ In this lab we added sensors and signal processing to our robot. We first added 
 ## Implementation
 *Insert FFT Analysis*
 
-Our Logic;
+Our Logic:
 Since we wanted to analyze signals from two sources, we had to switch which pin out we were reading data from on the arduino. We read audio from A0 and IR from A1. We made this switch in the while loop switching ADMUX back and forth from 0x40 to 0x41 (switching from A0 to A1). We checked determine which signal we were reading, we checked which pin we were reading from and then we checked 
 
 Amplifier Schematic:
