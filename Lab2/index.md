@@ -11,10 +11,10 @@
 ![Gain](Media/Gain.png)
 
 
-![660Hz Audio with AMP](Media/660Hz Audio with AMP.png)
+![660Hz Audio with AMP](Media/660HzAudiowithAMP.png)
 
 
-![6kHz IR with AMP](Media/6kHz IR with AMP.png)
+![6kHz IR with AMP](Media/6kHzIRwithAMP.png)
 
 ## Testing
 Audio only
