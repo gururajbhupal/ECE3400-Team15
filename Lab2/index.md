@@ -4,7 +4,7 @@
 
 
 ## Implementation
-![AmpSchematic](AmpSchematic.PNG)
+![AmpSchematic](Media/AmpSchematic.PNG)
 
 
 Gain demonstration
