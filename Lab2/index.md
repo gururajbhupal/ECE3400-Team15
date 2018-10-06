@@ -4,7 +4,7 @@
 In this lab we added sensors and signal processing to our robot. We first added a microphone to detect 660 Hz audio signals. Then, we added an IR sensor to detect other robots emitting IR at 6.08kHz. We processed the signals using the Arduino FFT Library. Also, we made 2 amplifiers to detect the signals from a farther distance. Finally, using a digital filter, we were able to ignore the decoys that emit IR at 18kHz.
 
 ## Implementation
-*Insert FFT Analysis*
+We used the FFT library for frequency analysis. We see that the FFT library uses a 32 bit pre-scalar and the Arduino runs on 16MHz, thus based on the math we get a bin width of 148.4Hz. We had two target frequencies 660Hz(Audio) and 6.08KHz(IR) which correspond to the 5th and the 43rd bin .In the code we checked the bin values to be above a threshold limit to differentiate the two frequencies .
 
 Our Logic:
 Since we wanted to analyze signals from two sources, we had to switch which pin out we were reading data from on the arduino. We read audio from A0 and IR from A1. We made this switch in the while loop switching ADMUX back and forth from 0x40 to 0x41 (switching from A0 to A1). We checked determine which signal we were reading, we checked which pin we were reading from and then we checked 
