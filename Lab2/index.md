@@ -37,7 +37,6 @@ Then we used the Arduino to detect the signals. These graphs confirm that the si
 
 Our Logic: Since we wanted to analyze signals from two sources, we had to switch which pin out we were reading data from on the arduino each time we ran the FFT. We read audio from A0 and IR from A1. We made this switch in the while loop while running the FFT, switching ADMUX back and forth from 0x40 to 0x41 (switching from A0 to A1). To determine if we are receiving an audio or IR signal, we checked which pin we were reading from, then the corresponding bin for that signal, and if the value was above the threshold, then we were receiving a signal. Similarly, if the value was below the the threshold then we can conclude we were not receiving a signal. We used pinouts 12 and 13 to turn on LEDs to indicate whether we were receiving signals or not.
 
-[Our Code](Media/Lab2Code.txt)
 [Our Code](IR_and_Audio_code/IR_and_Audio_code.ino)
 
 
