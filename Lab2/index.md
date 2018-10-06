@@ -37,67 +37,7 @@ Then we used the Arduino to detect the signals. These graphs confirm that the si
 
 Our Logic: Since we wanted to analyze signals from two sources, we had to switch which pin out we were reading data from on the arduino each time we ran the FFT. We read audio from A0 and IR from A1. We made this switch in the while loop while running the FFT, switching ADMUX back and forth from 0x40 to 0x41 (switching from A0 to A1). To determine if we are receiving an audio or IR signal, we checked which pin we were reading from, then the corresponding bin for that signal, and if the value was above the threshold, then we were receiving a signal. Similarly, if the value was below the the threshold then we can conclude we were not receiving a signal. We used pinouts 12 and 13 to turn on LEDs to indicate whether we were receiving signals or not.
 
-Our Code: 
-
-#define LOG_OUT 1 // use the log output function
-
-#define FFT_N 256 // set to 256 point fft
-
-#include <FFT.h> // include the library
-
-
-void setup() {
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
-  Serial.begin(115200); // use the serial port
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-}
-
-void loop() {
-  while(1) { // reduces jitter
-    if (ADMUX == 0x40) ADMUX = 0x41;
-    else ADMUX = 0x40;
-    cli();  // UDRE interrupt slows this way down on arduino1.0
-    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
-      fft_input[i] = k; // put real data into even bins
-      fft_input[i+1] = 0; // set odd bins to 0
-    }
-    fft_window(); // window the data for better frequency response
-    fft_reorder(); // reorder the data before doing the fft
-    fft_run(); // process the data in the fft
-    fft_mag_log(); // take the output of the fft
-    sei();
-    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-      if (i == 43 && fft_log_out[i] > 125 && ADMUX == 0x41) { 
-        // if receiving 6.08 kHz IR
-        digitalWrite(12, HIGH);
-      }
-      if (i == 43 && fft_log_out[i] < 125 && ADMUX == 0x41) {
-        // if not receiving 6.08 kHz IR
-        digitalWrite(12, LOW);
-      }
-      if (i == 5 && fft_log_out[i] > 125 && ADMUX == 0x40) {
-        // if receiving 660 Hz audio
-        digitalWrite(13, HIGH);
-      }
-      if (i == 5 && fft_log_out[i] < 125 && ADMUX == 0x40) {
-	// if not receiving 660 Hz audio
-        digitalWrite(13, LOW);
-      }
-    }
-  }
-}
-
+Our Code: (IR_and_Audio_code/IR_and_Audio_code.ino)
 
 
 ## Testing
