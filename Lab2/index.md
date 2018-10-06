@@ -28,7 +28,9 @@ Before we used either amplifier with the audio or IR signals, we tested both of 
 ## Testing
 We first tested the audio and IR signals individually. To test the both the audio and IR signals individually, we checked the expected bin of the signal. If the bin magnitude was above a certain amplitude, we turned an LED on, indicating that we were receiving a signal. Similarly, if we did not see the bin value at a high enough value, we turned the LED off. Here is a video of testing the audio sensors:
 
-[![Audio](http://img.youtube.com/vi/_ZcNHMHUNOg/0.jpg)](http://www.youtube.com/watch?v=_ZcNHMHUNOg)
+![Audio](Media/Audio.mp4)
+
+//[![Audio](http://img.youtube.com/vi/_ZcNHMHUNOg/0.jpg)](http://www.youtube.com/watch?v=_ZcNHMHUNOg)
 
 To test that we could distinguish between a robot and the decoy, we set up an LED to indicate if the we were receiving a 6.08 kHz IR signal. If we were receiving a 18 kHz IR signal, we do nothing. Both the robot hat and the decoy were powered on a moving toward and away from the robot and our system successfully never turned on the LED due to the decoy, but only due to the robot hat.
 
