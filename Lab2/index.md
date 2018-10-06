@@ -28,7 +28,7 @@ Before we used either amplifier with the audio or IR signals, we tested both of 
 ## Testing
 We first tested the audio and IR signals individually. To test the both the audio and IR signals individually, we checked the expected bin of the signal. If the bin magnitude was above a certain amplitude, we turned an LED on, indicating that we were receiving a signal. Similarly, if we did not see the bin value at a high enough value, we turned the LED off. Here is a video of testing the audio sensors:
 
-![Audio](Media/Audio.mp4)
+![Audio](Media/AmpSchematic.PNG)
 
 //[![Audio](http://img.youtube.com/vi/_ZcNHMHUNOg/0.jpg)](http://www.youtube.com/watch?v=_ZcNHMHUNOg)
 
