@@ -13,7 +13,7 @@ Pretty quickly, we realized that the we would only be able to recognize both the
 
 The same amplifier was used for the phototransistor except with the phototransistor set up. We used the same circuit as team alpha shown below:
 
-![Phototransistor Circuit](Media/Phototransistor.PNG)
+![Phototransistor Circuit](Media/Phototransistor.png)
 
 Here is a picture of our assembled amplifier where red is Vcc, black is ground, orange is the amplified signal, and green is in the input signal:
 
