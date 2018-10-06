@@ -75,19 +75,19 @@ void loop() {
     sei();
     for (byte i = 0 ; i < FFT_N/2 ; i++) { 
       if (i == 43 && fft_log_out[i] > 125 && ADMUX == 0x41) { 
-  // if receiving 6.08 kHz IR
+        // if receiving 6.08 kHz IR
         digitalWrite(12, HIGH);
       }
       if (i == 43 && fft_log_out[i] < 125 && ADMUX == 0x41) {
-  // if not receiving 6.08 kHz IR
+        // if not receiving 6.08 kHz IR
         digitalWrite(12, LOW);
       }
       if (i == 5 && fft_log_out[i] > 125 && ADMUX == 0x40) {
         // if receiving 660 Hz audio
-  digitalWrite(13, HIGH);
+        digitalWrite(13, HIGH);
       }
       if (i == 5 && fft_log_out[i] < 125 && ADMUX == 0x40) {
-	  // if not receiving 660 Hz audio
+	// if not receiving 660 Hz audio
         digitalWrite(13, LOW);
       }
     }
