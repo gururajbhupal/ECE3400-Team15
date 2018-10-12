@@ -6,9 +6,9 @@ int sensor_left = A3;
 int sensor_middle = A4;
 int sensor_right = A5;
 
-int left_threshold = 700;
-int middle_threshold = 700;
-int right_threshold = 700;
+int left_threshold = 100;
+int middle_threshold = 100;
+int right_threshold = 100;
 
 void setup() {
   servo_setup();
@@ -21,16 +21,16 @@ void loop() {
   Serial.println(analogRead(sensor_right));
   Serial.println();
   if (analogRead(sensor_middle) < middle_threshold) {
-    //go();
+    go();
   }
   if (analogRead(sensor_right) < right_threshold && analogRead(sensor_left) < left_threshold && analogRead(sensor_middle) < middle_threshold) {
-    //go();
+    go();
   }
-  if (analogRead(sensor_left) < left_threshold) {
-    //turn_left();
+  else if (analogRead(sensor_left) < left_threshold) {
+    turn_left();
   }
-  if (analogRead(sensor_right) < right_threshold) {
-    //turn_right();
+  else if (analogRead(sensor_right) < right_threshold) {
+    turn_right();
   }
   if (analogRead(sensor_right) > right_threshold && analogRead(sensor_left) > left_threshold && analogRead(sensor_middle) > middle_threshold) {
     halt();

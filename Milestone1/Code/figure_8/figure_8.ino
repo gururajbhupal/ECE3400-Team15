@@ -2,10 +2,16 @@
 
 Servo servo_left;
 Servo servo_right;
-int sensor_middle = A3; 
-int sensor_left = A4; 
+
+int sensor_left = A3;
+int sensor_middle = A4;  
 int sensor_right = A5; 
+
+
 int count = 0;
+int left_threshold = 300;
+int middle_threshold = 300;
+int right_threshold = 300;
 
 void setup() {
   servo_setup();
@@ -18,34 +24,34 @@ void loop() {
   Serial.println(analogRead(sensor_right));
   Serial.println();
 
-  if ((analogRead(sensor_right) < 700) && (analogRead(sensor_left) < 500) && (analogRead(sensor_middle) < 850) && (count < 4)) {
+  if ((analogRead(sensor_right) < right_threshold) && (analogRead(sensor_left) < left_threshold) && (analogRead(sensor_middle) < middle_threshold) && (count < 4)) {
       count++;
       turn_right_90();
-  } else if ((analogRead(sensor_right) < 700) && (analogRead(sensor_left) < 500) && (analogRead(sensor_middle) < 850) && (count > 3)) {
+  } else if ((analogRead(sensor_right) < right_threshold) && (analogRead(sensor_left) < left_threshold) && (analogRead(sensor_middle) < middle_threshold) && (count > 3)) {
       if (count == 7) {
         count = -1;
       }
       count++;
       turn_left_90();
   } else { 
-    if (analogRead(sensor_middle) < 850) {
+    if (analogRead(sensor_middle) < middle_threshold) {
       Serial.println("go1");
       Serial.println(analogRead(sensor_middle));
       go();
     }
-      if (analogRead(sensor_right) < 500 && analogRead(sensor_left) < 500 && analogRead(sensor_middle) < 850) {
+      if (analogRead(sensor_right) < right_threshold && analogRead(sensor_left) < left_threshold && analogRead(sensor_middle) < middle_threshold) {
         Serial.println("go2");
         go();
       }
-      if (analogRead(sensor_left) < 500) {
+      if (analogRead(sensor_left) < left_threshold) {
         Serial.println("left");
         turn_left();
       }
-      if (analogRead(sensor_right) < 600) {
+      if (analogRead(sensor_right) < right_threshold) {
         Serial.println("right");
         turn_right();
       }
-      if (analogRead(sensor_right) > 500 && analogRead(sensor_left) > 500 && analogRead(sensor_middle) > 850) {
+      if (analogRead(sensor_right) > right_threshold && analogRead(sensor_left) > left_threshold && analogRead(sensor_middle) > middle_threshold) {
         Serial.println("halt");
         halt();
     }
