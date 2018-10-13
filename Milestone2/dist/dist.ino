@@ -9,9 +9,14 @@ Servo servo_left; // pin 9
 Servo servo_right; // pin 10
 int wall_front = A1;
 int wall_right = A2;
-int sensor_left = A4;
-int sensor_middle = A3; 
+int sensor_left = A3;
+int sensor_middle = A4; 
 int sensor_right = A5; 
+
+int line_thresh = 400;
+int wall_thresh = 150;
+
+
 
 void servo_setup() {
   servo_right.attach(10);
@@ -21,8 +26,8 @@ void servo_setup() {
 }
 
 void go() {
-  servo_left.write(110);
-  servo_right.write(70);
+  servo_left.write(100);
+  servo_right.write(80);
 }
 
 void halt() {
@@ -31,36 +36,60 @@ void halt() {
 }
 
 void turn_left() {
-  servo_left.write(90);
+  servo_left.write(93);
   servo_right.write(70);
 }
 
 void turn_right() {
-  servo_left.write(100);
-  servo_right.write(90);
+  servo_left.write(110);
+  servo_right.write(87);
 }
 
-void turn_right_90() {
-  delay(1500); // goes forward until the wheels are in line with the intersetion
-  servo_left.write(95);
-  servo_right.write(95);
-  delay(600); // should be half way through turn when it starts to looks for a white line
-  while (analogRead(sensor_right) > 700) && (analogRead(sensor_left) > 500) && (analogRead(sensor_middle) > 850);
-  delay(150); //straightens out a little bit
-  // while all three sensors see black
-  // may have to mess around with these thresholds
+void turn_place() {
+  servo_left.write(80);
+  servo_right.write(80);
 }
 
 void turn_left_90() {
-  delay(1500); // goes forward until the wheels are in line with the intersetion
-  servo_left.write(85);
+  servo_left.write(95);
   servo_right.write(85);
-  delay(600); // should be half way through turn when it starts to looks for a white line
-  while (analogRead(sensor_right) > 700) && (analogRead(sensor_left) > 500) && (analogRead(sensor_middle) > 850);
-  delay(150); //straightens out a little bit
-  // while all three sensors see black
-  // may have to mess around with these thresholds
+  delay(700);
+  while (analogRead(sensor_left) < line_thresh) {
+    servo_left.write(90);
+    servo_right.write(85);
+    Serial.println("looking for black");
+  }
+  delay(700);
+  while (analogRead(sensor_middle) > line_thresh) {
+    servo_left.write(90);
+    servo_right.write(85);
+    Serial.println("looking for white");
+  }
+  servo_left.write(90);
+  servo_right.write(85);
+  delay(150);
 }
+
+void turn_right_90() {
+  servo_left.write(95);
+  servo_right.write(85);
+  delay(700);
+  while (analogRead(sensor_right) < line_thresh) {
+    servo_left.write(95);
+    servo_right.write(90);
+    Serial.println("looking for black");
+  }
+  delay(700);
+  while (analogRead(sensor_middle) > line_thresh) {
+    servo_left.write(95);
+    servo_right.write(90);
+    Serial.println("looking for white");
+  }
+  servo_left.write(95);
+  servo_right.write(90);
+  delay(250);
+}
+
 
 void fft_setup() {
   TIMSK0 = 0; // turn off timer0 for lower jitter
@@ -71,8 +100,9 @@ void fft_setup() {
 void fft() {  
   int temp = ADCSRA; // set temp the adc prev val
   ADCSRA = 0xe5; // set the adc to free running mode
-  int fft_length = 10;
+  int fft_length = 1000;
   while(fft_length > 0) { // reduces jitter
+    Serial.println("herererererere");
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -90,23 +120,29 @@ void fft() {
     fft_run(); // process the data in the fft
     fft_mag_log(); // take the output of the fft
     sei();
-    Serial.println("start");
+    
     for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-      Serial.println(fft_log_out[i]); // send out the data
+      //Serial.println("start");
+      //Serial.println(fft_log_out[i]); // send out the data
+      if (i == 43) Serial.println(fft_log_out[i]);
       if (i == 43 && fft_log_out[i] > 125) {
+        Serial.println("starrrrrrrrrrrrrrrrrrrrrrrrrrrrrrt");
         digitalWrite(7, HIGH);
+        halt();   
       }
       if (i == 43 && fft_log_out[i] < 125) {
-        digitalWrite(7, LOW);
+        //go();
+        //digitalWrite(7, LOW);
       }
     }
+    fft_length = fft_length-1;
   }
   ADCSRA = temp; // set the adc to NOT free running mode
 }
 
 
 bool check_front() {
-  if (analogRead(A1) > 100) { // then there is a wall
+  if (analogRead(A1) > wall_thresh) { // then there is a wall
     return true;
   } else {
     return false;
@@ -114,7 +150,7 @@ bool check_front() {
 }
 
 bool check_right() {
-  if (analogRead(A2) > 100) { // then there is a wall
+  if (analogRead(A2) > wall_thresh) { // then there is a wall
     return true;
   } else {
     return false;
@@ -122,7 +158,7 @@ bool check_right() {
 }
 
 void drive() {
-  if ((analogRead(sensor_right) < 700) && (analogRead(sensor_left) < 500) && (analogRead(sensor_middle) < 850)) {
+  if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
   // checks to see if at an intersection
       if (!check_right()) {
         turn_right_90();
@@ -136,26 +172,25 @@ void drive() {
         digitalWrite(2, HIGH); // no wall in front
       }
   } else { 
-    if (analogRead(sensor_middle) < 850) {
+    if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+      turn_left_90();
+    }
+    if (analogRead(sensor_middle) < line_thresh) {
       Serial.println("go1");
-      Serial.println(analogRead(sensor_middle));
+      //Serial.println(analogRead(sensor_middle));
       go();
     }
-      if (analogRead(sensor_right) < 500 && analogRead(sensor_left) < 500 && analogRead(sensor_middle) < 850) {
-        Serial.println("go2");
-        go();
-      }
-      if (analogRead(sensor_left) < 500) {
-        Serial.println("left");
-        turn_left();
-      }
-      if (analogRead(sensor_right) < 600) {
-        Serial.println("right");
-        turn_right();
-      }
-      if (analogRead(sensor_right) > 500 && analogRead(sensor_left) > 500 && analogRead(sensor_middle) > 850) {
-        Serial.println("halt");
-        halt();
+    if (analogRead(sensor_left) < line_thresh) {
+      Serial.println("left");
+      turn_left();
+    }
+    if (analogRead(sensor_right) < line_thresh) {
+      Serial.println("right");
+      turn_right();
+    }
+    if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+      Serial.println("halt");
+      halt();
     }
   }
 }
@@ -170,6 +205,71 @@ void setup() {
 }
 
 void loop() {
+  Serial.println(analogRead(sensor_left));
+//  Serial.println(analogRead(sensor_middle));
+//  Serial.println(analogRead(sensor_right));
+  if (check_front()) digitalWrite(3, HIGH);
+  else digitalWrite(3, LOW);
+  if (check_right()) digitalWrite(2, HIGH);
+  else digitalWrite(2, LOW);
+  if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+    if (!check_right()) { 
+      fft();
+      turn_right_90();
+    } else if (!check_front()) {
+      fft();
+      delay(500);
+    } else {
+      fft();
+      go();
+      while (analogRead(sensor_left) < line_thresh);
+      delay(1000);
+      //digitalWrite(7, HIGH);
+      turn_place();
+      delay(3000);
+      while (check_front()) {
+        while (analogRead(sensor_right) < line_thresh);
+        while (analogRead(sensor_right) > line_thresh);
+      }
+      //while (check_front() && analogRead(sensor_middle) > line_thresh);
+      servo_left.write(90);
+      servo_right.write(90);
+    }
+    //digitalWrite(7, LOW);
+  }
+  if (analogRead(sensor_middle) < line_thresh) {
+    go();
+  }
+  if (analogRead(sensor_left) < line_thresh) {
+    turn_left();
+  }
+  if (analogRead(sensor_right) < line_thresh) {
+    turn_right();
+  }
+  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+    halt();
+  }
   fft();
-  drive();
+  // drive();
 }
+
+//  if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+//    turn_left_90();
+//  }
+//  if (analogRead(sensor_middle) < line_thresh) {
+//    Serial.println("go1");
+//    //Serial.println(analogRead(sensor_middle));
+//    go();
+//  }
+//  if (analogRead(sensor_left) < line_thresh) {
+//    Serial.println("left");
+//    turn_left();
+//  }
+//  if (analogRead(sensor_right) < line_thresh) {
+//    Serial.println("right");
+//    turn_right();
+//  }
+//  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+//    Serial.println("halt");
+//    halt();
+//  }
