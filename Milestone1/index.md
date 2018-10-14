@@ -26,13 +26,13 @@ The logic behind the implementation is that if the central sensor is on white an
 To traverse the grid in a figure 8, we used our line following code in addition to new figure 8 logic. For the robot to go in a figure 8, it must make 4 right turns followed by 4 left turns. If all three sensors are over white, then the robot know it must turn left or right because the robot is at a junction. The robot keeps track of whether to make a left turn or a right turn using the count variable. If count is between 0 and 3, then it will turn right, if it is between 4 and 7 it will turn left. Once count gets to 7, count resets it to 0.
 
 
-![FigureEightCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/FigureEightCode.png)
+![FigureEightCode](Media/FigureEightCode.png)
 
 Once we determine which turn to make, we increment or reset count depending on the case, and then tell the robot to either turn left or right 90 degrees. The two implementations of turning right and left 90 degrees are shown below. As our robot turns, the sensor on the side it is turning will initially be over white when it enters the intersection, then black as it turns, and then white again once it has finished the turn. Our implementations tells the robot to move forward for 0.2 seconds and then to turn until it reaches white for the second time and then for 0.15 seconds more.  
 
 ![TurnRightCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/TurnRightCode.png)
 
-![TurnLeftCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/TurnLeftCode.png)
+![TurnLeftCode](Media/TurnLeftCode.png)
 
 Once the robot finishes executing a 90 degree turn, it resume running the line following code until it reaches another junction. Here is a video of our robot successfully traversing 2 figure 8s on the grid.
 
