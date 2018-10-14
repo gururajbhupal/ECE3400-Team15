@@ -186,6 +186,16 @@ void IR_detection() {
   DIDR0 =  t4;
 }
 
+/*Returns true if the robot is at an intersection, else false*/
+void atIntersection(){
+  if((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
 /*Traverses a maze via right hand wall following while line following*/
 void maze_traversal() {
 
@@ -203,7 +213,7 @@ void maze_traversal() {
   /*If there is NO ROBOT then traverse the maze via right hand wall following*/
   else {
     /*If we are at an intersection*/
-    if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+    if (atIntersection()) {
 
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
