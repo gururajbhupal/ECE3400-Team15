@@ -1,5 +1,7 @@
 #include <Servo.h> // include servo library
 
+/*Simple function so we can calibrate our wheels to sensors when we change distance*/
+
 Servo servo_left; // pin 9
 Servo servo_right; // pin 10
 int wall_front = A1;
@@ -32,6 +34,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200); // use the serial port
   servo_setup();
+  
   go();
   delay(700); //THIS IS THE DELAY FOR THE WHEELS TO REACH THE SENSOR
   halt();

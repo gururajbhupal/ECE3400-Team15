@@ -5,6 +5,8 @@
 Servo servo_left; // pin 9
 Servo servo_right; // pin 10
 
+//NEED TO CHANGE THE LOCATION OF THE RIGHT SENSOR TO THE MIDDLE OF THE ROBOT
+
 /*Initialize the parameters to corresponding pins*/
 int wall_front = A1;
 int wall_right = A2;
@@ -39,13 +41,13 @@ void halt() {
   servo_right.write(90);
 }
 
-/*Wide left turn*/
+/*Simple left turn*/
 void turn_left() {
   servo_left.write(93);
   servo_right.write(70);
 }
 
-/*Wide right turn*/
+/*Simple right turn*/
 void turn_right() {
   servo_left.write(110);
   servo_right.write(87);
@@ -66,16 +68,15 @@ void turn_place_right() {
 
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
-  // digitalWrite(7, HIGH);
   go();
-  delay(700);
-  // digitalWrite(7, LOW);
+  delay(700); //delay value to reach specification
 }
 
 /*Turns 90 degrees to the right until the middle sensor finds a line*/
 void turn_right_linetracker() {
   turn_place_right();
-  delay(300);
+  delay(300); //delay to get off the line
+  /*Following while loops keep the robot turning until we find the line to the right of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
 }
@@ -83,12 +84,13 @@ void turn_right_linetracker() {
 /*Turns to the left until a middle sensor finds a line*/
 void turn_left_linetracker() {
   turn_place_left();
-  delay(300);
+  delay(300); //delay to get off the line
+  /*Following while loops keep the robot turning until we find the line to the left of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
 }
 
-/*Returns true and turns on LED if there is a wall inf front. */
+/*Returns true and turns on LED if there is a wall in front. */
 bool check_front() {
   if (analogRead(A1) > wall_thresh) {
     digitalWrite(2, HIGH);
@@ -110,6 +112,7 @@ bool check_right() {
   }
 }
 
+/*follows the line the robot is on (robot must be on a line to work)*/
 void linefollow() {
   if (analogRead(sensor_middle) < line_thresh) {
     go();
@@ -125,26 +128,37 @@ void linefollow() {
   }
 }
 
-void the_follower() {
+/*Traverses a maze via right hand wall following while line following*/
+void maze_traversal() {
+
+  /*Checks if there is a wall and turns on LED if so - allows us to see what robot is thinking*/
   check_front();
   check_right();
+
+  /*If we are at an intersection*/
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+
+    /*Check if there is a wall to the right of us*/
     if (!check_right()) {
       adjust();
       turn_right_linetracker();
     }
+    /*If there is no wall to the right of us and no wall in front of us */
     else if (!check_front()) {
-      adjust();
-
+      adjust(); //adjust here takes us off the intersection allowing us to linefollow
     }
+
+    /*There IS A WALL to the right of us AND in front of us*/
     else {
       adjust();
       turn_left_linetracker();
+      /*Following if statement allows for 180 degree pivots*/
       if(check_front()){
         turn_left_linetracker();
       }
     }
   }
+  /*If we are not at an intersection then line follow*/
   linefollow();
 }
 void setup() {
@@ -152,9 +166,9 @@ void setup() {
   servo_setup();
   pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
-  pinMode(7, OUTPUT); // LED to indicate whether a wall is to the right or not
+  pinMode(7, OUTPUT); // LED to test stuff while implementing (NOT used in final version as of now)
 }
 
 void loop() {
-  the_follower();
+  maze_traversal();
 }
