@@ -5,19 +5,19 @@
 To aid the robot in navigating the grid, we used 3 line sensors. Due to shadows and that not all 3 sensors are the exact same height of the ground, each of the sensors has a different threshold to determine if it is above white or black. Using the following code, we put the sensors over white and black surfaces and reset the Uno to determine the thresholds without being spammed by constant readings.
 
 
-![SensorCalibrationCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/SensorCalibrationCode.png)
+![SensorCalibrationCode]Media/SensorCalibrationCode.png)
 
 ## Line Following
 
 To have the robot follow the line, we looped over 5 different cases for the 3 line sensors. The three line sensors are all in a row at the front of the robot. The middle sensor is supposed to be over white and the two outside sensors should be to the left and right of the line and sensing black. 
 
 
-![FollowLineCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/FollowLineCode.png)
+![FollowLineCode](Media/FollowLineCode.png)
 
 The logic behind the implementation is that if the central sensor is on white and the two outside sensors are on black, the robot should go straight. If all three sensors are white, then the robot is traversing over a junction and should continue to go straight. If the left sensor senses white, the robot is too far to the right and so the robot adjusts by turning slightly left. If the right sensor senses white, the robot is too far to the left and so the robot adjusts by turning slightly right. The final case is that if all sensors sense black, then the robot stops. This indicates that the robot has reaches the end of the line or that it is completely off the line. The functions for turning left, turning right, moving forward, and stopping are below. 
 
 
-![MoveCommandCode](https://github.com/gururajbhupal/ECE3400-Team15/edit/master/Milestone1/Media/MoveCommandCode.png)
+![MoveCommandCode](Media/MoveCommandCode.png)
 
 [![FollowLine](http://img.youtube.com/vi/6EOPY7VUni4/0.jpg)](http://www.youtube.com/watch?v=6EOPY7VUni4)
 
