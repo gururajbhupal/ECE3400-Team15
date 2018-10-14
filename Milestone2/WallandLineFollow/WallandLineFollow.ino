@@ -135,6 +135,7 @@ void maze_traversal() {
   check_front();
   check_right();
 
+
   /*If we are at an intersection*/
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
 
@@ -143,6 +144,7 @@ void maze_traversal() {
       adjust();
       turn_right_linetracker();
     }
+    
     /*If there is no wall to the right of us and no wall in front of us */
     else if (!check_front()) {
       adjust(); //adjust here takes us off the intersection allowing us to linefollow
