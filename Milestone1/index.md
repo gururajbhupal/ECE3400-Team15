@@ -5,7 +5,7 @@
 To aid the robot in navigating the grid, we used 3 line sensors. Due to shadows and that not all 3 sensors are the exact same height of the ground, each of the sensors has a different threshold to determine if it is above white or black. Using the following code, we put the sensors over white and black surfaces and reset the Uno to determine the thresholds without being spammed by constant readings.
 
 
-![SensorCalibrationCode](\Media\SensorCalibrationCode.png)
+![SensorCalibrationCode](/Media/SensorCalibrationCode.png)
 
 ## Line Following
 
