@@ -3,6 +3,8 @@
 
 #include <FFT.h> // include the library
 
+int IR_threshold = 175;
+
 void setup() {
   pinMode(7, OUTPUT);
   Serial.begin(115200); // use the serial port
@@ -34,11 +36,11 @@ void loop() {
     Serial.println("start");
     for (byte i = 0 ; i < FFT_N/2 ; i++) { 
       Serial.println(fft_log_out[i]); // send out the data
-      if (i == 43 && fft_log_out[i] > 125) {
+      if (i == 43 && fft_log_out[i] > IR_threshold) {
         digitalWrite(7, HIGH);
         Serial.println(9999);
       }
-      if (i == 43 && fft_log_out[i] < 125) {
+      if (i == 43 && fft_log_out[i] < IR_threshold) {
         digitalWrite(7, LOW);
       }
     }

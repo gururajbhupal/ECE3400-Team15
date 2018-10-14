@@ -53,10 +53,8 @@ void loop() {
       if (i == 43 && fft_log_out[i] < 125 && ADMUX == 0x41) {
         digitalWrite(12, LOW);
       }
-
       if (i == 5 && fft_log_out[i] > 125 && ADMUX == 0x40) {
         digitalWrite(13, HIGH);
-        Serial.println(9999);
       }
       if (i == 5 && fft_log_out[i] < 125 && ADMUX == 0x40) {
         digitalWrite(13, LOW);
