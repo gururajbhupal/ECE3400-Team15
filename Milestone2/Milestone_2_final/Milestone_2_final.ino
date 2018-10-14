@@ -203,13 +203,16 @@ void maze_traversal() {
   check_front();
   check_right();
 
-  /*If there is a robot avoid!!*/
+  /*If there is a robot avoid it!!*/
   if (sees_robot) {
+    /*Turn right until we see a line*/
     turn_right_linetracker();
+    /*Ensure that the line we pick up isn't gonna run us into a wall*/
     while (check_front()) {
       turn_right_linetracker();
     }
   }
+  
   /*If there is NO ROBOT then traverse the maze via right hand wall following*/
   else {
     /*If we are at an intersection*/
@@ -230,7 +233,7 @@ void maze_traversal() {
       else {
         adjust();
         turn_left_linetracker();
-        /*Following if statement allows for 180 degree pivots*/
+        /*Following if statement allows for robot to turn around at dead end*/
         if (check_front()) {
           turn_left_linetracker();
         }
@@ -247,12 +250,11 @@ void setup() {
   servo_setup(); //setup the servo
   pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
-  pinMode(7, OUTPUT); // LED to test stuff while implementing (NOT used in final version as of now)
-
+  pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
 }
 
 /*Main code to run*/
 void loop() {
-  IR_detection();
-  maze_traversal();
+  IR_detection(); //update sees_robot
+  maze_traversal(); //traverse the maze
 }
