@@ -8,5 +8,5 @@ You can view the contract here [contract](https://github.com/gururajbhupal/ECE34
 [Lab 2- Analog circuitry and FFT](/ECE3400-Team15/Lab2)  
 
 # Milestones
-[Milestone 1](/ECE3400-Team15/Milestone1) 
-[Milestone 2](/ECE3400-Team15/Milestone1)
+[Milestone 1](/ECE3400-Team15/Milestone1)  
+[Milestone 2](/ECE3400-Team15/Milestone1)  
