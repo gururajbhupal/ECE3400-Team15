@@ -134,7 +134,7 @@ void linefollow() {
   }
 }
 
-/*Sets sees_Robot to true and turns LED on if there is a robot, else sees_robot = false*/
+/*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
 
   /*Set temporary values for relevant registers*/
@@ -149,7 +149,6 @@ void IR_detection() {
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
 
-/*Do IR code from lab 2*/
   cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
     while (!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -167,6 +166,7 @@ void IR_detection() {
   fft_run(); // process the data in the fft
   fft_mag_log(); // take the output of the fft
   sei();
+  Serial.println("start");
   for (byte i = 0 ; i < FFT_N / 2 ; i++) {
     Serial.println(fft_log_out[i]); // send out the data
     if (i == 43 && fft_log_out[i] > IR_threshold) {
@@ -199,11 +199,11 @@ void atIntersection(){
 /*Traverses a maze via right hand wall following while line following*/
 void maze_traversal() {
 
-  /*Turns on relevant LED allows us to see what the robot is seeing*/
+  /*Checks if there is a wall and turns on LED if so - allows us to see what robot is thinking*/
   check_front();
   check_right();
 
-  /*If there is a robot!!*/
+  /*If there is a robot avoid it!!*/
   if (sees_robot) {
     /*Turn right until we see a line*/
     turn_right_linetracker();
@@ -218,18 +218,18 @@ void maze_traversal() {
     /*If we are at an intersection*/
     if (atIntersection()) {
 
-      /*If there is NO wall to the right of us*/
+      /*Check if there is a wall to the right of us*/
       if (!check_right()) {
         adjust();
         turn_right_linetracker();
       }
 
-      /*If there is NO wall to the right of us and NO wall in front of us */
+      /*If there is no wall to the right of us and no wall in front of us */
       else if (!check_front()) {
         adjust(); //adjust here takes us off the intersection allowing us to linefollow
       }
 
-      /*There IS a wall to the right of us and there IS a wall in front of us*/
+      /*There IS A WALL to the right of us AND in front of us*/
       else {
         adjust();
         turn_left_linetracker();
@@ -239,7 +239,7 @@ void maze_traversal() {
         }
       }
     }
-    /*While not at an intersection then line follow*/
+    /*If we are not at an intersection then line follow*/
     linefollow();
   }
 }
