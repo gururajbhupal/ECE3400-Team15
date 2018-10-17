@@ -72,7 +72,7 @@ void adjust() {
   delay(700); //delay value to reach specification
 }
 
-/*Turns 90 degrees to the right until the middle sensor finds a line*/
+/*Turns to the right until the middle sensor finds a line*/
 void turn_right_linetracker() {
   turn_place_right();
   delay(300); //delay to get off the line
@@ -128,6 +128,16 @@ void linefollow() {
   }
 }
 
+/*Returns true if the robot is at an intersection, else false*/
+void atIntersection(){
+  if((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
 /*Traverses a maze via right hand wall following while line following*/
 void maze_traversal() {
 
@@ -137,7 +147,7 @@ void maze_traversal() {
 
 
   /*If we are at an intersection*/
-  if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
+  if (atIntersection()) {
 
     /*Check if there is a wall to the right of us*/
     if (!check_right()) {
