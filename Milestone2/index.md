@@ -1,7 +1,7 @@
 # Introduction  
 The purpose of milestone 2 was to implement a wall following algorithm, expand our line following algorithm, as well as integrate everything from labs 1 and 2.  
   
-## Expanding on Line Follow  
+## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
 * *turn_left_linetracker()*  
 * *turn_right_linetracker()*  
@@ -28,7 +28,7 @@ To avoid other robots we had to implement our IR code and maze traversal code in
 ![IRDetection](Media/IR_detection.PNG)  
 
 ## Integrating Everything  
-To integrate everything we had to update our function maze_traversal() to include robot detection. The new block diagram is now  
+To integrate everything we had to update our function *maze_traversal()* to include robot detection. The new block diagram is now  
 
 ![blockDiagram2](Media/block_diagram_2.PNG)  
 
@@ -36,5 +36,9 @@ and the maze traversal code following from the block diagram is
 
 ![mazeTraversalFinal](Media/maze_traversal_final.PNG)
 
-To conclude, our *setup()* code just initializes the servos and indicator LEDS, and our code to run in *loop()* is now just two simple function calls!  
-![loop](Media/setup.PNG)  ![loop](Media/loop.PNG)    
+Now, our *setup()* code just initializes the servos and indicator LEDS, and our code to run in *loop()* is now just two simple function calls!  
+![loop](Media/setup.PNG)  ![loop](Media/loop.PNG)  
+
+## Going Forward
+As we move onto other labs we will likely need to implement a more efficient way to traverse the maze by keeping track of squares we have already visited. We will also likely change the way we avoid robots but turning around seems fine for now.
+
