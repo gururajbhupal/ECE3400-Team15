@@ -8,7 +8,7 @@ Our previous implementation of line follow didn’t really change, but we had to
 The functionality can be seen in the specification as well as the code below.  
 ![turnLeft](Media/turn_left_linetracker.PNG) ![turnRight](Media/turn_right_linetracker.PNG)  
 
-where *turn_place_left()* and *turn_place_right()* simply turn the robot in place by having the servos go in opposite directions at the same rate.
+where *turn_place_left()* and *turn_place_right()* simply turn the robot in place by having the servos go in opposite directions at the same rate.  
 ![turnPlaceLeft](Media/turn_place_left.PNG) ![turnPlaceRight](Media/turn_place_right.PNG)  
 
 ## Wall Following Algorithm  
