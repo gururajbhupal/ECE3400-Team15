@@ -36,5 +36,5 @@ and the maze traversal code following from the block diagram is
 
 ![mazeTraversalFinal](Media/maze_traversal_final.PNG)
 
-Our *setup()* code just initializes the servos and indicator LEDS, and our code to run in *loop()* is now just two simple function calls!  
+To conclude, our *setup()* code just initializes the servos and indicator LEDS, and our code to run in *loop()* is now just two simple function calls!  
 ![loop](Media/setup.PNG)  ![loop](Media/loop.PNG)    
