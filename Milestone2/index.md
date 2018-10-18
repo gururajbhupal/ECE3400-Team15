@@ -12,7 +12,7 @@ During this milestone our robot got what can only be described as half a makeove
 
 ![frontRobot](Media/robot_front.jpg=) ![sideRobot](Media/robot_side.jpg)  
 
-<img src="Media/robot_front.jpg" alt="Robot Front" width="200"/>
+<img src="Media/robot_front.jpg" alt="Robot Front" width="100" height="200"/>
 
 ## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
