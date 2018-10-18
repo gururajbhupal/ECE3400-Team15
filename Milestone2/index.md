@@ -47,6 +47,6 @@ Now, our *setup()* code just initializes the servos and indicator LEDS, and our 
 
 A demonstration of our robot traversing the maze as well as detecting and avoiding other robots is shown below.
 
-## Going Forward
+## Going Forward  
 As we move onto other labs we will likely need to implement a more efficient way to traverse the maze by keeping track of squares we have already visited. We will also likely change the way we avoid robots but turning around seems fine for now.
 
