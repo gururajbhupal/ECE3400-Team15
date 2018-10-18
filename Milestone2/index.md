@@ -2,9 +2,13 @@
 The purpose of milestone 2 was to implement a wall following algorithm, expand our line following algorithm, as well as integrate everything from labs 1 and 2.  
   
 ## Updating Our Robot  
-We added wall sensors to our robots front and right side. This allowed us to implement a right-hand wall following algorithm. We tested for the threshold to see a wall and have this in the global variable **wall_thresh**. If we detect a wall it means our sensor is reading OVER this threshold.
+We added wall sensors to our robots front and right side. This allowed us to implement a right-hand wall following algorithm. We tested for the threshold to see a wall and have this in the global variable **wall_thresh**. If we detect a wall it means our sensor is reading OVER this threshold.  
 
-Also, on another note, our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!  
+We also rearranged our line sensors to all be the same height and in the same line so that we could use just one global threshold variable **line_thresh**. If we detect a while line it means our sensor is reading BELOW this threshold.
+
+We added the IR receiver to the top of the robot on the big breadboard but that is only temporary. We have a global variable for the IR threshold **IR_threshold**. If we detect and IR signal we are reading OVER this threshold
+
+During this milestone our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!  
 
 ![frontRobot](Media/robot_front.jpg) ![sideRobot](Media/robot_side.jpg)  
 
@@ -33,11 +37,11 @@ So that we can see what the robot is thinking, we call *check_front()* and *chec
 
 Note: due to the about 3 inch distance from the sensors to the wheels, we implemented the function *adjust()* so that we could pivot 90-degrees at an intersection. Adjust simply has the robot go forward up until the wheels reach the intersection. The delay value is found via manual testing.
 
+![Adjust](Media/adjust.PNG)  
+
 A video of our robot traversing a maze with our right-hand wall following algorithm is shown below.
 
-[![Wall Following](http://img.youtube.com/vi/Jq2T61r8EME/0.jpg)](http://www.youtube.com/watch?v=Jq2T61r8EME)
-
-![Adjust](Media/adjust.PNG)  
+[![Wall Following](http://img.youtube.com/vi/Jq2T61r8EME/0.jpg)](http://www.youtube.com/watch?v=Jq2T61r8EME)  
 
 ## Avoiding Other Robots  
 To avoid other robots we had to implement our IR code and maze traversal code in one document. This was tricky because the fft library and servo library use the same timer. To get around this we declared a global boolean variable **sees_robot** which is initialized to **false**. We then created the function *IR_detection()* which essentially runs the fft code from lab 2 and set sees_robot to true as well as turns an LED on when a robot is detected. To get around the issue of the fft and servo libraries using the same timers we used temporary values to store the relevant registers at the beginning of the function and restored those registers to their previous value at the end. The function implementation can be seen below.  
