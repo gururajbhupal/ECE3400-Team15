@@ -41,7 +41,7 @@ Note: due to the about 3 inch distance from the sensors to the wheels, we implem
 
 A video of our robot traversing a maze with our right-hand wall following algorithm is shown below.
 
-[![Wall Following](http://img.youtube.com/vi/Jq2T61r8EME/0.jpg)](http://www.youtube.com/watch?v=Jq2T61r8EME)  
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Jq2T61r8EME" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> 
 
 ## Avoiding Other Robots  
 To avoid other robots we had to implement our IR code and maze traversal code in one document. This was tricky because the fft library and servo library use the same timer. To get around this we declared a global boolean variable **sees_robot** which is initialized to **false**. We then created the function *IR_detection()* which essentially runs the fft code from lab 2 and set sees_robot to true as well as turns an LED on when a robot is detected. To get around the issue of the fft and servo libraries using the same timers we used temporary values to store the relevant registers at the beginning of the function and restored those registers to their previous value at the end. The function implementation can be seen below.  
