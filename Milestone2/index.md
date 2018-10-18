@@ -6,7 +6,7 @@ We added wall sensors to our robots front and right side. This allowed us to imp
 
 Also, on another note, our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!  
 
-![frontRobot](Media/robot_front.jpg =250x250) ![sideRobot](Media/robot_side.jpg =250x250)  
+![frontRobot](Media/robot_front.jpg) ![sideRobot](Media/robot_side.jpg)  
 
 ## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
