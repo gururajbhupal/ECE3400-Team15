@@ -10,7 +10,9 @@ We added the IR receiver to the top of the robot on the big breadboard but that 
 
 During this milestone our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!  
 
-![frontRobot](Media/robot_front.jpg) ![sideRobot](Media/robot_side.jpg)  
+![frontRobot](Media/robot_front.jpg=) ![sideRobot](Media/robot_side.jpg)  
+
+<img src="Media/robot_front.jpg" alt="Robot Front" width="200"/>
 
 ## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
