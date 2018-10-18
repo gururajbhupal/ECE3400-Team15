@@ -2,9 +2,11 @@
 The purpose of milestone 2 was to implement a wall following algorithm, expand our line following algorithm, as well as integrate everything from labs 1 and 2.  
   
 ## Updating Our Robot  
-Our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!
+We added wall sensors to our robots front and right side. This allowed us to implement a right-hand wall following algorithm. We tested for the threshold to see a wall and have this in the global variable **wall_thresh**. If we detect a wall it means our sensor is reading OVER this threshold.
 
-![frontRobot](Media/robot_front.jpg) ![sideRobot](Media/robot_side.jpg)  
+Also, on another note, our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!  
+
+![frontRobot](Media/robot_front.jpg =250x250) ![sideRobot](Media/robot_side.jpg =250x250)  
 
 ## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
@@ -20,6 +22,8 @@ where *turn_place_left()* and *turn_place_right()* simply turn the robot in plac
 With line following in place, our wall following algorithm can be seen in the block diagram below.  
 
 ![blockDiagram1](Media/block_diagram_1.PNG)  
+
+Note: When turning left we turn 180 degrees if there is a wall to the left. THe block diagram repeats itself with each call of *maze_traversal()* in *loop*
 
 The maze traversal function *maze_traversal()* now follows simply from the block diagram.  
 
