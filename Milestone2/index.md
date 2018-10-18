@@ -24,6 +24,8 @@ So that we can see what the robot is thinking, we call *check_front()* and *chec
 
 Note: due to the about 3 inch distance from the sensors to the wheels, we implemented the function *adjust()* so that we could pivot 90-degrees at an intersection. Adjust simply has the robot go forward up until the wheels reach the intersection. The delay value is found via manual testing.
 
+A video of our robot traversing a maze with our right-hand wall following algorithm is shown below.
+
 ![Adjust](Media/adjust.PNG)  
 
 ## Avoiding Other Robots  
@@ -42,6 +44,8 @@ and the maze traversal code following from the block diagram is
 
 Now, our *setup()* code just initializes the servos and indicator LEDS, and our code to run in *loop()* is now just two simple function calls!  
 ![setup](Media/setup.PNG)  ![loop](Media/loop.PNG)  
+
+A demonstration of our robot traversing the maze as well as detecting and avoiding other robots is shown below.
 
 ## Going Forward
 As we move onto other labs we will likely need to implement a more efficient way to traverse the maze by keeping track of squares we have already visited. We will also likely change the way we avoid robots but turning around seems fine for now.
