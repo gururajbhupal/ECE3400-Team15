@@ -1,6 +1,11 @@
 # Introduction  
 The purpose of milestone 2 was to implement a wall following algorithm, expand our line following algorithm, as well as integrate everything from labs 1 and 2.  
   
+## Updating Our Robot  
+Our robot got what can only be described as half a makeover. Some wiring was cleaned, and the sensors were all rearranged to be the exact same height. Stay tuned for our upcoming overhaul!
+
+![frontRobot](Media/robot_front.PNG) ![sideRobot](Media/robot_side.PNG)  
+
 ## Implementing Proper Turn Functions
 Our previous implementation of line follow didn’t really change, but we had to properly implement a function for turning left and right in place. This resulted in the functions:  
 * *turn_left_linetracker()*  
@@ -25,6 +30,8 @@ So that we can see what the robot is thinking, we call *check_front()* and *chec
 Note: due to the about 3 inch distance from the sensors to the wheels, we implemented the function *adjust()* so that we could pivot 90-degrees at an intersection. Adjust simply has the robot go forward up until the wheels reach the intersection. The delay value is found via manual testing.
 
 A video of our robot traversing a maze with our right-hand wall following algorithm is shown below.
+
+
 
 ![Adjust](Media/adjust.PNG)  
 
