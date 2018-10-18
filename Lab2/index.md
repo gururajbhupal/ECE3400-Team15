@@ -43,14 +43,14 @@ Our Logic: Since we wanted to analyze signals from two sources, we had to switch
 ## Testing
 We first tested the audio and IR signals individually. To test the both the audio and IR signals individually, we checked the expected bin of the signal. If the bin magnitude was above a certain amplitude, we turned an LED on, indicating that we were receiving a signal. Similarly, if we did not see the bin value at a high enough value, we turned the LED off. Here is a video of testing the audio sensors:
 
-[![Audio](http://img.youtube.com/vi/_ZcNHMHUNOg/0.jpg)](http://www.youtube.com/watch?v=_ZcNHMHUNOg)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_ZcNHMHUNOg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 To test that we could distinguish between a robot and the decoy, we set up an LED to indicate if the we were receiving a 6.08 kHz IR signal. If we were receiving a 18 kHz IR signal, we do nothing. Both the robot hat and the decoy were powered on a moving toward and away from the robot and our system successfully never turned on the LED due to the decoy, but only due to the robot hat.
 
-[![IRDecoy](http://img.youtube.com/vi/bU6DcMbJmxA/0.jpg)](http://www.youtube.com/watch?v=bU6DcMbJmxA)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/bU6DcMbJmxA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 To test the combined system, we added a second LED, one to indicate we were receiving audio and one to indicate we were receiving IR. Here is the video of testing the single system.
 
-[![AudioIR](http://img.youtube.com/vi/3XAn1rwMJDE/0.jpg)](http://www.youtube.com/watch?v=3XAn1rwMJDE)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3XAn1rwMJDE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
