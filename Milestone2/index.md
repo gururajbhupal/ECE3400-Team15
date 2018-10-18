@@ -65,8 +65,7 @@ Now, our *setup()* code just initializes the servos and indicator LEDS, and our 
 
 A demonstration of our robot traversing the maze as well as detecting and avoiding other robots is shown below.
 
-[![Milestone 2 Demo](http://img.youtube.com/vi/h-wGLCHZvRA/0.jpg)](http://www.youtube.com/watch?v=h-wGLCHZvRA)
-
+<iframe width="560" height="315" src="https://www.youtube.com/embed/h-wGLCHZvRA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ## Going Forward  
 As we move onto other labs we will likely need to implement a more efficient way to traverse the maze by keeping track of squares we have already visited. We will also likely change the way we avoid robots but turning around seems fine for now.
