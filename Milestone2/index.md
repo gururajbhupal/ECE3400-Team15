@@ -31,7 +31,7 @@ Note: due to the about 3 inch distance from the sensors to the wheels, we implem
 
 A video of our robot traversing a maze with our right-hand wall following algorithm is shown below.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Jq2T61r8EME" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+[![Wall Following](http://img.youtube.com/vi/Jq2T61r8EME/0.jpg)](http://www.youtube.com/watch?v=Jq2T61r8EME)
 
 ![Adjust](Media/adjust.PNG)  
 
