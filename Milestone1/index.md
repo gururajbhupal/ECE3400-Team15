@@ -19,7 +19,7 @@ The logic behind the implementation is that if the central sensor is on white an
 
 ![MoveCommandCode](Media/MoveCommandCode.png)
 
-[![FollowLine](http://img.youtube.com/vi/6EOPY7VUni4/0.jpg)](http://www.youtube.com/watch?v=6EOPY7VUni4)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6EOPY7VUni4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ## Traversing Grid in a Figure 8
 
@@ -36,4 +36,4 @@ Once we determine which turn to make, we increment or reset count depending on t
 
 Once the robot finishes executing a 90 degree turn, it resume running the line following code until it reaches another junction. Here is a video of our robot successfully traversing 2 figure 8s on the grid.
 
-[![FigureEight](http://img.youtube.com/vi/swSXyXTXP5s/0.jpg)](http://www.youtube.com/watch?v=swSXyXTXP5s)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/swSXyXTXP5s" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
