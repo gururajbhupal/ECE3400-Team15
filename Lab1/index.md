@@ -12,7 +12,7 @@ Utilizing the [Arduino IDE](https://www.arduino.cc/en/Main/Software), we were ab
  
 ![Blink Internal LED Code](Media/internalLED.PNG)
 
-[![Internal LED Blinking](http://img.youtube.com/vi/gtsBVHqelFk/0.jpg)](http://www.youtube.com/watch?v=gtsBVHqelFk)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/gtsBVHqelFk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 We then moved on to blinking an external LED, so we connected an LED to the Uno with a ~300Ω resistor in series to help prevent voltages over ~5V from damaging the Uno.
 
@@ -20,7 +20,7 @@ This is the code we used to blink the external LED, starting with the same base 
 
 ![Blink External LED Code](Media/externalLED.PNG)
 
-[![External LED Blinking](http://img.youtube.com/vi/lo2UhQs6UsQ/0.jpg)](http://www.youtube.com/watch?v=lo2UhQs6UsQ)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lo2UhQs6UsQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ### Reading and Printing Potentiometer Serial Data
 
@@ -32,7 +32,7 @@ The code we used to read from the potentiometer first declared pin A0 as an inpu
 
 ![Printing Serial Data Code](Media/potRead.PNG)
 
-[![Printing Serial Data](http://img.youtube.com/vi/7JXkB8mXXx0/0.jpg)](http://www.youtube.com/watch?v=7JXkB8mXXx0)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/7JXkB8mXXx0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ### Mapping Values from Potentiometer to LED
 
@@ -40,7 +40,7 @@ The range of values read from the potentiometer [0, 1024] is four times the rang
 
 ![Potentiometer-controlled LED Code](Media/analogLED.PNG)
 
-[![Potentiometer-controlled LED](http://img.youtube.com/vi/rfy2OAFVIig/0.jpg)](http://www.youtube.com/watch?v=rfy2OAFVIig)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rfy2OAFVIig" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ### Mapping Values from Potentiometer to Servo
 
@@ -48,7 +48,7 @@ In order to scale the potentiometer range [0, 1024] to the servo range [0, 180],
 
 ![Potentiometer-controlled LED Code](Media/ServoandPotentiometerCode.png)
 
-[![Potentiometer-controlled LED](http://img.youtube.com/vi/Mvg55Toar-s/0.jpg)](http://www.youtube.com/watch?v=Mvg55Toar-s)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Mvg55Toar-s" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ### Assembly and Autonomous Driving
 
@@ -60,7 +60,7 @@ Movement around a square can be broken down into two components: moving forward 
 
 ![Square Movement Code](Media/movementCode.PNG)
 
-[![Square Movement](http://img.youtube.com/vi/cwXXq-iTddo/0.jpg)](http://www.youtube.com/watch?v=cwXXq-iTddo)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cwXXq-iTddo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
 
