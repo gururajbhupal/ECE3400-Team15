@@ -21,7 +21,7 @@ Here is a picture of our assembled amplifier where red is Vcc, black is ground, 
 
 Before we used either amplifier with the audio or IR signals, we tested both of them and measured the gain. Inputting a small signal on a signal generator, we were able to have a gain of about 55 for the two amplifiers. Here is an oscilloscope screenshot showing the gain where Channel 2 is the input and Channel 1 is the output of the amplifier:
 
-<img src="Media/Gain.png" alt="Gain" width="250"/>
+<img src="Media/Gain.png" alt="Gain" width="350"/>
 
 Once we unit tested the amplifiers, we used it to amplify both the audio and IR signals. For example, here are pictures of our signal from the microphone before and after amplification and the phototransistor before and after amplififcation where Channel 2 is the raw signal and Channel 1 is after amplification:
 
@@ -31,9 +31,9 @@ Once we unit tested the amplifiers, we used it to amplify both the audio and IR 
 
 Then we used the Arduino to detect the signals. These graphs confirm that the signals are in the expected bins. From the FFT, in these two graphs, you can clearly see the peaks where the the audio signal in the 5th bin, the IR signal in the 43rd bin:
 
-<img src="Media/IR_Signal.png" alt="IR Signal" width="250"/>
+<img src="Media/IR_Signal.png" alt="IR Signal" width="400"/>
 
-<img src="Media/Audio_Signal.png" alt="Audio Signal" width="250"/>
+<img src="Media/Audio_Signal.png" alt="Audio Signal" width="400"/>
 
 Our Logic: Since we wanted to analyze signals from two sources, we had to switch which pin out we were reading data from on the arduino each time we ran the FFT. We read audio from A0 and IR from A1. We made this switch in the while loop while running the FFT, switching ADMUX back and forth from 0x40 to 0x41 (switching from A0 to A1). To determine if we are receiving an audio or IR signal, we checked which pin we were reading from, then the corresponding bin for that signal, and if the value was above the threshold, then we were receiving a signal. Similarly, if the value was below the the threshold then we can conclude we were not receiving a signal. We used pinouts 12 and 13 to turn on LEDs to indicate whether we were receiving signals or not.
 
