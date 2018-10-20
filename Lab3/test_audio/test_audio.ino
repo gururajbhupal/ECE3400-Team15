@@ -3,7 +3,7 @@
 
 #include <FFT.h> // include the library
 
-int audio_threshold = 175;
+int audio_threshold = 155;
 
 void setup() {
   pinMode(7, OUTPUT);
@@ -36,9 +36,12 @@ void loop() {
     Serial.println("start");
     for (byte i = 0 ; i < FFT_N/2 ; i++) { 
       Serial.println(fft_log_out[i]); // send out the data
-      if (i == 5 && fft_log_out[i] > audio_threshold) {
+      if (i == 5 && fft_log_out[i] >= audio_threshold) {
         digitalWrite(7, HIGH);
-        Serial.println(9999);
+//        Serial.println(999999999);
+//        Serial.println(999999999);
+//        Serial.println(999999999);
+//        Serial.println(999999999);
       }
       if (i == 5 && fft_log_out[i] < audio_threshold) {
         digitalWrite(7, LOW);

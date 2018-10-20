@@ -53,18 +53,18 @@ void loop() {
       Serial.println(fft_log_out[i]); // send out the data
 
 //0x40 is IR
-      if (i == 43 && fft_log_out[i] > IR_threshold && ADMUX == 0x40) {
+      if (i == 43 && fft_log_out[i] > IR_threshold && ADMUX == 0x41) {
         digitalWrite(7, HIGH);
       }
-      if (i == 43 && fft_log_out[i] < IR_threshold && ADMUX == 0x40) {
+      if (i == 43 && fft_log_out[i] < IR_threshold && ADMUX == 0x41) {
         digitalWrite(7, LOW);
       }
       
 //0x41 is audio
-      if (i == 5 && fft_log_out[i] > audio_threshold && ADMUX == 0x41) {
+      if (i == 5 && fft_log_out[i] > audio_threshold && ADMUX == 0x40) {
         digitalWrite(7, HIGH);
       }
-      if (i == 5 && fft_log_out[i] < audio_threshold && ADMUX == 0x41) {
+      if (i == 5 && fft_log_out[i] < audio_threshold && ADMUX == 0x40) {
         digitalWrite(7, LOW);
       }
     }
