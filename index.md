@@ -6,6 +6,7 @@ You can view the contract here [contract](https://github.com/gururajbhupal/ECE34
 # Labs
 [Lab 1- Microcontrollers](/ECE3400-Team15/Lab1)  
 [Lab 2- Analog circuitry and FFT](/ECE3400-Team15/Lab2)  
+[Lab 3- System Integration and Radio Communication](/ECE3400-Team15/Lab3)
 
 # Milestones
 [Milestone 1](/ECE3400-Team15/Milestone1)  
