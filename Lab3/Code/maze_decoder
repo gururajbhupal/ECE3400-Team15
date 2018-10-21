@@ -15,18 +15,18 @@ void decode(int msg_in[]) {
             
             // signal walls
             case 2:
-                Serial.print(",west=true");
+                if (bit) Serial.print(",west=true");
                 break;
             case 3:
-                Serial.print(",north=true");
+                if (bit) Serial.print(",north=true");
                 break;
             case 4:
-                Serial.print(",east=true");
+                if (bit) Serial.print(",east=true");
                 break;
             
             // robot detection
             case 5: 
-                Serial.print(",robot=true");
+                if (bit) Serial.print(",robot=true");
                 break;
                 
             // treasure detection
