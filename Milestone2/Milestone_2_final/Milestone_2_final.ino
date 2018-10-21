@@ -187,7 +187,7 @@ void IR_detection() {
 }
 
 /*Returns true if the robot is at an intersection, else false*/
-void atIntersection(){
+bool atIntersection(){
   if((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)){
     return true;
   }
