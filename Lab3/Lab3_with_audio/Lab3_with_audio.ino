@@ -181,6 +181,8 @@ void audio_detection() {
   fft_mag_log(); // take the output of the fft
   sei();
 
+  /*When audio is detected, detects_audio is set to true. Once detected
+    this value is never set back to false*/
   for (byte i = 0; i < FFT_N / 2; i++) {
     if (i == 5 && fft_log_out[i] > 125) {
       detects_audio = true;
@@ -327,9 +329,11 @@ void setup() {
 
 /*Main code to run*/
 void loop() {
-  while(!detects_audio){
+  /*Loop until we hear a 660Hz signal. Loop gets skipped on reiteration once the signal
+    has been detected*/
+  while(!detects_audio){ //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
       audio_detection();
   }
-  IR_detection(); //update sees_robot and detects_audio
+  IR_detection(); //update sees_robot 
   maze_traversal(); //traverse the maze
 }
