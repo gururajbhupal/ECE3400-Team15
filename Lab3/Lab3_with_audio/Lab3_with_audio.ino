@@ -158,8 +158,10 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(12, s1);
   digitalWrite(13, s0); //LSB
 }
+
+/*Sets detects_audio to true if we detect a 660Hz signal. Else does nothing*/
 void audio_detection() {
-  mux_select(0,0,0);
+  mux_select(0,0,0); //select correct mux output
   /*Set temporary values for relevant registers*/
   int temp1 = TIMSK0;
   int temp2 = ADCSRA;
@@ -209,7 +211,7 @@ void audio_detection() {
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
-  mux_select(0,0,1);
+  mux_select(0,0,1); //select correct mux output
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -241,13 +243,12 @@ void IR_detection() {
   sei();
 
   for (byte i = 0 ; i < FFT_N / 2 ; i++) {
-    Serial.println(fft_log_out[i]); // send out the data
-    /*If there is a wall*/
+    /*If there is a robot*/
     if (i == 43 && fft_log_out[i] > IR_threshold) {
       digitalWrite(7, HIGH);
       sees_robot = true;
     }
-    /*If there is no robot detected - care about not seeing IR case because in our implementation we need to exit our lock*/
+    /*If there is no robot detected (care about not seeing IR case because in our implementation we need to exit our lock)*/
     if (i == 43 && fft_log_out[i] < IR_threshold) {
       digitalWrite(7, LOW);
       sees_robot = false;
@@ -275,10 +276,6 @@ void maze_traversal() {
 
   /*Once we detect audio, traverse the maze as before*/
   while (detects_audio || button_pressed) {
-    /*Checks if there is a wall and turns on LED if so - allows us to see what robot is thinking*/
-    check_front();
-    check_right();
-
     /*If there is a robot avoid it!!*/
     if (sees_robot) {
       /*Turn right until we see a line*/
@@ -333,8 +330,6 @@ void setup() {
   pinMode(11, OUTPUT); //S2 - MSB
   pinMode(12, OUTPUT); //S1
   pinMode(13, OUTPUT); // S0 - LSB
-
-
 }
 
 /*Main code to run*/
