@@ -103,10 +103,10 @@ void turn_left_linetracker() {
 /*Returns true and turns on LED if there is a wall in front. */
 bool check_front() {
   if (analogRead(A1) > wall_thresh) {
-    digitalWrite(2, HIGH);
+    //digitalWrite(2, HIGH);
     return true;
   } else {
-    digitalWrite(2, LOW);
+    //digitalWrite(2, LOW);
     return false;
   }
 }
@@ -114,10 +114,10 @@ bool check_front() {
 /*Returns true and turns on LED if there is a wall to the right. */
 bool check_right() {
   if (analogRead(A2) > wall_thresh) {
-    digitalWrite(3, HIGH);
+    //digitalWrite(3, HIGH);
     return true;
   } else {
-    digitalWrite(3, LOW);
+    //digitalWrite(3, LOW);
     return false;
   }
 }
@@ -147,6 +147,9 @@ void linefollow() {
 //}
 
 void audio_detection() {
+  digitalWrite(13, 0); //SO
+  digitalWrite(12, 0); //S1
+  digitalWrite(11, 0); //S2
   /*Set temporary values for relevant registers*/
   int temp1 = TIMSK0;
   int temp2 = ADCSRA;
@@ -181,6 +184,7 @@ void audio_detection() {
   for (byte i = 0; i < FFT_N / 2; i++) {
     if (i == 5 && fft_log_out[i] > 125) {
       detects_audio = true;
+      digitalWrite(2, HIGH);
     }
   }
 
@@ -193,7 +197,9 @@ void audio_detection() {
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
-
+  digitalWrite(13, 1); //SO
+  digitalWrite(12, 0); //S1
+  digitalWrite(11, 0); //S2
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -312,12 +318,17 @@ void setup() {
   pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
+
+  //MUX SELECT
+  pinMode(13, OUTPUT); // S0 LSB
+  pinMode(12, OUTPUT); //S1
+  pinMode(11, OUTPUT); //S2 MSB
 }
 
 /*Main code to run*/
 void loop() {
-  while (!detects_audio) {
-    audio_detection();
+  while(!detects_audio){
+      audio_detection();
   }
   IR_detection(); //update sees_robot and detects_audio
   maze_traversal(); //traverse the maze
