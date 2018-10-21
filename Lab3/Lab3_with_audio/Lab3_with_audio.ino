@@ -16,11 +16,13 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
-/*Initialize the parameters to corresponding pins*/
-int wall_front = A1;
-int wall_right = A2;
+/* Parameters hooked up to MUX which outputs to Analog pin A0
+   Audio, IR connected to MUX
+   Left, Middle, Right wall sensors are all connected to MUX
+*/
 
 
+/*Line sensors*/
 int sensor_left = A3;
 int sensor_middle = A4;
 int sensor_right = A5;
@@ -100,24 +102,51 @@ void turn_left_linetracker() {
   while (analogRead(sensor_middle) > line_thresh);
 }
 
+
+/*
+  Select output of mux based on select bits.
+  Order is s2 s1 s0 from 000 to 111
+  000 is audio
+  001 is IR
+  010
+  011 is right wall sensor
+  100
+  101 is left wall sensor
+  110
+  111 is middle wall sensor
+*/
+void mux_select(int s2, int s1, int s0) {
+  digitalWrite(11, s2); //MSB
+  digitalWrite(12, s1);
+  digitalWrite(13, s0); //LSB
+}
+
 /*Returns true and turns on LED if there is a wall in front. */
-bool check_front() {
-  if (analogRead(A1) > wall_thresh) {
-    //digitalWrite(2, HIGH);
+bool check_left() {
+  mux_select(1, 0, 1);
+  if (analogRead(A0) > wall_thresh) {
     return true;
   } else {
-    //digitalWrite(2, LOW);
+    return false;
+  }
+}
+
+/*Returns true and turns on LED if there is a wall in front. */
+bool check_front() {
+  mux_select(1, 1, 1);
+  if (analogRead(A0) > wall_thresh) {
+    return true;
+  } else {
     return false;
   }
 }
 
 /*Returns true and turns on LED if there is a wall to the right. */
 bool check_right() {
-  if (analogRead(A2) > wall_thresh) {
-    //digitalWrite(3, HIGH);
+  mux_select(0, 1, 1);
+  if (analogRead(A0) > wall_thresh) {
     return true;
   } else {
-    //digitalWrite(3, LOW);
     return false;
   }
 }
@@ -147,21 +176,12 @@ void linefollow() {
 //}
 
 
-/*
- *Select output of mux based on select bits.
- *Order is s2 s1 s0 from 000 to 111
- *000 is audio
- *001 is IR
-*/
-void mux_select(int s2, int s1, int s0) {
-  digitalWrite(11, s2); //MSB
-  digitalWrite(12, s1);
-  digitalWrite(13, s0); //LSB
-}
-
 /*Sets detects_audio to true if we detect a 660Hz signal. Else does nothing*/
 void audio_detection() {
-  mux_select(0,0,0); //select correct mux output
+  mux_select(0, 0, 0); //select correct mux output
+
+  servo_right.detach();
+  servo_left.detach();
   /*Set temporary values for relevant registers*/
   int temp1 = TIMSK0;
   int temp2 = ADCSRA;
@@ -196,7 +216,7 @@ void audio_detection() {
   /*When audio is detected, detects_audio is set to true. Once detected
     this value is never set back to false*/
   for (byte i = 0; i < FFT_N / 2; i++) {
-    if (i == 5 && fft_log_out[i] > 125) {
+    if (i == 5 && fft_log_out[i] > 150) {
       detects_audio = true;
       digitalWrite(2, HIGH);
     }
@@ -207,11 +227,16 @@ void audio_detection() {
   ADCSRA = temp2;
   ADMUX = temp3;
   DIDR0 =  temp4;
+
+  servo_right.attach(10);
+  servo_left.attach(9);
 }
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
-  mux_select(0,0,1); //select correct mux output
+  mux_select(0, 0, 1); //select correct mux output
+  servo_right.detach();
+  servo_left.detach();
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -260,7 +285,11 @@ void IR_detection() {
   ADCSRA = t2;
   ADMUX = t3;
   DIDR0 =  t4;
+
+  servo_right.attach(10);
+  servo_left.attach(9);
 }
+
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
@@ -275,7 +304,7 @@ bool atIntersection() {
 void maze_traversal() {
 
   /*Once we detect audio, traverse the maze as before*/
-  while (detects_audio || button_pressed) {
+  while (detects_audio) {
     /*If there is a robot avoid it!!*/
     if (sees_robot) {
       /*Turn right until we see a line*/
@@ -321,7 +350,7 @@ void maze_traversal() {
 /*Set up necessary stuff*/
 void setup() {
   Serial.begin(115200); // use the serial port
-  servo_setup(); //setup the servo
+  servo_setup();
   pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
@@ -342,3 +371,7 @@ void loop() {
   IR_detection(); //update sees_robot
   maze_traversal(); //traverse the maze
 }
+
+
+
+
