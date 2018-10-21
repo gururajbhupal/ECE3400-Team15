@@ -146,10 +146,20 @@ void linefollow() {
 //  }
 //}
 
+
+/*
+ *Select output of mux based on select bits.
+ *Order is s2 s1 s0 from 000 to 111
+ *000 is audio
+ *001 is IR
+*/
+void mux_select(int s2, int s1, int s0) {
+  digitalWrite(11, s2); //MSB
+  digitalWrite(12, s1);
+  digitalWrite(13, s0); //LSB
+}
 void audio_detection() {
-  digitalWrite(13, 0); //SO
-  digitalWrite(12, 0); //S1
-  digitalWrite(11, 0); //S2
+  mux_select(0,0,0);
   /*Set temporary values for relevant registers*/
   int temp1 = TIMSK0;
   int temp2 = ADCSRA;
@@ -199,9 +209,7 @@ void audio_detection() {
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
-  digitalWrite(13, 1); //SO
-  digitalWrite(12, 0); //S1
-  digitalWrite(11, 0); //S2
+  mux_select(0,0,1);
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -321,19 +329,21 @@ void setup() {
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
 
-  //MUX SELECT
-  pinMode(13, OUTPUT); // S0 LSB
+  //MUX SELECT PINS
+  pinMode(11, OUTPUT); //S2 - MSB
   pinMode(12, OUTPUT); //S1
-  pinMode(11, OUTPUT); //S2 MSB
+  pinMode(13, OUTPUT); // S0 - LSB
+
+
 }
 
 /*Main code to run*/
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop gets skipped on reiteration once the signal
     has been detected*/
-  while(!detects_audio){ //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-      audio_detection();
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
   }
-  IR_detection(); //update sees_robot 
+  IR_detection(); //update sees_robot
   maze_traversal(); //traverse the maze
 }
