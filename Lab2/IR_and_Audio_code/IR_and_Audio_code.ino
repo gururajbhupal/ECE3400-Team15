@@ -1,10 +1,10 @@
 /*
-fft_adc_serial.pde
-guest openmusiclabs.com 7.7.14
-example sketch for testing the fft library.
-it takes in data on ADC0 (Analog0) and processes them
-with the fft. the data is sent out over the serial
-port at 115.2kb.
+  fft_adc_serial.pde
+  guest openmusiclabs.com 7.7.14
+  example sketch for testing the fft library.
+  it takes in data on ADC0 (Analog0) and processes them
+  with the fft. the data is sent out over the serial
+  port at 115.2kb.
 */
 
 #define LOG_OUT 1 // use the log output function
@@ -13,8 +13,12 @@ port at 115.2kb.
 #include <FFT.h> // include the library
 
 void setup() {
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  //MUX SELECT
+  pinMode(13, OUTPUT); // S0 LSB
+  pinMode(12, OUTPUT); //S1
+  pinMode(11, OUTPUT); //S2 MSB
   Serial.begin(115200); // use the serial port
   TIMSK0 = 0; // turn off timer0 for lower jitter
   ADCSRA = 0xe5; // set the adc to free running mode
@@ -23,12 +27,12 @@ void setup() {
 }
 
 void loop() {
-  while(1) { // reduces jitter
+  while (1) { // reduces jitter
     if (ADMUX == 0x40) ADMUX = 0x41;
     else ADMUX = 0x40;
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      while (!(ADCSRA & 0x10)); // wait for adc to be ready
       ADCSRA = 0xf5; // restart adc
       byte m = ADCL; // fetch adc data
       byte j = ADCH;
@@ -36,7 +40,7 @@ void loop() {
       k -= 0x0200; // form into a signed int
       k <<= 6; // form into a 16b signed int
       fft_input[i] = k; // put real data into even bins
-      fft_input[i+1] = 0; // set odd bins to 0
+      fft_input[i + 1] = 0; // set odd bins to 0
     }
     fft_window(); // window the data for better frequency response
     fft_reorder(); // reorder the data before doing the fft
@@ -44,20 +48,20 @@ void loop() {
     fft_mag_log(); // take the output of the fft
     sei();
     Serial.println("start");
-    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+    for (byte i = 0 ; i < FFT_N / 2 ; i++) {
       Serial.println(fft_log_out[i]); // send out the data
       if (i == 43 && fft_log_out[i] > 125 && ADMUX == 0x41) {
-        digitalWrite(12, HIGH);
+        digitalWrite(2, HIGH);
         Serial.println(9999);
       }
       if (i == 43 && fft_log_out[i] < 125 && ADMUX == 0x41) {
-        digitalWrite(12, LOW);
+        digitalWrite(2, LOW);
       }
       if (i == 5 && fft_log_out[i] > 125 && ADMUX == 0x40) {
-        digitalWrite(13, HIGH);
+        digitalWrite(3, HIGH);
       }
       if (i == 5 && fft_log_out[i] < 125 && ADMUX == 0x40) {
-        digitalWrite(13, LOW);
+        digitalWrite(3, LOW);
       }
     }
   }

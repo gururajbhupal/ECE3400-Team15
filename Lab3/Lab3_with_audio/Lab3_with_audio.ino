@@ -4,8 +4,6 @@
 #include <Servo.h> // include servo library
 #include <FFT.h> // include the library
 
-// A0 is being used for the IR sensor
-
 Servo servo_left; // pin 9
 Servo servo_right; // pin 10
 
@@ -14,6 +12,9 @@ bool sees_robot = false;
 
 /*boolean which is true if 660Hz has been detected, false otherwise*/
 bool detects_audio = false;
+
+/*boolean which is true if the override button has been pressed, false otherwise*/
+bool button_pressed = false;
 
 /*Initialize the parameters to corresponding pins*/
 int wall_front = A1;
@@ -102,10 +103,10 @@ void turn_left_linetracker() {
 /*Returns true and turns on LED if there is a wall in front. */
 bool check_front() {
   if (analogRead(A1) > wall_thresh) {
-    digitalWrite(2, HIGH);
+    //digitalWrite(2, HIGH);
     return true;
   } else {
-    digitalWrite(2, LOW);
+    //digitalWrite(2, LOW);
     return false;
   }
 }
@@ -113,10 +114,10 @@ bool check_front() {
 /*Returns true and turns on LED if there is a wall to the right. */
 bool check_right() {
   if (analogRead(A2) > wall_thresh) {
-    digitalWrite(3, HIGH);
+    //digitalWrite(3, HIGH);
     return true;
   } else {
-    digitalWrite(3, LOW);
+    //digitalWrite(3, LOW);
     return false;
   }
 }
@@ -137,12 +138,70 @@ void linefollow() {
   }
 }
 
+//NEED TO IMPLEMENT THIS
+/*Sets button_pressed to true if we press our override button*/
+//void button_detection() {
+//  if () {
+//    button_pushed = true;
+//  }
+//}
+
+void audio_detection() {
+  digitalWrite(13, 0); //SO
+  digitalWrite(12, 0); //S1
+  digitalWrite(11, 0); //S2
+  /*Set temporary values for relevant registers*/
+  int temp1 = TIMSK0;
+  int temp2 = ADCSRA;
+  int temp3 = ADMUX;
+  int temp4 = DIDR0;
+
+
+  /*Set register values to required values for IR detection*/
+  TIMSK0 = 0; // turn off timer0 for lower jitter
+  ADCSRA = 0xe5; // set the adc to free running mode
+  ADMUX = 0x40; // use adc0
+  DIDR0 = 0x01; // turn off the digital input for adc0
+
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    while (!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    fft_input[i] = k; // put real data into even bins
+    fft_input[i + 1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+
+  /*When audio is detected, detects_audio is set to true. Once detected
+    this value is never set back to false*/
+  for (byte i = 0; i < FFT_N / 2; i++) {
+    if (i == 5 && fft_log_out[i] > 125) {
+      detects_audio = true;
+      digitalWrite(2, HIGH);
+    }
+  }
+
+  /*Restore the register values*/
+  TIMSK0 = temp1;
+  ADCSRA = temp2;
+  ADMUX = temp3;
+  DIDR0 =  temp4;
+}
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
-
-//MIGHT NEED TO ADD MUX STUFF
-void IR_audio_detection() {
-
+void IR_detection() {
+  digitalWrite(13, 1); //SO
+  digitalWrite(12, 0); //S1
+  digitalWrite(11, 0); //S2
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -172,7 +231,7 @@ void IR_audio_detection() {
   fft_run(); // process the data in the fft
   fft_mag_log(); // take the output of the fft
   sei();
-  Serial.println("start");
+
   for (byte i = 0 ; i < FFT_N / 2 ; i++) {
     Serial.println(fft_log_out[i]); // send out the data
     /*If there is a wall*/
@@ -183,14 +242,8 @@ void IR_audio_detection() {
     /*If there is no robot detected - care about not seeing IR case because in our implementation we need to exit our lock*/
     if (i == 43 && fft_log_out[i] < IR_threshold) {
       digitalWrite(7, LOW);
-      sees_robot = false; 
+      sees_robot = false;
     }
-    /*If 6660Hz has been detected*/
-    if (i == 5 && fft_log_out[i] > 125) {
-      digitalWrite(13, HIGH);
-      detects_audio = true;
-    }
-    //Don't care about the case in which we don't detect audio
   }
 
   /*Restore the register values*/
@@ -200,7 +253,7 @@ void IR_audio_detection() {
   DIDR0 =  t4;
 }
 /*Returns true if the robot is at an intersection, else false*/
-void atIntersection() {
+bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
     return true;
   }
@@ -213,7 +266,7 @@ void atIntersection() {
 void maze_traversal() {
 
   /*Once we detect audio, traverse the maze as before*/
-  while (detects_audio) {
+  while (detects_audio || button_pressed) {
     /*Checks if there is a wall and turns on LED if so - allows us to see what robot is thinking*/
     check_front();
     check_right();
@@ -267,9 +320,20 @@ void setup() {
   pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
   pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
+
+  //MUX SELECT
+  pinMode(13, OUTPUT); // S0 LSB
+  pinMode(12, OUTPUT); //S1
+  pinMode(11, OUTPUT); //S2 MSB
 }
 
 /*Main code to run*/
-  IR_audio_detection(); //update sees_robot and detects_audio
+void loop() {
+  /*Loop until we hear a 660Hz signal. Loop gets skipped on reiteration once the signal
+    has been detected*/
+  while(!detects_audio){ //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+      audio_detection();
+  }
+  IR_detection(); //update sees_robot 
   maze_traversal(); //traverse the maze
 }
