@@ -3,6 +3,7 @@ heading = 0;
 if (turn_left) heading++;
 if (turn_right) heading--;
 if (heading == 4) heading = 0;
+if (heading == -1) heading = 3;
 
 
 void scan() {
