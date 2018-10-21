@@ -119,6 +119,7 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(11, s2); //MSB
   digitalWrite(12, s1);
   digitalWrite(13, s0); //LSB
+  delay(10);
 }
 
 /*Returns true and turns on LED if there is a wall in front. */
@@ -151,21 +152,7 @@ bool check_right() {
   }
 }
 
-/*follows the line the robot is on, else halts if all three sensors are not on a line*/
-void linefollow() {
-  if (analogRead(sensor_middle) < line_thresh) {
-    go();
-  }
-  if (analogRead(sensor_left) < line_thresh) {
-    turn_left();
-  }
-  if (analogRead(sensor_right) < line_thresh) {
-    turn_right();
-  }
-  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt();
-  }
-}
+
 
 //NEED TO IMPLEMENT THIS
 /*Sets button_pressed to true if we press our override button*/
@@ -180,8 +167,6 @@ void linefollow() {
 void audio_detection() {
   mux_select(0, 0, 0); //select correct mux output
 
-  servo_right.detach();
-  servo_left.detach();
   /*Set temporary values for relevant registers*/
   int temp1 = TIMSK0;
   int temp2 = ADCSRA;
@@ -216,7 +201,7 @@ void audio_detection() {
   /*When audio is detected, detects_audio is set to true. Once detected
     this value is never set back to false*/
   for (byte i = 0; i < FFT_N / 2; i++) {
-    if (i == 5 && fft_log_out[i] > 150) {
+    if (i == 5 && fft_log_out[i] > 135) {
       detects_audio = true;
       digitalWrite(2, HIGH);
     }
@@ -228,15 +213,13 @@ void audio_detection() {
   ADMUX = temp3;
   DIDR0 =  temp4;
 
-  servo_right.attach(10);
-  servo_left.attach(9);
+  servo_setup();
 }
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
 void IR_detection() {
   mux_select(0, 0, 1); //select correct mux output
-  servo_right.detach();
-  servo_left.detach();
+
   /*Set temporary values for relevant registers*/
   int t1 = TIMSK0;
   int t2 = ADCSRA;
@@ -285,11 +268,23 @@ void IR_detection() {
   ADCSRA = t2;
   ADMUX = t3;
   DIDR0 =  t4;
-
-  servo_right.attach(10);
-  servo_left.attach(9);
 }
+/*follows the line the robot is on, else halts if all three sensors are not on a line*/
+void linefollow() {
+  if (analogRead(sensor_middle) < line_thresh) {
 
+    go();
+  }
+  if (analogRead(sensor_left) < line_thresh) {
+    turn_left();
+  }
+  if (analogRead(sensor_right) < line_thresh) {
+    turn_right();
+  }
+  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+    halt();
+  }
+}
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
@@ -303,47 +298,47 @@ bool atIntersection() {
 /*Traverses a maze via right hand wall following while line following*/
 void maze_traversal() {
 
-  /*Once we detect audio, traverse the maze as before*/
-  while (detects_audio) {
-    /*If there is a robot avoid it!!*/
-    if (sees_robot) {
-      /*Turn right until we see a line*/
+  /*If there is a robot avoid it!!*/
+  if (sees_robot) {
+
+    /*Turn right until we see a line*/
+    turn_right_linetracker();
+    /*Ensure that the line we pick up isn't gonna run us into a wall*/
+    while (check_front()) {
       turn_right_linetracker();
-      /*Ensure that the line we pick up isn't gonna run us into a wall*/
-      while (check_front()) {
+    }
+  }
+
+  /*If there is NO ROBOT then traverse the maze via right hand wall following*/
+  else {
+
+    /*If we are at an intersection*/
+    if (atIntersection()) {
+
+      /*Check if there is a wall to the right of us*/
+      if (!check_right()) {
+        adjust();
         turn_right_linetracker();
       }
-    }
 
-    /*If there is NO ROBOT then traverse the maze via right hand wall following*/
-    else {
-      /*If we are at an intersection*/
-      if (atIntersection()) {
+      /*If there is no wall to the right of us and no wall in front of us */
+      else if (!check_front()) {
+        adjust(); //adjust here takes us off the intersection allowing us to linefollow
+      }
 
-        /*Check if there is a wall to the right of us*/
-        if (!check_right()) {
-          adjust();
-          turn_right_linetracker();
-        }
-
-        /*If there is no wall to the right of us and no wall in front of us */
-        else if (!check_front()) {
-          adjust(); //adjust here takes us off the intersection allowing us to linefollow
-        }
-
-        /*There IS A WALL to the right of us AND in front of us*/
-        else {
-          adjust();
+      /*There IS A WALL to the right of us AND in front of us*/
+      else {
+        adjust();
+        turn_left_linetracker();
+        /*Following if statement allows for robot to turn around at dead end*/
+        if (check_front()) {
           turn_left_linetracker();
-          /*Following if statement allows for robot to turn around at dead end*/
-          if (check_front()) {
-            turn_left_linetracker();
-          }
         }
       }
-      /*If we are not at an intersection then line follow*/
-      linefollow();
     }
+    /*If we are not at an intersection then line follow*/
+
+    linefollow();
   }
 }
 
@@ -365,11 +360,11 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
-  IR_detection(); //update sees_robot
-  maze_traversal(); //traverse the maze
+    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+      audio_detection();
+    }
+    IR_detection(); //update sees_robot
+    maze_traversal(); //traverse the maze
 }
 
 
