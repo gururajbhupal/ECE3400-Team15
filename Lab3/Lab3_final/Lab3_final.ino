@@ -14,8 +14,8 @@ RF24 radio(9, 10);
 /* Radio pipe addresses for the 2 nodes to communicate.*/
 const uint64_t pipes[2] = { 0x000000002ALL, 0x000000002BLL };
 
-Servo servo_left; // pin 9
-Servo servo_right; // pin 10
+Servo servo_left; // pin 6
+Servo servo_right; // pin 5
 
 /*boolean which is true if a robot has been detected, false otherwise*/
 bool sees_robot = false;
@@ -59,8 +59,8 @@ int IR_threshold = 160; //if above this we detect IR hat
 
 /*Initializes the servo*/
 void servo_setup() {
-  servo_right.attach(10);
-  servo_left.attach(9);
+  servo_right.attach(5);
+  servo_left.attach(6);
   servo_left.write(90);
   servo_right.write(90);
 }
@@ -152,24 +152,24 @@ void update_position() {
 void scan() {
   switch (heading) {
     case 0: // north
-      if (check_left) data = data | 0x0100; // west=true
-      if (check_front) data = data | 0x0200; // north=true
-      if (check_right) data = data | 0x0400; // east=true
+      if (check_left()) data = data | 0x0100; // west=true
+      if (check_front()) data = data | 0x0200; // north=true
+      if (check_right()) data = data | 0x0400; // east=true
       break;
     case 1: // west
-      if (check_left) data = data | 0x0800; // south=true
-      if (check_front) data = data | 0x0100; // west=true
-      if (check_right) data = data | 0x0200;// north=true
+      if (check_left()) data = data | 0x0800; // south=true
+      if (check_front()) data = data | 0x0100; // west=true
+      if (check_right()) data = data | 0x0200;// north=true
       break;
     case 2: // south
-      if (check_left) data = data | 0x0400;// east=true
-      if (check_front) data = data | 0x0800;// south=true
-      if (check_right) data = data | 0x0100;// west=true
+      if (check_left()) data = data | 0x0400;// east=true
+      if (check_front()) data = data | 0x0800;// south=true
+      if (check_right()) data = data | 0x0100;// west=true
       break;
     case 3: // east
-      if (check_left) data = data | 0x0200;// north=true
-      if (check_front) data = data | 0x0400;// east=true
-      if (check_right) data = data | 0x0800;// south=true
+      if (check_left()) data = data | 0x0200;// north=true
+      if (check_front()) data = data | 0x0400;// east=true
+      if (check_right()) data = data | 0x0800;// south=true
       break;
   }
 }
@@ -211,9 +211,9 @@ void turn_left_linetracker() {
   111 is middle wall sensor
 */
 void mux_select(int s2, int s1, int s0) {
-  digitalWrite(11, s2); //MSB
-  digitalWrite(12, s1);
-  digitalWrite(13, s0); //LSB
+  digitalWrite(4, s2); //MSB
+  digitalWrite(0, s1);
+  digitalWrite(1, s0); //LSB
   delay(10);
 }
 
@@ -451,9 +451,9 @@ void setup() {
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
 
   //MUX SELECT PINS
-  pinMode(11, OUTPUT); //S2 - MSB
-  pinMode(12, OUTPUT); //S1
-  pinMode(13, OUTPUT); // S0 - LSB
+  pinMode(4, OUTPUT); //S2 - MSB
+  pinMode(0, OUTPUT); //S1
+  pinMode(1, OUTPUT); // S0 - LSB
 
   // Setup and configure rf radio
   radio.begin();
@@ -481,9 +481,9 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
+//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+//    audio_detection();
+//  }
   IR_detection(); //update sees_robot
   maze_traversal(); //traverse the maze
 }
