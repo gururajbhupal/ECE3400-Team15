@@ -77,7 +77,7 @@ The first thing we did was to start the robot once a 660 Hz tone is played. To d
 
 <img src="Media/audio_detect.png" alt="audio_detect" width="250"/>
 
-##Starting on a 660 Hz Tone and exploring the entire maze
+## Starting on a 660 Hz Tone and exploring the entire maze
 
 To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
 
@@ -85,7 +85,7 @@ To implement this with out full code, we used a spin lock that would only allow 
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
-## The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
 
 (demo of starting on 660hz tone, exploring maze, ir detection) 
 <iframe width="1440" height="526" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
