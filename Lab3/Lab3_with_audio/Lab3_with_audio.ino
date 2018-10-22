@@ -28,15 +28,15 @@ int sensor_middle = A4;
 int sensor_right = A5;
 
 /*Initialize threshold values*/
-int line_thresh = 400; //if below this we detect a white line
+int line_thresh = 300; //if below this we detect a white line
 int wall_thresh = 150; //if above this we detect a wall
 int IR_threshold = 160; //if above this we detect IR hat
 
 
 /*Initializes the servo*/
 void servo_setup() {
-  servo_right.attach(10);
-  servo_left.attach(9);
+  servo_right.attach(5);
+  servo_left.attach(6);
   servo_left.write(90);
   servo_right.write(90);
 }
@@ -116,18 +116,20 @@ void turn_left_linetracker() {
   111 is middle wall sensor
 */
 void mux_select(int s2, int s1, int s0) {
-  digitalWrite(11, s2); //MSB
-  digitalWrite(12, s1);
-  digitalWrite(13, s0); //LSB
-  delay(10);
+  digitalWrite(4, s2); //MSB
+  digitalWrite(2, s1);
+  digitalWrite(3, s0); //LSB
+  delay(15);
 }
 
 /*Returns true and turns on LED if there is a wall in front. */
 bool check_left() {
   mux_select(1, 0, 1);
   if (analogRead(A0) > wall_thresh) {
+    Serial.println(analogRead(A0));
     return true;
   } else {
+    Serial.println(analogRead(A0));
     return false;
   }
 }
@@ -212,8 +214,7 @@ void audio_detection() {
   ADCSRA = temp2;
   ADMUX = temp3;
   DIDR0 =  temp4;
-
-  servo_setup();
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
@@ -268,11 +269,12 @@ void IR_detection() {
   ADCSRA = t2;
   ADMUX = t3;
   DIDR0 =  t4;
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
+
 /*follows the line the robot is on, else halts if all three sensors are not on a line*/
 void linefollow() {
   if (analogRead(sensor_middle) < line_thresh) {
-
     go();
   }
   if (analogRead(sensor_left) < line_thresh) {
@@ -285,6 +287,7 @@ void linefollow() {
     halt();
   }
 }
+
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
@@ -300,7 +303,6 @@ void maze_traversal() {
 
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
-
     /*Turn right until we see a line*/
     turn_right_linetracker();
     /*Ensure that the line we pick up isn't gonna run us into a wall*/
@@ -314,6 +316,7 @@ void maze_traversal() {
 
     /*If we are at an intersection*/
     if (atIntersection()) {
+      digitalWrite(7, HIGH);
 
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
@@ -337,7 +340,6 @@ void maze_traversal() {
       }
     }
     /*If we are not at an intersection then line follow*/
-
     linefollow();
   }
 }
@@ -346,25 +348,23 @@ void maze_traversal() {
 void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup();
-  pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
-  pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
   pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
 
   //MUX SELECT PINS
-  pinMode(11, OUTPUT); //S2 - MSB
-  pinMode(12, OUTPUT); //S1
-  pinMode(13, OUTPUT); // S0 - LSB
+  pinMode(4, OUTPUT); //S2 - MSB
+  pinMode(2, OUTPUT); //S1
+  pinMode(3, OUTPUT); // S0 - LSB
 }
 
 /*Main code to run*/
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-      audio_detection();
-    }
-    IR_detection(); //update sees_robot
-    maze_traversal(); //traverse the maze
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
+  }
+  IR_detection(); //update sees_robot
+  maze_traversal(); //traverse the maze
 }
 
 

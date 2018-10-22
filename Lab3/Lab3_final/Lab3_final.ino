@@ -6,7 +6,6 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-// #include "printf.h"
 
 /*Set up nRF24L01 radio on SPI bus plus pins 9 & 10*/
 RF24 radio(9, 10);
@@ -212,9 +211,9 @@ void turn_left_linetracker() {
 */
 void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s2); //MSB
-  digitalWrite(0, s1);
-  digitalWrite(1, s0); //LSB
-  delay(10);
+  digitalWrite(2, s1);
+  digitalWrite(3, s0); //LSB
+  delay(15);
 }
 
 /*Returns true and turns on LED if there is a wall in front. */
@@ -231,8 +230,10 @@ bool check_left() {
 bool check_front() {
   mux_select(1, 1, 1);
   if (analogRead(A0) > wall_thresh) {
+    digitalWrite(3, HIGH);
     return true;
   } else {
+    digitalWrite(3, LOW);
     return false;
   }
 }
@@ -241,8 +242,10 @@ bool check_front() {
 bool check_right() {
   mux_select(0, 1, 1);
   if (analogRead(A0) > wall_thresh) {
+    digitalWrite(2, HIGH);
     return true;
   } else {
+    digitalWrite(2, LOW);
     return false;
   }
 }
@@ -308,7 +311,7 @@ void audio_detection() {
   ADMUX = temp3;
   DIDR0 =  temp4;
 
-  servo_setup();
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
 /*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
@@ -363,11 +366,12 @@ void IR_detection() {
   ADCSRA = t2;
   ADMUX = t3;
   DIDR0 =  t4;
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
+
 /*follows the line the robot is on, else halts if all three sensors are not on a line*/
 void linefollow() {
   if (analogRead(sensor_middle) < line_thresh) {
-
     go();
   }
   if (analogRead(sensor_left) < line_thresh) {
@@ -409,7 +413,6 @@ void maze_traversal() {
 
     /*If we are at an intersection*/
     if (atIntersection()) {
-
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
         adjust();
@@ -437,6 +440,7 @@ void maze_traversal() {
         }
       }
     }
+
     /*If we are not at an intersection then line follow*/
     linefollow();
   }
@@ -446,14 +450,11 @@ void maze_traversal() {
 void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup();
-  pinMode(2, OUTPUT); // LED to indicate whether a wall is to the front or not
-  pinMode(3, OUTPUT); // LED to indicate whether a wall is to the right or not
-  pinMode(7, OUTPUT); // LED to indicate whether there is a robot in front of us
 
   //MUX SELECT PINS
   pinMode(4, OUTPUT); //S2 - MSB
-  pinMode(0, OUTPUT); //S1
-  pinMode(1, OUTPUT); // S0 - LSB
+  pinMode(2, OUTPUT); //S1
+  pinMode(3, OUTPUT); //S0 - LSB
 
   // Setup and configure rf radio
   radio.begin();
@@ -481,9 +482,9 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-//    audio_detection();
-//  }
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
+  }
   IR_detection(); //update sees_robot
   maze_traversal(); //traverse the maze
 }
