@@ -31,10 +31,19 @@ bool button_pressed = false;
    Left, Middle, Right wall sensors are all connected to MUX
 */
 
- unsigned int data; // rf
- int x = 0; // current coordinates
- int y = 0;
- int heading; // direction
+unsigned int data; // rf message
+
+// current coordinates
+int x = 0;
+int y = 0;
+
+int heading = 0; // orientation of robot with respect to the way it is initially facing (north)
+/*
+  0 = north
+  1 = east
+  2 = south
+  3 = west
+*/
 
 
 /*Line sensors*/
@@ -97,44 +106,43 @@ void turn_place_right() {
 void adjust() {
   go();
   delay(700); //delay value to reach specification
-  
 }
 
 void rf() {
   // format info into data
-  
+
   data = data | y;
-  data = data | x<<4;
-  
+  data = data | x << 4;
+
   radio.stopListening();
   bool ok = radio.write( &data, sizeof(unsigned int) );
 
-   if (ok)
-      printf("ok...\n");
-    else
-      printf("failed.\n\r");
+  if (ok)
+    printf("ok...\n");
+  else
+    printf("failed.\n\r");
 
-    // Now, continue listening
-    radio.startListening();
+  // Now, continue listening
+  radio.startListening();
 
-    data = data & 0x00FF; // clears treasure/walls
+  data = data & 0x0000; // clears treasure/walls
 }
 
 void update_position() {
-    switch (heading) {
-        case 0: 
-            y++;
-            break;
-        case 1: 
-            x++;
-            break;
-        case 2:
-            y--;
-            break;
-        case 3:
-            x--;
-            break;
-    }
+  switch (heading) {
+    case 0:
+      y++;
+      break;
+    case 1:
+      x++;
+      break;
+    case 2:
+      y--;
+      break;
+    case 3:
+      x--;
+      break;
+  }
 }
 
 // assuming starting at bottom right facing north
@@ -142,28 +150,28 @@ void update_position() {
 
 
 void scan() {
-    switch (heading) {
-        case 0: // north
-            if (check_left) data = data | 0x0100; // west=true
-            if (check_front) data = data | 0x0200; // north=true
-            if (check_right) data = data | 0x0400; // east=true
-            break;
-        case 1: // west
-            if (check_left) data = data | 0x0800; // south=true
-            if (check_front) data = data | 0x0100; // west=true
-            if (check_right) data = data | 0x0200;// north=true
-            break;
-        case 2: // south
-            if (check_left) data = data | 0x0400;// east=true
-            if (check_front) data = data | 0x0800;// south=true
-            if (check_right) data = data | 0x0100;// west=true
-            break;
-        case 3: // east
-            if (check_left) data = data | 0x0200;// north=true
-            if (check_front) data = data | 0x0400;// east=true
-            if (check_right) data = data | 0x0800;// south=true
-            break;
-    }
+  switch (heading) {
+    case 0: // north
+      if (check_left) data = data | 0x0100; // west=true
+      if (check_front) data = data | 0x0200; // north=true
+      if (check_right) data = data | 0x0400; // east=true
+      break;
+    case 1: // west
+      if (check_left) data = data | 0x0800; // south=true
+      if (check_front) data = data | 0x0100; // west=true
+      if (check_right) data = data | 0x0200;// north=true
+      break;
+    case 2: // south
+      if (check_left) data = data | 0x0400;// east=true
+      if (check_front) data = data | 0x0800;// south=true
+      if (check_right) data = data | 0x0100;// west=true
+      break;
+    case 3: // east
+      if (check_left) data = data | 0x0200;// north=true
+      if (check_front) data = data | 0x0400;// east=true
+      if (check_right) data = data | 0x0800;// south=true
+      break;
+  }
 }
 
 
