@@ -13,19 +13,19 @@ This helps in 2 aspects ,
 
 Our Data Protocol was something as below.
 
-##Nibble 1 
+## Nibble 1 
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-##Nibble 2 
+## Nibble 2 
 [4:7] - Robot y co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-##Nibble 3
+## Nibble 3
 [8] - Left Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [9] - Front Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [10] - Right Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [11] - Back Wall sensor ( 0 - no wall ; 1 - wall exists ) - Optional ,not implemented on hardware by team 15.
 
-##Nibble 4
+## Nibble 4
 [12-14] - Treasure Type  ( Predetermined treasure type codes as below) 
 No Treasure = 0;
 Blue Triangle = 1; 	Blue Square = 2;	 Blue Diamond = 3;
@@ -45,7 +45,7 @@ The process was familiarised by a set of default serial prints by Arduino to the
 ## Updating the GUI from a virtual robot on a separate Arduino which is wirelessly connected to the base station.
 
 Once the robot sends the base station a message with all of the information encoded in the format described above, the base station decodes the message with the use of masking and bit shifting in order to extract information from specific bits. The base station iterates over the bits of the message and prints (without newlines) the information contained within them. For example, if our robot detects another robot, bit 15 will be set to 1 and the base station will print “,robot=true”. Once the message has been fully parsed and interpreted, it prints a new line so that the GUI will receive the information and update accordingly. To ensure our communication protocol works as intended, we created a random 3x3 maze and queued up the messages a virtual robot would send if it traversed the maze.
- <img src="robot_to_base_code.png" width="250"/>
+ <img src="Media/robot_to_base_code.PNG" width="250"/>
 
 The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
 
@@ -60,7 +60,7 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
-<img src="audio_detect.png" alt="audio_detect" width="250"/>
+<img src="Media/audio_detect.png" alt="audio_detect" width="250"/>
 
 ##Starting on a 660 Hz Tone and exploring the entire maze
 
