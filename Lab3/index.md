@@ -2,7 +2,7 @@
 
 
 ## Introduction
-In this lab we integrated many of the components we had working in the previous labs (including IR sensor, audio sensor, line sensors, and wall sensors) to have our robot start tracking the maze after a 660 Hz tone. Additionally, our robot sent information wirelessly to a base station which displayed the information on the screen using a GUI.
+In this lab, we integrated many of the components we had working in the previous labs (including IR sensor, audio sensor, line sensors, and wall sensors) to have our robot start tracking the maze after a 660 Hz tone. Additionally, our robot sent information wirelessly to a base station which displayed the information on the screen using a GUI.
 
 ## Data Scheme for Storing Information
 The data scheme involved defining a protocol for storage on the Robot and transfer of maze information from the robot to the base station. 
