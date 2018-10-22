@@ -13,19 +13,19 @@ This helps in 2 aspects ,
 
 Our Data Protocol was something as below.
 
-# Nibble 1 
+##Nibble 1 
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-# Nibble 2 
+##Nibble 2 
 [4:7] - Robot y co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-# Nibble 3
+##Nibble 3
 [8] - Left Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [9] - Front Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [10] - Right Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 [11] - Back Wall sensor ( 0 - no wall ; 1 - wall exists ) - Optional ,not implemented on hardware by team 15.
 
-# Nibble 4
+##Nibble 4
 [12-14] - Treasure Type  ( Predetermined treasure type codes as below) 
 No Treasure = 0;
 Blue Triangle = 1; 	Blue Square = 2;	 Blue Diamond = 3;
@@ -42,13 +42,10 @@ In order to get the Arduinos to communicate wirelessly using the RF chips, we st
 GUI is one of the visualization aspects of any project to make the product more user-friendly or to visualize data better, and in this project is being used for the later. The setup involved setting up a couple of python libraries and running a pre-coded configurable(can be configured to set Robot Positions, a maze which pops up on the local browser to display the robot/maze information. 
 The process was familiarised by a set of default serial prints by Arduino to the serial port which can be converted to GUI on a web browser.
 
-## Updating the GUI from a virtual robot on a separate Arduino which is wirelessly connected to the base station
+## Updating the GUI from a virtual robot on a separate Arduino which is wirelessly connected to the base station.
+
 Once the robot sends the base station a message with all of the information encoded in the format described above, the base station decodes the message with the use of masking and bit shifting in order to extract information from specific bits. The base station iterates over the bits of the message and prints (without newlines) the information contained within them. For example, if our robot detects another robot, bit 15 will be set to 1 and the base station will print “,robot=true”. Once the message has been fully parsed and interpreted, it prints a new line so that the GUI will receive the information and update accordingly. To ensure our communication protocol works as intended, we created a random 3x3 maze and queued up the messages a virtual robot would send if it traversed the maze.
  <img src="robot_to_base_code.png" width="250"/>
-<<<<<<< HEAD
-=======
- 
->>>>>>> 4519e31a68e280802ac9eb3f3dc67266f0e20359
 
 The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
 
@@ -61,12 +58,12 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 
 ## Starting on a 660 Hz Tone 
 
-
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
 <img src="audio_detect.png" alt="audio_detect" width="250"/>
 
 ##Starting on a 660 Hz Tone and exploring the entire maze
+
 To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
 
 <img src="Media/spinlock.png" alt="spinlock" width="250"/>
@@ -75,11 +72,7 @@ One problem we had with this was that powering the wall sensors with the same po
 
 ## The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
 
-<<<<<<< HEAD
 (demo of starting on 660hz tone, exploring maze, ir detection) 
-=======
-(demo of starting on 660hz tone, exploring maze, ir detection)
->>>>>>> 4519e31a68e280802ac9eb3f3dc67266f0e20359
 <iframe width="1440" height="526" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
