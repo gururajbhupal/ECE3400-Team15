@@ -243,10 +243,10 @@ void turn_left_linetracker() {
   111 is middle wall sensor
 */
 void mux_select(int s2, int s1, int s0) {
-  digitalWrite(4, s2); //MSB
-  digitalWrite(2, s1);
-  digitalWrite(3, s0); //LSB
-  delay(15);
+  digitalWrite(4, s2); //MSB s2
+  digitalWrite(2, s1); //s1
+  digitalWrite(3, s0); //LSB s0
+  delay(15); //small delay allows mux enough time to select appropriate input
 }
 
 
