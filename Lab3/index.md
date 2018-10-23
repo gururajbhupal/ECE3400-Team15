@@ -91,8 +91,8 @@ Now that we have a robot that can traverse the maze via right-hand wall followin
 This called for a rework of our wiring. The first of which was to free up digital pins for the radio transmitter, and the second of which was to free up analog pins for sensors later down the line. 
 
 ### Adding a Mux
-We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* written as shown below.  
-
+We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* written as shown below.
+Note: Mux inputs which are not used are grounded.
 
 ```
 /*
@@ -115,11 +115,115 @@ void mux_select(int s2, int s1, int s0) {
 }
 ```
 
+Each of the signals input into the mux has a corresponding function: *check_front()*, *check_left()*, *check_right()* *IR_detection()*, *audio_detection()*. Each of these functions calls our mux select function with the corresponding parameters.
 
+AN IMPORTANT NOTE: For reasons we can't yet explain, our audio and IR detection code (which runs the FFT code) severely interferes with our servos operation. We got past this in lab 2 with temp variables but that doesn't seem to work anymore. We debugged it down to the fact that when we call either the IR or audio detection code the mux never resets and so just that signal is going into the analog pin and the noise from that signal is causing issues. This is just our hypotheses and may not actually be the case. To get around this both *audio_detection()* and *IR_detection()* set the mux to output an empty signal so that when the maze traversal code was running there would be no audio or IR signal going into the board. This solved a lot of our issues.
+
+### Adding the Radios
+Once the mux was setup we disconnected most of our LEDS to free up digital pin slots, then plugged the radio transmitter in. Our main code was now in need of an overhaul to implement radio communication during maze traversal. To do this we added three new functions:
+* *rf()*
+* *update_position()*
+* *scan_walls()*
+
+The global variables x, y, and heading were also added. 
+* x and y are the current position of the robot
+* heading is the direction the robot is facing
+
+The implementation of the functions was as follows:
+
+```
+/*Turns the information into data and start listening*/
+void rf() {
+  /* format info into data*/
+  data = data | y;
+  data = data | x << 4;
+
+  radio.stopListening();
+  bool ok = radio.write( &data, sizeof(unsigned int) );
+
+  if (ok)
+    printf("ok...\n");
+  else
+    printf("failed.\n\r");
+
+  /*Now, continue listening*/
+  radio.startListening();
+
+  Serial.println(data, HEX);
+
+  /*Clear the data*/
+  data = data & 0x0000; 
+}
+```
+
+```
+/*Updates the position of the robot assuming that the starting position is
+  the bottom right facing north*/
+void update_position() {
+  switch (heading) {
+    case 0:
+      y++;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
+      break;
+    case 1:
+      x++;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
+      break;
+    case 2:
+      y--;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
+      break;
+    case 3:
+      x--;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
+      break;
+  }
+}
+```
+
+```
+/*Scans the walls and updates data accordingly*/
+void scan_walls() {
+  switch (heading) {
+    case 0: // north
+      if (check_left()) data = data | 0x0100; // west=true
+      if (check_front()) data = data | 0x0200; // north=true
+      if (check_right()) data = data | 0x0400; // east=true
+      break;
+    case 1: // west
+      if (check_left()) data = data | 0x0800; // south=true
+      if (check_front()) data = data | 0x0100; // west=true
+      if (check_right()) data = data | 0x0200;// north=true
+      break;
+    case 2: // south
+      if (check_left()) data = data | 0x0400;// east=true
+      if (check_front()) data = data | 0x0800;// south=true
+      if (check_right()) data = data | 0x0100;// west=true
+      break;
+    case 3: // east
+      if (check_left()) data = data | 0x0200;// north=true
+      if (check_front()) data = data | 0x0400;// east=true
+      if (check_right()) data = data | 0x0800;// south=true
+      break;
+  }
+}
+```
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
-We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
+With everything set up its time to show this baby off! We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
 
 <img src="Media/Test-Maze.png" width="300"/>
 
@@ -129,3 +233,6 @@ The following videos show the information the base station received from the rob
 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+## Conclusion
+We have a lot of stuff to do and a lot of things to refine and fix. Hoping to get ahead shortly!
