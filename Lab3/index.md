@@ -81,7 +81,7 @@ The first thing we did was to start the robot once a 660 Hz tone is played. To d
 
 To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
 
-<img src="Media/spinlock.png" alt="spinlock" width="600"/>
+<img src="Media/spinlock.png" alt="spinlock" width="300"/>
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
