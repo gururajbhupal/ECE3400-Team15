@@ -104,3 +104,5 @@ The following image is the information the base station received from the robot.
 
 <img src="Media/maze_map_result.png" width="300"/>
 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
