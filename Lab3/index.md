@@ -13,15 +13,15 @@ This helps in 2 aspects ,
 
 Our Data Protocol was something as below.
 
-## Nibble 1 
+### Nibble 1 
 
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-## Nibble 2 
+### Nibble 2 
 
 [4:7] - Robot y co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
-## Nibble 3
+### Nibble 3
 
 [8] - Left Wall sensor ( 0 - no wall ; 1 - wall exists ) 
 
@@ -32,7 +32,7 @@ Our Data Protocol was something as below.
 [11] - Back Wall sensor ( 0 - no wall ; 1 - wall exists ) - Optional ,not implemented on hardware by team 15.
 
 
-## Nibble 4
+### Nibble 4
 
 [12-14] - Treasure Type  ( Predetermined treasure type codes as below) 
 
@@ -52,7 +52,7 @@ In order to get the Arduinos to communicate wirelessly using the RF chips, we st
 
 ## Updating the GUI from Base Station
 GUI is one of the visualization aspects of any project to make the product more user-friendly or to visualize data better, and in this project is being used for the later. The setup involved setting up a couple of python libraries and running a pre-coded configurable(can be configured to set Robot Positions, a maze which pops up on the local browser to display the robot/maze information. 
-The process was familiarised by a set of default serial prints by Arduino to the serial port which can be converted to GUI on a web browser.
+The process was familiarized by a set of default serial prints by Arduino to the serial port which can be converted to GUI on a web browser.
 
 ## Updating the GUI from a virtual robot on a separate Arduino which is wirelessly connected to the base station.
 
@@ -64,10 +64,10 @@ Once the robot sends the base station a message with all of the information enco
 
 The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
 
-## Demo of robot-to-gui integration
+### Demo of robot-to-gui integration
 <iframe width="560" height="315" src="https://www.youtube.com/embed/FKI-ZMED-DY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-## Screen recording of GUI
+### Screen recording of GUI
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
@@ -85,24 +85,22 @@ To implement this with out full code, we used a spin lock that would only allow 
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
-##The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+## The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
-## Mapping a Test Maze
-We set up the following test maze and ran our robot through it, sending maze information to the base station at every intersection.
+## Mapping the Maze
+We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
 
 <img src="Media/Test-Maze.png" width="300"/>
 
-##Final demo of robot exploring the test maze and sending observations to base
+## Final demo of robot exploring the test maze and sending observations to base
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
-The following image is the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall positions of the entire test maze. The robot started in the bottom right corner of the maze (0, 0) while facing upwards.
-
-<img src="Media/maze_map_result.png" width="300"/>
+The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall positions of the entire test maze. The robot started in the top left corner of the maze (0, 0) while facing downwards.
 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
