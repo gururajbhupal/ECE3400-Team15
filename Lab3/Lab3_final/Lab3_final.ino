@@ -25,24 +25,22 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
-/* Parameters hooked up to MUX which outputs to Analog pin A0
-   Audio, IR connected to MUX
-   Left, Middle, Right wall sensors are all connected to MUX
-*/
+
 
 unsigned int data; // rf message
 
-// current coordinates
+/*Current coordinates*/
 int x = 0;
 int y = 0;
 
-int heading = 0; // orientation of robot with respect to the way it is initially facing (north)
-/*
-  0 = north
-  1 = east
-  2 = south
-  3 = west
+/* Orientation of robot with respect to the way it is initially facing (north)
+ * 0 = north
+ * 1 = east
+ * 2 = south
+ * 3 = west
 */
+int heading = 0;  
+
 
 
 /*Line sensors*/
@@ -50,10 +48,17 @@ int sensor_left = A3;
 int sensor_middle = A4;
 int sensor_right = A5;
 
-/*Initialize threshold values*/
-int line_thresh = 400; //if below this we detect a white line
-int wall_thresh = 150; //if above this we detect a wall
-int IR_threshold = 160; //if above this we detect IR hat
+/* NOTE: Sensors hooked up to MUX which outputs to Analog pin A0
+ * Audio
+ * IR
+ * Left, Middle, Right wall sensor
+*/
+
+
+/*Initialize sensor threshold values*/
+int line_thresh = 400; //if BELOW this we detect a white line
+int wall_thresh = 150; //if ABOVE this we detect a wall
+int IR_threshold = 160; //if ABOVE this we detect IR hat
 
 
 /*Initializes the servo*/
@@ -64,11 +69,13 @@ void servo_setup() {
   servo_right.write(90);
 }
 
+
 /*Go Straight*/
 void go() {
   servo_left.write(100);
   servo_right.write(80);
 }
+
 
 /*Stop*/
 void halt() {
@@ -76,17 +83,20 @@ void halt() {
   servo_right.write(90);
 }
 
+
 /*Simple left turn*/
 void turn_left() {
   servo_left.write(93);
   servo_right.write(70);
 }
 
+
 /*Simple right turn*/
 void turn_right() {
   servo_left.write(110);
   servo_right.write(87);
 }
+
 
 /*Turns to the left in place*/
 void turn_place_left() {
@@ -101,15 +111,17 @@ void turn_place_right() {
   servo_right.write(100);
 }
 
+
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
   delay(700); //delay value to reach specification
 }
 
-void rf() {
-  // format info into data
 
+/*Turns the information into data and start listening*/
+void rf() {
+  /* format info into data*/
   data = data | y;
   data = data | x << 4;
 
@@ -121,13 +133,18 @@ void rf() {
   else
     printf("failed.\n\r");
 
-  // Now, continue listening
+  /*Now, continue listening*/
   radio.startListening();
 
   Serial.println(data, HEX);
-  data = data & 0x0000; // clear data
+
+  /*Clear the data*/
+  data = data & 0x0000; 
 }
 
+
+/*Updates the position of the robot assuming that the starting position is
+  the bottom right facing north*/
 void update_position() {
   switch (heading) {
     case 0:
@@ -161,10 +178,8 @@ void update_position() {
   }
 }
 
-// assuming starting at bottom right facing north
 
-
-
+/*Scans the walls and updates data accordingly*/
 void scan_walls() {
   switch (heading) {
     case 0: // north
@@ -191,7 +206,7 @@ void scan_walls() {
 }
 
 
-/*Turns 90 degrees to the right until the middle sensor finds a line*/
+/*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
 void turn_right_linetracker() {
   turn_place_right();
   delay(300); //delay to get off the line
@@ -202,7 +217,8 @@ void turn_right_linetracker() {
   if (heading == -1) heading = 3;
 }
 
-/*Turns to the left until a middle sensor finds a line*/
+
+/*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
 void turn_left_linetracker() {
   turn_place_left();
   delay(300); //delay to get off the line
@@ -233,7 +249,8 @@ void mux_select(int s2, int s1, int s0) {
   delay(15);
 }
 
-/*Returns true and turns on LED if there is a wall to the left. */
+
+/*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
   mux_select(1, 0, 1);
   if (analogRead(A0) > wall_thresh) {
@@ -243,7 +260,8 @@ bool check_left() {
   }
 }
 
-/*Returns true and turns on LED if there is a wall in front. */
+
+/*Sets mux_select to front wall sensor information, and returns true and turns on LED if there is a wall in front. */
 bool check_front() {
   mux_select(1, 1, 1);
   if (analogRead(A0) > wall_thresh) {
@@ -255,7 +273,7 @@ bool check_front() {
   }
 }
 
-/*Returns true and turns on LED if there is a wall to the right. */
+/*Sets mux_select to right wall sensor information, and returns true and turns on LED if there is a wall to the right. */
 bool check_right() {
   mux_select(0, 1, 1);
   if (analogRead(A0) > wall_thresh) {
@@ -268,7 +286,6 @@ bool check_right() {
 }
 
 
-
 //NEED TO IMPLEMENT THIS
 /*Sets button_pressed to true if we press our override button*/
 //void button_detection() {
@@ -278,7 +295,8 @@ bool check_right() {
 //}
 
 
-/*Sets detects_audio to true if we detect a 660Hz signal. Else does nothing*/
+/*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
+  is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
 void audio_detection() {
   mux_select(0, 0, 0); //select correct mux output
 
@@ -331,7 +349,9 @@ void audio_detection() {
   mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
-/*Sets sees_Robot to true if there is a robot, else sees_robot = false*/
+
+/*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
+  mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
 void IR_detection() {
   mux_select(0, 0, 1); //select correct mux output
 
@@ -386,7 +406,8 @@ void IR_detection() {
   mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
-/*follows the line the robot is on, else halts if all three sensors are not on a line*/
+
+/*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
 void linefollow() {
   if (analogRead(sensor_middle) < line_thresh) {
     go();
@@ -398,9 +419,11 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt();
+    halt(); //NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
   }
 }
+
+
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
@@ -411,7 +434,8 @@ bool atIntersection() {
   }
 }
 
-/*Traverses a maze via right hand wall following while line following*/
+
+/*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
 void maze_traversal() {
 
   /*If there is a robot avoid it!!*/
@@ -467,37 +491,41 @@ void maze_traversal() {
   }
 }
 
-/*Set up necessary stuff*/
+
+/*Set up necessary stuff for our code to work*/
 void setup() {
   Serial.begin(115200); // use the serial port
-  servo_setup();
+  servo_setup(); //setup the servos
 
-  //MUX SELECT PINS
+  /*MUX SELECT PINS*/
   pinMode(4, OUTPUT); //S2 - MSB
   pinMode(2, OUTPUT); //S1
   pinMode(3, OUTPUT); //S0 - LSB
 
-  // Setup and configure rf radio
+  /* Setup and configure rf radio*/
   radio.begin();
 
-  // optionally, increase the delay between retries & # of retries
+  /*Optionally, increase the delay between retries & # of retries*/
   radio.setRetries(15, 15);
   radio.setAutoAck(true);
-  // set the channel
+  
+  /*Set the channel*/
   radio.setChannel(0x50);
-  // set the power
-  // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+  
+  /*Set the power
+   *RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.*/
   radio.setPALevel(RF24_PA_MAX);
-  //RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+  
+  /*RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps*/
   radio.setDataRate(RF24_2MBPS);
 
-  // optionally, reduce the payload size.  seems to
-  // improve reliability
+  /*Optionally, reduce the payload size. Seems to improve reliability*/
   radio.setPayloadSize(8);
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 }
+
 
 /*Main code to run*/
 void loop() {
@@ -506,8 +534,12 @@ void loop() {
   while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
     audio_detection();
   }
-  IR_detection(); //update sees_robot
-  maze_traversal(); //traverse the maze
+
+  /*Update sees_robot*/
+  IR_detection(); 
+
+  /*Traverse the maze*/
+  maze_traversal();
 }
 
 
