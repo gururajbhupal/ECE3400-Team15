@@ -221,6 +221,68 @@ void scan_walls() {
 }
 ```
 
+Now in our function *maze_traversal()* we just call *update_position()*, *scan_walls()*, and *rf()* accordingly!
+Full implementation is shown below.
+
+```
+/*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
+void maze_traversal() {
+  
+  /*If there is a robot avoid it!!*/
+  if (sees_robot) {
+    Serial.print("Robot");
+    /*Turn right until we see a line*/
+    turn_right_linetracker();
+    /*Ensure that the line we pick up isn't gonna run us into a wall*/
+    while (check_front()) {
+      turn_right_linetracker();
+    }
+  }
+
+  /*If there is NO ROBOT then traverse the maze via right hand wall following*/
+  else {
+
+    /*If we are at an intersection*/
+    if (atIntersection()) {
+      /*Check if there is a wall to the right of us*/
+      if (!check_right()) {
+        Serial.println("turning right");
+        adjust();
+        update_position();
+        scan_walls();
+        rf();
+        turn_right_linetracker();
+      }
+
+      /*If there is no wall to the right of us and no wall in front of us */
+      else if (!check_front()) {
+        adjust(); //adjust here takes us off the intersection allowing us to linefollow
+        update_position();
+        scan_walls();
+        rf();
+      }
+
+      /*There IS A WALL to the right of us AND in front of us*/
+      else {
+        adjust();
+        update_position();
+        scan_walls();
+        rf();
+        turn_left_linetracker();
+        /*Following if statement allows for robot to turn around at dead end*/
+        if (check_front()) {
+          turn_left_linetracker();
+        }
+      }
+    }
+
+    /*If we are not at an intersection then line follow*/
+    linefollow();
+  }
+}
+```
+
+
 ## Final demo of robot exploring the test maze and sending observations to base
 
 With everything set up its time to show this baby off! We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
