@@ -65,10 +65,10 @@ Once the robot sends the base station a message with all of the information enco
 The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
 
 (demo of robot-to-gui integration)
-<iframe width="1000" src="https://www.youtube.com/embed/FKI-ZMED-DY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/FKI-ZMED-DY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 (screen recording of GUI)
-<iframe width="1000" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
 ## Starting on a 660 Hz Tone 
@@ -88,7 +88,7 @@ One problem we had with this was that powering the wall sensors with the same po
 The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
 
 (demo of starting on 660hz tone, exploring maze, ir detection) 
-<iframe width="1000" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
 
