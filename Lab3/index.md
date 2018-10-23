@@ -59,7 +59,7 @@ The process was familiarised by a set of default serial prints by Arduino to the
 Once the robot sends the base station a message with all of the information encoded in the format described above, the base station decodes the message with the use of masking and bit shifting in order to extract information from specific bits. The base station iterates over the bits of the message and prints (without newlines) the information contained within them. For example, if our robot detects another robot, bit 15 will be set to 1 and the base station will print “,robot=true”. Once the message has been fully parsed and interpreted, it prints a new line so that the GUI will receive the information and update accordingly. To ensure our communication protocol works as intended, we created a random 3x3 maze and queued up the messages a virtual robot would send if it traversed the maze.
 
 
- <img src="Media/robot_to_base_code.PNG" width="250"/>
+ <img src="Media/robot_to_base_code.PNG" width="650"/>
  
 
 The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
@@ -75,13 +75,13 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
-<img width="600" src="Media/audio_detect.png" alt="audio_detect" width="250"/>
+<img src="Media/audio_detect.png" alt="audio_detect" width="600"/>
 
 ## Starting on a 660 Hz Tone and exploring the entire maze
 
 To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
 
-<img width="700" src="Media/spinlock.png" alt="spinlock" width="250"/>
+<img src="Media/spinlock.png" alt="spinlock" width="600"/>
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
