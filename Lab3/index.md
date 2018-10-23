@@ -2,7 +2,25 @@
 
 
 ## Introduction
-In this lab, we integrated many of the components we had working in the previous labs (including IR sensor, audio sensor, line sensors, and wall sensors) to have our robot start tracking the maze after a 660 Hz tone. Additionally, our robot sent information wirelessly to a base station which displayed the information on the screen using a GUI.
+In this lab, we integrated many of the components we had working in the previous labs (including IR sensor, audio sensor, line sensors, and wall sensors) to have our robot start tracking the maze after a 660 Hz tone. Additionally, our robot sent information wirelessly to a base station which displayed the information on the screen using a GUI.  
+
+## Starting on a 660 Hz Tone 
+
+The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
+
+<img src="Media/audio_detect.png" alt="audio_detect" width="600"/>
+
+## Starting on a 660 Hz Tone and exploring the entire maze  
+
+To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
+
+<img src="Media/spinlock.png" alt="spinlock" width="300"/>
+
+One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
+
+### The below video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+ 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 ## Data Scheme for Storing Information
 The data scheme involved defining a protocol for storage on the Robot and transfer of maze information from the robot to the base station. 
@@ -14,10 +32,10 @@ This helps in 2 aspects ,
 Our Data Protocol was something as below.
 
 ### Nibble 1 
-[0:3] - Robot x co-ordinate (Range is 0-8 since its a 9*9 matrix) 
+[0:3] - Robot x co-ordinate (Range is 0-8 since its a 9x9 matrix) 
 
 ### Nibble 2 
-[4:7] - Robot y co-ordinate (Range is 0-8 since its a 9*9 matrix) 
+[4:7] - Robot y co-ordinate (Range is 0-8 since its a 9x9 matrix) 
 
 ### Nibble 3
 [8] - West Wall(0:no wall; 1:wall exists) 
@@ -64,29 +82,7 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 
 
 ### Screen recording of GUI
-<iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
-
-
-## Starting on a 660 Hz Tone 
-
-The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
-
-<img src="Media/audio_detect.png" alt="audio_detect" width="600"/>
-
-## Starting on a 660 Hz Tone and exploring the entire maze
-
-To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
-
-<img src="Media/spinlock.png" alt="spinlock" width="300"/>
-
-One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
-
-### The below video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
- 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
-
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>  
 
 ## Mapping the Maze
 We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
