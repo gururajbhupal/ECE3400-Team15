@@ -85,17 +85,18 @@ To implement this with out full code, we used a spin lock that would only allow 
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
-###The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+##The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
 
-###Demo of starting on 660hz tone, exploring maze, ir detection 
+##Demo of starting on 660hz tone, exploring maze, ir detection 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 
 ## Mapping a Test Maze
 We set up the following test maze and ran our robot through it, sending maze information to the base station at every intersection.
 
 <img src="Media/Test-Maze.png" width="300"/>
 
-###Demo of robot exploring the test maze and sending observations to base
+##Demo of robot exploring the test maze and sending observations to base
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
