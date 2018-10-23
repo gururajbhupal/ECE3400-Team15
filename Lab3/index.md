@@ -90,5 +90,15 @@ The following video shows the robot starting on a 660Hz tone and exploring the e
 (demo of starting on 660hz tone, exploring maze, ir detection) 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
+## Mapping a Test Maze
+We set up the following test maze and ran our robot through it, sending maze information to the base station at every intersection.
 
+<img src="Media/Test-Maze.png" width="300"/>
+
+(demo of robot exploring the test maze and sending observations to base)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+This is the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall position of the entire test maze.
+
+<img src="Media/maze_map_result.png" width="300"/>
 
