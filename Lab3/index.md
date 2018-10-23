@@ -98,7 +98,7 @@ We set up the following test maze and ran our robot through it, sending maze inf
 (demo of robot exploring the test maze and sending observations to base)
 <iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-This is the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall position of the entire test maze.
+This is the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall positions of the entire test maze.
 
 <img src="Media/maze_map_result.png" width="300"/>
 
