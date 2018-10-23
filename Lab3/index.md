@@ -93,19 +93,19 @@ This called for a rework of our wiring. The first of which was to free up digita
 ### Adding a Mux
 We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* written as shown below.  
 
-'''javascript
-/*
-  Select output of mux based on select bits.
-  Order is s2 s1 s0 from 000 to 111
-  000 is audio
-  001 is IR
-  010
-  011 is right wall sensor
-  100
-  101 is left wall sensor
-  110
-  111 is middle wall sensor
-*/
+{{#markdown}}
+'''
+* Select output of mux based on select bits.
+* Order is s2 s1 s0 from 000 to 111
+* 000 is audio
+* 001 is IR
+* 010
+* 011 is right wall sensor
+* 100
+* 101 is left wall sensor
+* 110
+* 111 is middle wall sensor
+
 void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s2); //MSB s2
   digitalWrite(2, s1); //s1
@@ -113,6 +113,7 @@ void mux_select(int s2, int s1, int s0) {
   delay(15); //small delay allows mux enough time to select appropriate input
 }
 '''
+{{#markdown}}
 
 
 ## Final demo of robot exploring the test maze and sending observations to base
