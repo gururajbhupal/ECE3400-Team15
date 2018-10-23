@@ -29,7 +29,7 @@ This helps in 2 aspects:
 * Memory requirement to store the data is less. 
 * Data size is less, hence processing will be faster and hence helps to decrease latency during data transmission.
 
-Our Data Protocol was something as below.
+Our Data Protocol organization can be seen below.
 
 ### Nibble 1 
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9x9 matrix) 
@@ -63,9 +63,6 @@ By this, we are able to send all the data using just 2 bytes of which can be eas
 ## Sending Information Wirelessly Between Arduinos
 In order to get the Arduinos to communicate wirelessly using the RF chips, we studied and experimented with the given GettingStarted.ino file to find out which parts were necessary to transmit and receive information and which parts were extraneous to our objective for this lab. The configuration settings in our code were drawn heavily from the given configuration settings, with the only changes being an increased power and data rate and a decreased payload size for more reliability. Since the robot was always sending information and the base station was always receiving it, we found the role switching capabilities of the original code to be unnecessary. Both pipes for reading and writing were set from the beginning and we found no need for the base station to send information for the robot to receive beyond an acknowledgment of a successfully received message. As a result, the final RF code used for this lab was significantly cut down in length while still remaining functional.
 
-## Updating the GUI from Base Station
-GUI is one of the visualization aspects of any project to make the product more user-friendly or to visualize data better, and in this project is being used for the later. The setup involved setting up a couple of python libraries and running a pre-coded configurable(can be configured to set Robot Positions, a maze which pops up on the local browser to display the robot/maze information. 
-The process was familiarized by a set of default serial prints by Arduino to the serial port which can be converted to GUI on a web browser.
 
 ## Updating the GUI from a virtual robot on a separate Arduino which is wirelessly connected to the base station.
 
@@ -75,7 +72,10 @@ Once the robot sends the base station a message with all of the information enco
  <img src="Media/robot_to_base_code.PNG" width="650"/>
  
 
-The video below shows a video of data transmission from Arduino1 → Arduino 2 and Arduino2 using the same to display it on the GUI. 
+The two videos below show data transmission from Arduino1 → Arduino 2 and Arduino2 using the data to display the information on the GUI.  
+The first video is of us initializing the arduinos.  
+The second video is a screen recording of the GUI from the base station.  
+Note: This is a virtual demo to ensure we understood the GUI and RF implementation.
 
 ### Demo of robot-to-gui integration
 <iframe width="560" height="315" src="https://www.youtube.com/embed/FKI-ZMED-DY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -88,6 +88,9 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
 
 <img src="Media/Test-Maze.png" width="300"/>
+
+##Systems Integration  
+Now that
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
