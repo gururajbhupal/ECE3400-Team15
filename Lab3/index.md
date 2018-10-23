@@ -8,15 +8,84 @@ In this lab, we integrated many of the components we had working in the previous
 
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
-<img src="Media/audio_detect.png" alt="audio_detect" width="600"/>
+```
+/*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
+  is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
+void audio_detection() {
+  mux_select(0, 0, 0); //select correct mux output
+
+  /*Set temporary values for relevant registers*/
+  int temp1 = TIMSK0;
+  int temp2 = ADCSRA;
+  int temp3 = ADMUX;
+  int temp4 = DIDR0;
+
+
+  /*Set register values to required values for IR detection*/
+  TIMSK0 = 0; // turn off timer0 for lower jitter
+  ADCSRA = 0xe5; // set the adc to free running mode
+  ADMUX = 0x40; // use adc0
+  DIDR0 = 0x01; // turn off the digital input for adc0
+
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    while (!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    fft_input[i] = k; // put real data into even bins
+    fft_input[i + 1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+
+  /*When audio is detected, detects_audio is set to true. Once detected
+    this value is never set back to false*/
+  for (byte i = 0; i < FFT_N / 2; i++) {
+    if (i == 5 && fft_log_out[i] > 135) {
+      detects_audio = true;
+      digitalWrite(2, HIGH);
+    }
+  }
+
+  /*Restore the register values*/
+  TIMSK0 = temp1;
+  ADCSRA = temp2;
+  ADMUX = temp3;
+  DIDR0 =  temp4;
+
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
+}
+```
 
 ## Starting on a 660 Hz Tone and exploring the entire maze  
 
 To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
 
-<img src="Media/spinlock.png" alt="spinlock" width="300"/>
+```
+/*Main code to run*/
+void loop() {
+  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
+    has been detected*/
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
+  }
 
-One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
+  /*Update sees_robot*/
+  IR_detection(); 
+
+  /*Traverse the maze*/
+  maze_traversal();
+}
+```
+
+One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier. To make sense of the way we mux select see the mux implementation below.
 
 ### The below video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
  
