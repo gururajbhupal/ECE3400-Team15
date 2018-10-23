@@ -22,17 +22,20 @@ Our Data Protocol was something as below.
 ### Nibble 3
 [8] - West Wall(0:no wall; 1:wall exists) 
 
-[9] - North Wall(0:no wall; 1-wall exists) 
+[9] - North Wall(0:no wall; 1:wall exists) 
 
-[10] - East Wall(0-no wall; 1-wall exists) 
+[10] - East Wall(0:no wall; 1:wall exists) 
 
-[11] - South Wall(0-no wall; 1-wall exists)
+[11] - South Wall(0:no wall; 1:wall exists)
 
 ### Nibble 4
 [12:14] - Treasure Type (Predetermined treasure type codes as below) 
+
 No Treasure = 0
-Blue Triangle = 1 	Blue Square = 2	         Blue Diamond = 3
-Red Triangle = 4 	Red Square = 5 	         Red Diamond = 6 
+
+Blue Triangle = 1 | Blue Square = 2 | Blue Diamond = 3
+
+Red Triangle = 4 | Red Square = 5 | Red Diamond = 6 
 
 [15] - Opponent Robot ( 0 - no Robot exists ; 1 - Robot obstructing path ) 
 
