@@ -25,7 +25,8 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
-
+// when we start to get first walls to be sensed
+int initial = 1;
 
 unsigned int data; // rf message
 
@@ -115,7 +116,7 @@ void turn_place_right() {
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
-  delay(700); //delay value to reach specification
+  delay(600); //delay value to reach specification
 }
 
 
@@ -438,6 +439,12 @@ bool atIntersection() {
 /*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
 void maze_traversal() {
 
+  if (initial) {
+    scan_walls();
+    rf();
+    initial = 0;
+  }
+  
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
     Serial.print("Robot");
@@ -531,9 +538,9 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
+//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+//    audio_detection();
+//  }
 
   /*Update sees_robot*/
   IR_detection(); 
