@@ -91,7 +91,28 @@ Now that we have a robot that can traverse the maze via right-hand wall followin
 This called for a rework of our wiring. The first of which was to free up digital pins for the radio transmitter, and the second of which was to free up analog pins for sensors later down the line. 
 
 ### Adding a Mux
-We decided to implement 
+We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* written as shown below.  
+
+'''javascript
+/*
+  Select output of mux based on select bits.
+  Order is s2 s1 s0 from 000 to 111
+  000 is audio
+  001 is IR
+  010
+  011 is right wall sensor
+  100
+  101 is left wall sensor
+  110
+  111 is middle wall sensor
+*/
+void mux_select(int s2, int s1, int s0) {
+  digitalWrite(4, s2); //MSB s2
+  digitalWrite(2, s1); //s1
+  digitalWrite(3, s0); //LSB s0
+  delay(15); //small delay allows mux enough time to select appropriate input
+}
+'''
 
 
 ## Final demo of robot exploring the test maze and sending observations to base
@@ -100,8 +121,9 @@ We set up the following the maze and ran our robot through it, sending maze info
 
 <img src="Media/Test-Maze.png" width="300"/>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+The following videos show the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards.
 
-The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall positions of the entire test maze. The robot started in the top left corner of the maze (0, 0) while facing downwards.
+<iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>  
+
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
