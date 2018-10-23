@@ -14,32 +14,24 @@ This helps in 2 aspects ,
 Our Data Protocol was something as below.
 
 ### Nibble 1 
-
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
 ### Nibble 2 
-
 [4:7] - Robot y co-ordinate (Range is 0-8 since its a 9*9 matrix) 
 
 ### Nibble 3
+[8] - West Wall ( 0 - no wall ; 1 - wall exists ) 
 
-[8] - Left Wall sensor ( 0 - no wall ; 1 - wall exists ) 
+[9] - North Wall ( 0 - no wall ; 1 - wall exists ) 
 
-[9] - Front Wall sensor ( 0 - no wall ; 1 - wall exists ) 
+[10] - East Wall( 0 - no wall ; 1 - wall exists ) 
 
-[10] - Right Wall sensor ( 0 - no wall ; 1 - wall exists ) 
-
-[11] - Back Wall sensor ( 0 - no wall ; 1 - wall exists ) - Optional ,not implemented on hardware by team 15.
-
+[11] - South Wall( 0 - no wall ; 1 - wall exists )
 
 ### Nibble 4
-
 [12-14] - Treasure Type  ( Predetermined treasure type codes as below) 
-
 No Treasure = 0;
-
 Blue Triangle = 1; 	Blue Square = 2;	 Blue Diamond = 3;
-
 Red Triangle = 4; 	Red Square = 5; 	 Red Diamond = 6;
 
 [15] - Opponent Robot ( 0 - no Robot exists ; 1 - Robot obstructing path ) 
@@ -67,8 +59,10 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 ### Demo of robot-to-gui integration
 <iframe width="560" height="315" src="https://www.youtube.com/embed/FKI-ZMED-DY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
+
 ### Screen recording of GUI
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 
 
 ## Starting on a 660 Hz Tone 
@@ -85,9 +79,10 @@ To implement this with out full code, we used a spin lock that would only allow 
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier.
 
-## The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+### The below video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 
 
 ## Mapping the Maze
