@@ -266,10 +266,8 @@ bool check_left() {
 bool check_front() {
   mux_select(1, 1, 1);
   if (analogRead(A0) > wall_thresh) {
-    digitalWrite(3, HIGH);
     return true;
   } else {
-    digitalWrite(3, LOW);
     return false;
   }
 }
@@ -278,10 +276,8 @@ bool check_front() {
 bool check_right() {
   mux_select(0, 1, 1);
   if (analogRead(A0) > wall_thresh) {
-    digitalWrite(2, HIGH);
     return true;
   } else {
-    digitalWrite(2, LOW);
     return false;
   }
 }
@@ -337,7 +333,6 @@ void audio_detection() {
   for (byte i = 0; i < FFT_N / 2; i++) {
     if (i == 5 && fft_log_out[i] > 135) {
       detects_audio = true;
-      digitalWrite(2, HIGH);
     }
   }
 
@@ -389,12 +384,10 @@ void IR_detection() {
   for (byte i = 0 ; i < FFT_N / 2 ; i++) {
     /*If there is a robot*/
     if (i == 43 && fft_log_out[i] > IR_threshold) {
-      digitalWrite(7, HIGH);
       sees_robot = true;
     }
     /*If there is no robot detected (care about not seeing IR case because in our implementation we need to exit our lock)*/
     if (i == 43 && fft_log_out[i] < IR_threshold) {
-      digitalWrite(7, LOW);
       sees_robot = false;
     }
   }

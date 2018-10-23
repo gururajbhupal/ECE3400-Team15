@@ -50,7 +50,6 @@ void audio_detection() {
   for (byte i = 0; i < FFT_N / 2; i++) {
     if (i == 5 && fft_log_out[i] > 135) {
       detects_audio = true;
-      digitalWrite(2, HIGH);
     }
   }
 
