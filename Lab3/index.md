@@ -75,7 +75,7 @@ The video below shows a video of data transmission from Arduino1 → Arduino 2 a
 
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
-<img width="400" src="Media/audio_detect.png" alt="audio_detect" width="250"/>
+<img width="600" src="Media/audio_detect.png" alt="audio_detect" width="250"/>
 
 ## Starting on a 660 Hz Tone and exploring the entire maze
 
