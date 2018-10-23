@@ -25,9 +25,9 @@ One problem we had with this was that powering the wall sensors with the same po
 ## Data Scheme for Storing Information
 The data scheme involved defining a protocol for storage on the Robot and transfer of maze information from the robot to the base station. 
 We tried to minimize the size of the data type in this protocol by defining most of the information on bit level. 
-This helps in 2 aspects , 
-(i) Memory requirement to store the data is less. 
-(ii) Data size is less, hence processing will be faster and hence helps to decrease latency during data transmission.
+This helps in 2 aspects:   
+* (i) Memory requirement to store the data is less. 
+* (ii) Data size is less, hence processing will be faster and hence helps to decrease latency during data transmission.
 
 Our Data Protocol was something as below.
 
