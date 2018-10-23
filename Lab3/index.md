@@ -84,25 +84,24 @@ Note: This is a virtual demo to ensure we understood the GUI and RF implementati
 ### Screen recording of GUI
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kc94y1iIkes" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>  
 
-## Mapping the Maze
-We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
 
-<img src="Media/Test-Maze.png" width="300"/>
-
-##Systems Integration  
+## Systems Integration  
 Now that we have a robot that can traverse the maze via right-hand wall following (while line following), starts on a 660Hz tone, and radio communications working it's time to integrate everything.
 
 This called for a rework of our wiring. The first of which was to free up digital pins for the radio transmitter, and the second of which was to free up analog pins for sensors later down the line. 
 
-###Adding a Mux
+### Adding a Mux
 We decided to implement 
+
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
+We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
+
+<img src="Media/Test-Maze.png" width="300"/>
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-
 The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as a whole describing the size and wall positions of the entire test maze. The robot started in the top left corner of the maze (0, 0) while facing downwards.
-
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
