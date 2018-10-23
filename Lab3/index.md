@@ -88,7 +88,7 @@ One problem we had with this was that powering the wall sensors with the same po
 The following video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
 
 (demo of starting on 660hz tone, exploring maze, ir detection) 
-<iframe width="1440" height="526" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<iframe width="700" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 
 
