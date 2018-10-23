@@ -90,7 +90,12 @@ We set up the following the maze and ran our robot through it, sending maze info
 <img src="Media/Test-Maze.png" width="300"/>
 
 ##Systems Integration  
-Now that
+Now that we have a robot that can traverse the maze via right-hand wall following (while line following), starts on a 660Hz tone, and radio communications working it's time to integrate everything.
+
+This called for a rework of our wiring. The first of which was to free up digital pins for the radio transmitter, and the second of which was to free up analog pins for sensors later down the line. 
+
+###Adding a Mux
+We decided to implement 
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
