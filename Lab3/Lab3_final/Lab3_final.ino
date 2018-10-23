@@ -124,22 +124,39 @@ void rf() {
   // Now, continue listening
   radio.startListening();
 
-  data = data & 0x0000; // clears treasure/walls
+  Serial.println(data, HEX);
+  data = data & 0x0000; // clear data
 }
 
 void update_position() {
   switch (heading) {
     case 0:
       y++;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
       break;
     case 1:
       x++;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
       break;
     case 2:
       y--;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
       break;
     case 3:
       x--;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
       break;
   }
 }
@@ -148,7 +165,7 @@ void update_position() {
 
 
 
-void scan() {
+void scan_walls() {
   switch (heading) {
     case 0: // north
       if (check_left()) data = data | 0x0100; // west=true
@@ -216,7 +233,7 @@ void mux_select(int s2, int s1, int s0) {
   delay(15);
 }
 
-/*Returns true and turns on LED if there is a wall in front. */
+/*Returns true and turns on LED if there is a wall to the left. */
 bool check_left() {
   mux_select(1, 0, 1);
   if (analogRead(A0) > wall_thresh) {
@@ -399,7 +416,7 @@ void maze_traversal() {
 
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
-
+    Serial.print("Robot");
     /*Turn right until we see a line*/
     turn_right_linetracker();
     /*Ensure that the line we pick up isn't gonna run us into a wall*/
@@ -415,8 +432,10 @@ void maze_traversal() {
     if (atIntersection()) {
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
+        Serial.println("turning right");
         adjust();
         update_position();
+        scan_walls();
         rf();
         turn_right_linetracker();
       }
@@ -425,6 +444,7 @@ void maze_traversal() {
       else if (!check_front()) {
         adjust(); //adjust here takes us off the intersection allowing us to linefollow
         update_position();
+        scan_walls();
         rf();
       }
 
@@ -432,6 +452,7 @@ void maze_traversal() {
       else {
         adjust();
         update_position();
+        scan_walls();
         rf();
         turn_left_linetracker();
         /*Following if statement allows for robot to turn around at dead end*/
@@ -482,9 +503,9 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
+//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+//    audio_detection();
+//  }
   IR_detection(); //update sees_robot
   maze_traversal(); //traverse the maze
 }
