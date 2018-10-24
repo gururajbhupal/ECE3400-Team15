@@ -357,12 +357,9 @@ With everything set up its time to show this baby off! We set up the following t
 
 <img src="Media/Test-Maze.png" width="300"/>
 
-The following videos show the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards.
+The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/b-ZRW0ASdzc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>  
-
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/qwj-zpVfnow" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+INSERT VIDEO HERE
 
 ## Conclusion
 We have a lot of stuff to do and a lot of things to refine and fix (like how do we map the maze if we run into a robot?!). Expect some exciting refinements at a lab near you.
