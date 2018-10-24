@@ -197,6 +197,9 @@ The global variables x, y, and heading were also added.
 * x and y are the current position of the robot
 * heading is the direction the robot is facing
 
+
+Small Side Note: There was a slight issue with how we initally mapped. The GUI is rows by columns which is y,x but we map based on x,y! This had to be changed in our initial implementation. Don't make the same mistake as us.
+
 The implementation of the functions was as follows:
 
 ```
@@ -349,7 +352,6 @@ void maze_traversal() {
   }
 }
 ```
-
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
