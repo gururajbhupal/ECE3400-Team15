@@ -227,9 +227,7 @@ void maze_traversal() {
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
-With everything set up its time to show this baby off! We set up the following the maze and ran our robot through it, sending maze information to the base station at every intersection.
-
-<img src="Media/Test-Maze.png" width="300"/>
+With everything set up its time to show this baby off! 
 
 The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards. However, it could start from any corner of the maze and map it properly!
 
