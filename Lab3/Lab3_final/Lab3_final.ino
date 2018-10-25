@@ -35,12 +35,12 @@ int x = 0;
 int y = 0;
 
 /* Orientation of robot with respect to the way it is initially facing (north)
- * 0 = north
- * 1 = east
- * 2 = south
- * 3 = west
+   0 = north
+   1 = east
+   2 = south
+   3 = west
 */
-int heading = 0;  
+int heading = 2;
 
 
 
@@ -50,9 +50,9 @@ int sensor_middle = A4;
 int sensor_right = A5;
 
 /* NOTE: Sensors hooked up to MUX which outputs to Analog pin A0
- * Audio
- * IR
- * Left, Middle, Right wall sensor
+   Audio
+   IR
+   Left, Middle, Right wall sensor
 */
 
 
@@ -140,7 +140,7 @@ void rf() {
   Serial.println(data, HEX);
 
   /*Clear the data*/
-  data = data & 0x0000; 
+  data = data & 0x0000;
 }
 
 
@@ -149,28 +149,28 @@ void rf() {
 void update_position() {
   switch (heading) {
     case 0:
-      y++;
+      x--;
       Serial.print("x:");
       Serial.print(x);
       Serial.print("y:");
       Serial.println(y);
       break;
     case 1:
-      x++;
-      Serial.print("x:");
-      Serial.print(x);
-      Serial.print("y:");
-      Serial.println(y);
-      break;
-    case 2:
       y--;
       Serial.print("x:");
       Serial.print(x);
       Serial.print("y:");
       Serial.println(y);
       break;
+    case 2:
+      x++;
+      Serial.print("x:");
+      Serial.print(x);
+      Serial.print("y:");
+      Serial.println(y);
+      break;
     case 3:
-      x--;
+      y++;
       Serial.print("x:");
       Serial.print(x);
       Serial.print("y:");
@@ -342,7 +342,9 @@ void audio_detection() {
   ADMUX = temp3;
   DIDR0 =  temp4;
 
-  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
+  if (detect_audio) {
+    mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
+  }
 }
 
 
@@ -437,7 +439,7 @@ void maze_traversal() {
     rf();
     initial = 0;
   }
-  
+
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
     Serial.print("Robot");
@@ -508,14 +510,14 @@ void setup() {
   /*Optionally, increase the delay between retries & # of retries*/
   radio.setRetries(15, 15);
   radio.setAutoAck(true);
-  
+
   /*Set the channel*/
   radio.setChannel(0x50);
-  
+
   /*Set the power
-   *RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.*/
+    RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.*/
   radio.setPALevel(RF24_PA_MAX);
-  
+
   /*RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps*/
   radio.setDataRate(RF24_2MBPS);
 
@@ -524,19 +526,19 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
-}
 
-
-/*Main code to run*/
-void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
   while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
     audio_detection();
   }
+}
 
+
+/*Main code to run*/
+void loop() {
   /*Update sees_robot*/
-  IR_detection(); 
+  IR_detection();
 
   /*Traverse the maze*/
   maze_traversal();
