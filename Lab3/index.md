@@ -159,29 +159,7 @@ Now that we have a robot that can traverse the maze via right-hand wall followin
 This called for a rework of our wiring. The first of which was to free up digital pins for the radio transmitter, and the second of which was to free up analog pins for sensors later down the line. 
 
 ### Adding a Mux
-We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* written as shown below.
-Note: Mux inputs which are not used are grounded.
-
-```
-/*
-  Select output of mux based on select bits.
-  Order is s2 s1 s0 from 000 to 111
-  000 is audio
-  001 is IR
-  010
-  011 is right wall sensor
-  100
-  101 is left wall sensor
-  110
-  111 is middle wall sensor
-*/
-void mux_select(int s2, int s1, int s0) {
-  digitalWrite(4, s2); //MSB s2
-  digitalWrite(2, s1); //s1
-  digitalWrite(3, s0); //LSB s0
-  delay(15); //small delay allows mux enough time to select appropriate input
-}
-```
+We decided to implement a mux to switch between our analog inputs. The mux currently has our audio and IR sensors as well as all three of our wall sensors (a left wall sensor was added to map the maze correctly at some point). To switch the mux output we have a function *mux_select(int s2, int s1, int s0)* we wrote to switch between inputs. Inputs that aren't used are grounded.
 
 Each of the signals input into the mux has a corresponding function: *check_front()*, *check_left()*, *check_right()* *IR_detection()*, *audio_detection()*. Each of these functions calls our mux select function with the corresponding parameters.
 
@@ -195,12 +173,12 @@ Once the mux was setup we disconnected most of our LEDS to free up digital pin s
 
 The global variables x, y, and heading were also added. 
 * x and y are the current position of the robot
-* heading is the direction the robot is facing
+* heading is the direction the robot is facing (initally south to conform to GUI)
 
 
 Small Side Note: There was a slight issue with how we initally mapped. The GUI is rows by columns which is y,x but we map based on x,y! This had to be changed in our initial implementation. Don't make the same mistake as us.
 
-The implementation of the functions was as follows:
+A snippet of each function is shown below
 
 ```
 /*Turns the information into data and start listening*/
@@ -212,15 +190,8 @@ void rf() {
   radio.stopListening();
   bool ok = radio.write( &data, sizeof(unsigned int) );
 
-  if (ok)
-    printf("ok...\n");
-  else
-    printf("failed.\n\r");
-
   /*Now, continue listening*/
   radio.startListening();
-
-  Serial.println(data, HEX);
 
   /*Clear the data*/
   data = data & 0x0000; 
@@ -234,32 +205,12 @@ void update_position() {
   switch (heading) {
     case 0:
       y++;
-      Serial.print("x:");
-      Serial.print(x);
-      Serial.print("y:");
-      Serial.println(y);
       break;
     case 1:
       x++;
-      Serial.print("x:");
-      Serial.print(x);
-      Serial.print("y:");
-      Serial.println(y);
       break;
-    case 2:
-      y--;
-      Serial.print("x:");
-      Serial.print(x);
-      Serial.print("y:");
-      Serial.println(y);
-      break;
-    case 3:
-      x--;
-      Serial.print("x:");
-      Serial.print(x);
-      Serial.print("y:");
-      Serial.println(y);
-      break;
+
+  ... rest of cases
   }
 }
 ```
@@ -273,47 +224,20 @@ void scan_walls() {
       if (check_front()) data = data | 0x0200; // north=true
       if (check_right()) data = data | 0x0400; // east=true
       break;
-    case 1: // west
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
-      break;
-    case 2: // south
-      if (check_left()) data = data | 0x0400;// east=true
-      if (check_front()) data = data | 0x0800;// south=true
-      if (check_right()) data = data | 0x0100;// west=true
-      break;
-    case 3: // east
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
-      break;
+
+  ... Rest of cases
   }
 }
 ```
 
 Now in our function *maze_traversal()* we just call *update_position()*, *scan_walls()*, and *rf()* accordingly!
-Full implementation is shown below.
+A small snippet of *maze_traversal()* is shown below.
 
 ```
 /*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
 void maze_traversal() {
-  
-  /*If there is a robot avoid it!!*/
-  if (sees_robot) {
-    Serial.print("Robot");
-    /*Turn right until we see a line*/
-    turn_right_linetracker();
-    /*Ensure that the line we pick up isn't gonna run us into a wall*/
-    while (check_front()) {
-      turn_right_linetracker();
-    }
-  }
+ ... rest of code
 
-  /*If there is NO ROBOT then traverse the maze via right hand wall following*/
-  else {
-
-    /*If we are at an intersection*/
     if (atIntersection()) {
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
@@ -325,33 +249,10 @@ void maze_traversal() {
         turn_right_linetracker();
       }
 
-      /*If there is no wall to the right of us and no wall in front of us */
-      else if (!check_front()) {
-        adjust(); //adjust here takes us off the intersection allowing us to linefollow
-        update_position();
-        scan_walls();
-        rf();
-      }
-
-      /*There IS A WALL to the right of us AND in front of us*/
-      else {
-        adjust();
-        update_position();
-        scan_walls();
-        rf();
-        turn_left_linetracker();
-        /*Following if statement allows for robot to turn around at dead end*/
-        if (check_front()) {
-          turn_left_linetracker();
-        }
-      }
-    }
-
-    /*If we are not at an intersection then line follow*/
-    linefollow();
-  }
+ ... rest of code
 }
 ```
+Note: we have yet to implement how we update the maze in the case we see a robot.
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
