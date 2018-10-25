@@ -31,7 +31,8 @@ unsigned int data; // rf message
 int x = 0;
 int y = 0;
 
-int maze[9][9];
+
+bool maze[9][9];
 
 /* Orientation of robot with respect to the way it is initially facing (north)
    0 = north
@@ -138,12 +139,10 @@ void rf() {
 
   Serial.println(data, HEX);
 
-// Store data
-maze[x][y] = data;
-/*Clear the data*/
-data = data & 0x0000;
-    
-    
+  /* Mark tile as visited */
+  maze[x][y] = 1;
+  /*Clear the data*/
+  data = data & 0x0000;
 }
 
 
@@ -519,8 +518,8 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-//  scan_walls();
-//  rf();
+  //  scan_walls();
+  //  rf();
 }
 
 
