@@ -9,8 +9,9 @@ In this lab, we integrated many of the components we had working in the previous
 The first thing we did was to start the robot once a 660 Hz tone is played. To do this, we used our code from lab 2 and we also added a variable detects_audio that indicates if we have heard the signal or not. Our code is below.
 
 ```
-/*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
-  is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
+/*
+Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.
+*/
 void audio_detection() {
   mux_select(0, 0, 0); //select correct mux output
 
@@ -20,30 +21,7 @@ void audio_detection() {
   int temp3 = ADMUX;
   int temp4 = DIDR0;
 
-
-  /*Set register values to required values for IR detection*/
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    while (!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i + 1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
+  ... fft code same as IR
 
   /*When audio is detected, detects_audio is set to true. Once detected
     this value is never set back to false*/
@@ -70,17 +48,11 @@ To implement this with out full code, we used a spin lock that would only allow 
 ```
 /*Main code to run*/
 void loop() {
-  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
-    has been detected*/
+  ...
   while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
     audio_detection();
   }
-
-  /*Update sees_robot*/
-  IR_detection(); 
-
-  /*Traverse the maze*/
-  maze_traversal();
+  ...
 }
 ```
 
@@ -252,7 +224,6 @@ void maze_traversal() {
  ... rest of code
 }
 ```
-Note: we have yet to implement how we update the maze in the case we see a robot.
 
 ## Final demo of robot exploring the test maze and sending observations to base
 
@@ -260,7 +231,7 @@ With everything set up its time to show this baby off! We set up the following t
 
 <img src="Media/Test-Maze.png" width="300"/>
 
-The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards.
+The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards. However, it could start from any corner of the maze and map it properly!
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/U0MhqqGQsVE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> 
 
