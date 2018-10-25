@@ -43,13 +43,13 @@ void audio_detection() {
 
 ## Starting on a 660 Hz Tone and exploring the entire maze  
 
-To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. In the loop we check for the audio signal.
+To implement this with out full code, we used a spin lock that would only allow the robot to start traversing the maze once the tone was played. In this code, we loop while we have not yet heard the audio signal. 
 
 ```
 /*Main code to run*/
 void loop() {
   ...
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+  while (!detects_audio) {
     audio_detection();
   }
   ...
@@ -58,7 +58,7 @@ void loop() {
 
 One problem we had with this was that powering the wall sensors with the same power as the amplifier that power the microphone signal caused a lot of noise that prevented us from distinguishing the 660 Hz tone from noise. To fix this, we add a second power source just to power the audio signal amplifier. To make sense of the way we mux select see the mux implementation below.
 
-### The below video shows the robot starting on a 660Hz tone and exploring the entire maze and changing a path if it sees another robot and ignoring the Decoys.
+### Exploring the Maze, Avoiding Robots, Ignoring Decoys - All on 660Hz
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cb1B5bx-IMQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
@@ -223,7 +223,7 @@ void maze_traversal() {
 }
 ```
 
-## Final demo of robot exploring the test maze and sending observations to base
+## Systems Integration Demo
 
 With everything set up its time to show this baby off! 
 
