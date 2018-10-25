@@ -25,9 +25,6 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
-// when we start to get first walls to be sensed
-int initial = 1;
-
 unsigned int data; // rf message
 
 /*Current coordinates*/
@@ -342,9 +339,7 @@ void audio_detection() {
   ADMUX = temp3;
   DIDR0 =  temp4;
 
-  if (detect_audio) {
-    mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
-  }
+  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
 
@@ -433,16 +428,8 @@ bool atIntersection() {
 
 /*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
 void maze_traversal() {
-
-  if (initial) {
-    scan_walls();
-    rf();
-    initial = 0;
-  }
-
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
-    Serial.print("Robot");
     /*Turn right until we see a line*/
     turn_right_linetracker();
     /*Ensure that the line we pick up isn't gonna run us into a wall*/
@@ -458,7 +445,6 @@ void maze_traversal() {
     if (atIntersection()) {
       /*Check if there is a wall to the right of us*/
       if (!check_right()) {
-        Serial.println("turning right");
         adjust();
         update_position();
         scan_walls();
@@ -527,16 +513,18 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
-    has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
+//  scan_walls();
+//  rf();
 }
 
 
 /*Main code to run*/
 void loop() {
+  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
+    has been detected*/
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
+  }
   /*Update sees_robot*/
   IR_detection();
 
