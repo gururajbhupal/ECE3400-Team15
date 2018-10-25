@@ -1,0 +1,26 @@
+int ir_flag = 0;
+
+// in IR_detection
+if (sees_robot) {
+    if_flag = 1;
+    old_heading = heading;
+}
+
+
+// in if (atIntersection)
+if (ir_flag && (abs(heading - old_heading) == 2)) {
+    switch (heading) {
+        case 0: // north
+            x++;
+            break;
+        case 1: // west
+            y++;
+            break;
+        case 2:
+            x--;
+            break;
+        case 3:
+            y--;
+            break;
+    }
+}
