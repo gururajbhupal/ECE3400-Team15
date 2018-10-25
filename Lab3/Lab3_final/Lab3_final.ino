@@ -31,6 +31,8 @@ unsigned int data; // rf message
 int x = 0;
 int y = 0;
 
+int maze[9][9];
+
 /* Orientation of robot with respect to the way it is initially facing (north)
    0 = north
    1 = east
@@ -136,8 +138,12 @@ void rf() {
 
   Serial.println(data, HEX);
 
-  /*Clear the data*/
-  data = data & 0x0000;
+// Store data
+maze[x][y] = data;
+/*Clear the data*/
+data = data & 0x0000;
+    
+    
 }
 
 
