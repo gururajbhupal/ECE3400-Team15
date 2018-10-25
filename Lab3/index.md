@@ -361,7 +361,7 @@ With everything set up its time to show this baby off! We set up the following t
 
 The following video shows the information the base station received from the robot. It is in the format that is required for the maze GUI to update properly. Each line accurately represents the robot's observations on each tile of the maze, as well as the walls. The robot started in the top left corner of the maze (0, 0) while facing downwards.
 
-INSERT VIDEO HERE
+<iframe width="560" height="315" src="https://www.youtube.com/embed/U0MhqqGQsVE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> 
 
 ## Conclusion
 We have a lot of stuff to do and a lot of things to refine and fix (like how do we map the maze if we run into a robot?!). Expect some exciting refinements at a lab near you.
