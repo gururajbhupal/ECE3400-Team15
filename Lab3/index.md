@@ -69,7 +69,7 @@ This helps in 2 aspects:
 * Memory requirement to store the data is less. 
 * Data size is less, hence processing will be faster and hence helps to decrease latency during data transmission.
 
-Our Data Protocol organization can be seen below.
+Our Data Protocol organization is as follows.
 
 ### Nibble 1 
 [0:3] - Robot x co-ordinate (Range is 0-8 since its a 9x9 matrix) 
@@ -99,6 +99,9 @@ Red Triangle = 4 | Red Square = 5 | Red Diamond = 6
 
 
 By this, we are able to send all the data using just 2 bytes of which can be easily stored as an integer. If we want to introduce a “data data_bar” scheme for more redundancy for data correction, we can still implement the whole protocol in an unsigned long. But the data was pretty clean over the channel, so we did not care to implement more redundancy.  
+
+### Storing Visited Locations
+Our current implementation for storing visited locations is to initialize a ixj boolean 2d array which sets the i,j index to true if it has been visited. This might not be the most efficient way to do this and we will look to optimize this in the future.
 
 ## Sending Information Wirelessly Between Arduinos
 In order to get the Arduinos to communicate wirelessly using the RF chips, we studied and experimented with the given GettingStarted.ino file to find out which parts were necessary to transmit and receive information and which parts were extraneous to our objective for this lab. The configuration settings in our code were drawn heavily from the given configuration settings, with the only changes being an increased power and data rate and a decreased payload size for more reliability. Since the robot was always sending information and the base station was always receiving it, we found the role switching capabilities of the original code to be unnecessary. Both pipes for reading and writing were set from the beginning and we found no need for the base station to send information for the robot to receive beyond an acknowledgment of a successfully received message. As a result, the final RF code used for this lab was significantly cut down in length while still remaining functional.
