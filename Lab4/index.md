@@ -8,7 +8,8 @@ In this lab, we interfaced the OV7670 camera with the FPGA, established communic
 We used I2C communication from the Arduino to set registers on the camera. The camera registers configure the camera as per the requirements. 
 We set up the I2C communication as below.
 
-**insert I2C circuit picture **
+![I2C-Communication](Media/I2C.PNG)
+
 
 The 24MHz signal is taken from the PLL set up on the FPGA. 
 
@@ -110,6 +111,8 @@ OV7670_write_register(0x42, 0x80);
 ```
 
 **Add color bar ***
+
+
 
 
 ## Displaying Camera Image on Screen
