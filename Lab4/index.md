@@ -10,6 +10,10 @@ We set up the I2C communication as below.
 
 ![I2C-Communication](Media/I2C.PNG)
 
+![I2C-Communication](Media/circuit_diagram.png)
+
+<img src="Media/circuit_diagram.png" alt="Circuit Diagram" width="250"/>
+
 The 24MHz signal is taken from the PLL set up on the FPGA. 
 
 We used the registers provided in the Arduino template and also some extra registers as below required for the task. 
