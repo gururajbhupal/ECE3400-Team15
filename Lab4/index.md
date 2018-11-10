@@ -16,25 +16,25 @@ We used the registers provided in the Arduino template and also some extra regis
 
 
 ```
-    OV7670_write_register(0x11, 0xC0);
-    OV7670_write_register(0x1E, 0x30);
-    OV7670_write_register(0x0C, 0x08);
-    OV7670_write_register(0x12, 0x0C);
-    OV7670_write_register(0x40, 0xD0);
-    OV7670_write_register(0x42, read_register_value(0x42)&0xF7);
+OV7670_write_register(0x11, 0xC0); //use external clock directly
+OV7670_write_register(0x1E, 0x30); //mirror and Vertical Flip
+OV7670_write_register(0x0C, 0x08); //scale enable
+OV7670_write_register(0x12, 0x0C); //RGB output
+OV7670_write_register(0x40, 0xD0); //RGB565 format
+OV7670_write_register(0x42, 0x00); //reset DSP bar 
 ```
 
 
 To make sure the registers are set we read the registers before setting and after setting to make sure the registers are actually changing. 
  
 ```
- Serial.println("Before Setting");
- read_key_registers();
+Serial.println("Before Setting");
+read_key_registers();
 
- set_color_matrix();
+set_color_matrix();
 
- Serial.println("After Setting");
- read_key_registers();
+Serial.println("After Setting");
+read_key_registers();
 ```
 
 ## Arduino-FPGA Communication
@@ -69,7 +69,6 @@ always @ (VGA_PIXEL_X, VGA_PIXEL_Y) begin
 
 		end
 end
-
 ```
 
 
@@ -78,13 +77,12 @@ To unit test the code first we directly used the input in the VGA module.
 ```
 .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? pixel_data_RGB332 : WHITE)
 ```
-*insert input code ***
+
 Next, we had to test the memory module, in order to read dynamically i.e to update the read address images onto the screen with every pixel in the correct position, it was required to make use of the HREF and VSYNC signals from the camera to recognize the end of the line and end of a frame.
 
 ```
 .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? MEM_OUTPUT : WHITE)
 ```
-*insert output code ***
 
 
 **insert flag image ***
@@ -102,19 +100,16 @@ Colour bar
 For the color bar test, we had to have special settings. We used below register configuration for color bar output.
 
 ```
-    OV7670_write_register(0x11, 0xC0);
-    OV7670_write_register(0x1E, 0x30);
-    OV7670_write_register(0x0C, 0x08);
-    OV7670_write_register(0x12, 0x0C);
-    OV7670_write_register(0x40, 0xD0);
-    OV7670_write_register(0x42, read_register_value(0x42)&0xF7);
+OV7670_write_register(0x11, 0xC0);
+OV7670_write_register(0x1E, 0x30);
+OV7670_write_register(0x0C, 0x08);
+OV7670_write_register(0x12, 0x0D);
+OV7670_write_register(0x40, 0xD0);
+OV7670_write_register(0x42, 0x80);
 
 ```
-**** Insert registers and color bar ****
 
 **Add color bar ***
-
-
 
 
 ## Displaying Camera Image on Screen
