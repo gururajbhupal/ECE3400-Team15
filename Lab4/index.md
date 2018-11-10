@@ -8,8 +8,7 @@ In this lab, we interfaced the OV7670 camera with the FPGA, established communic
 We used I2C communication from the Arduino to set registers on the camera. The camera registers configure the camera as per the requirements. 
 We set up the I2C communication as below.
 
-![I2C-Communication](Media/I2C.PNG)
-
+<img src="Media/circuit_diagram.png" alt="Circuit Diagram" width="250"/>
 
 The 24MHz signal is taken from the PLL set up on the FPGA. 
 
@@ -85,8 +84,7 @@ Next, we had to test the memory module, in order to read dynamically i.e to upda
 .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? MEM_OUTPUT : WHITE)
 ```
 
-
-**insert flag image ***
+<img src="Media/IMG_6181.jpg" alt="Test Image" width="250"/>
 
 
 
@@ -110,9 +108,7 @@ OV7670_write_register(0x42, 0x80);
 
 ```
 
-**Add color bar ***
-
-
+<img src="Media/IMG_2353.JPG" alt="Color Bar Test" width="250"/>
 
 
 ## Displaying Camera Image on Screen
@@ -137,6 +133,7 @@ On the negative edge of VSync, we reset the result, countRed and countBlue for t
 
 The below video shows detection of Red color on an oscilloscope.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-61CGE04P9I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 
