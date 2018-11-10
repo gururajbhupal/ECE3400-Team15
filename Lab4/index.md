@@ -6,16 +6,36 @@ In this lab, we interfaced the OV7670 camera with the FPGA, established communic
 
 ## Arduino-Camera Communication
 We used I2C communication from the Arduino to set registers on the camera. The camera registers configure the camera as per the requirements. 
-We set up the I2C communication as below 
+We set up the I2C communication as below.
+
 **insert I2C circuit picture **
+
 The 24MHz signal is taken from the PLL set up on the FPGA. 
 
 We used the registers provided in the Arduino template and also some extra registers as below required for the task. 
-*** insert extra registers ***
-To make sure the registers are set we read the registers before setting and after setting to make sure the registers are actually changing.  
-**** add code for before and after setting***
 
 
+```
+    OV7670_write_register(0x11, 0xC0);
+    OV7670_write_register(0x1E, 0x30);
+    OV7670_write_register(0x0C, 0x08);
+    OV7670_write_register(0x12, 0x0C);
+    OV7670_write_register(0x40, 0xD0);
+    OV7670_write_register(0x42, read_register_value(0x42)&0xF7);
+```
+
+
+To make sure the registers are set we read the registers before setting and after setting to make sure the registers are actually changing. 
+ 
+```
+ Serial.println("Before Setting");
+ read_key_registers();
+
+ set_color_matrix();
+
+ Serial.println("After Setting");
+ read_key_registers();
+```
 
 ## Arduino-FPGA Communication
 For the communication between the Arduino and FPGA, we followed the same protocol we had set up for the radio communication between the Arduino. Since we had sense fixed number of conditions, the protocol used is as below. 
@@ -32,11 +52,41 @@ We used 3 GPIO pins to communicate between the FPGA and the Arduino.
 ## Displaying Image in M9K Block
 The display is VGA compatible, to display the content in the FPGA we need to connect a VGA connector to GPIO pins.
 In order to test displaying the content of the memory on the screen, we first wrote a test image of 3 horizontal bars of varying color into the memory with the following code:
-* insert flag code*
+
+
+```
+always @ (VGA_PIXEL_X, VGA_PIXEL_Y) begin
+		//READ_ADDRESS = (VGA_PIXEL_X + VGA_PIXEL_Y*`SCREEN_WIDTH);
+		if( VGA_PIXEL_Y<(48))begin
+				pixel_data_RGB332 = RED ;
+		end
+		else if(VGA_PIXEL_Y<(92)) begin
+				pixel_data_RGB332 = BLUE ;
+
+		end
+		else begin
+				pixel_data_RGB332 = GREEN ;
+
+		end
+end
+
+```
+
+
+
 To unit test the code first we directly used the input in the VGA module. 
+```
+.PIXEL_COLOR_IN(VGA_READ_MEM_EN ? pixel_data_RGB332 : WHITE)
+```
 *insert input code ***
 Next, we had to test the memory module, in order to read dynamically i.e to update the read address images onto the screen with every pixel in the correct position, it was required to make use of the HREF and VSYNC signals from the camera to recognize the end of the line and end of a frame.
-***insert output code **
+
+```
+.PIXEL_COLOR_IN(VGA_READ_MEM_EN ? MEM_OUTPUT : WHITE)
+```
+*insert output code ***
+
+
 **insert flag image ***
 
 
@@ -51,7 +101,15 @@ VSync - to indicate the end of the frame.
 Colour bar 
 For the color bar test, we had to have special settings. We used below register configuration for color bar output.
 
+```
+    OV7670_write_register(0x11, 0xC0);
+    OV7670_write_register(0x1E, 0x30);
+    OV7670_write_register(0x0C, 0x08);
+    OV7670_write_register(0x12, 0x0C);
+    OV7670_write_register(0x40, 0xD0);
+    OV7670_write_register(0x42, read_register_value(0x42)&0xF7);
 
+```
 **** Insert registers and color bar ****
 
 **Add color bar ***
