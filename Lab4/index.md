@@ -74,6 +74,7 @@ end
 
 
 To unit test the code first we directly used the input in the VGA module. 
+
 ```
 .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? pixel_data_RGB332 : WHITE)
 ```
@@ -84,7 +85,7 @@ Next, we had to test the memory module, in order to read dynamically i.e to upda
 .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? MEM_OUTPUT : WHITE)
 ```
 
-<img src="Media/IMG_6181.jpg" alt="Test Image" width="250"/>
+<img src="Media/IMG_6181.jpg" alt="Test Image" width="500"/>
 
 
 
@@ -108,7 +109,7 @@ OV7670_write_register(0x42, 0x80);
 
 ```
 
-<img src="Media/IMG_2353.JPG" alt="Color Bar Test" width="250"/>
+<img src="Media/IMG_2353.JPG" alt="Color Bar Test" width="500"/>
 
 
 ## Displaying Camera Image on Screen
@@ -117,7 +118,13 @@ The two main things we need to consider for the communication are
 (ii) The input to the VGA is RGB332 - 1 byte of data
 Based on the above observations we need to downsample the data i.e we need to selectively choose bits from RGB565 and feed it to RGB332.
 The code that downsamples is below. In two cycles, we selected the most significant bits from each color and assigned them to the appropriate bits in RGB332. Each time PCLK is high, a new byte is being sent so at each rising edge of PCLK, if HREF is high, we read the byte and flip the variable that says which bits of RGB332 we write to the next time we read a byte. 
-**insert downsampling technique **
+
+```
+Input Byte	7	6	5	4	3	2	1	0	7	6	5	4	3	2	1	0
+RGB565		R4	R3	R2	R1	R0	G5	G4	G3	G2	G1	G0	B4	B3	B2	B1	B0
+RGB332		R2	R1	R0			G2	G1	G0				B1	B0			
+Output Byte	7	6	5			4	3	2				1	0			
+```
 
 We also need to re-set color bar registers to get the camera to display the video output.
 
