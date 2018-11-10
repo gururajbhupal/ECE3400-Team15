@@ -106,7 +106,6 @@ OV7670_write_register(0x0C, 0x08);
 OV7670_write_register(0x12, 0x0D);
 OV7670_write_register(0x40, 0xD0);
 OV7670_write_register(0x42, 0x80);
-
 ```
 
 <img src="Media/IMG_2353.JPG" alt="Color Bar Test" width="500"/>
