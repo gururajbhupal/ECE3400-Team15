@@ -527,9 +527,9 @@ void setup() {
 void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-    audio_detection();
-  }
+//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+//    audio_detection();
+//  }
   /*Update sees_robot*/
   IR_detection();
 
