@@ -490,6 +490,8 @@ void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup(); //setup the servos
 
+  pinMode(7, OUTPUT);
+
   /*MUX SELECT PINS*/
   pinMode(4, OUTPUT); //S2 - MSB
   pinMode(2, OUTPUT); //S1
@@ -525,16 +527,16 @@ void setup() {
 
 /*Main code to run*/
 void loop() {
-  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
-    has been detected*/
-//  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-//    audio_detection();
-//  }
-  /*Update sees_robot*/
-  IR_detection();
-
-  /*Traverse the maze*/
-  maze_traversal();
+    /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
+      has been detected*/
+//    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+//      audio_detection();
+//    }
+    /*Update sees_robot*/
+    IR_detection();
+  
+    /*Traverse the maze*/
+    maze_traversal();
 }
 
 
