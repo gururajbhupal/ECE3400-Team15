@@ -433,62 +433,8 @@ bool atIntersection() {
 }
 
 
-/*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
-void maze_traversal() {
-  /*If there is a robot avoid it!!*/
-  if (sees_robot) {
-    /*Turn right until we see a line*/
-    turn_right_linetracker();
-    /*Ensure that the line we pick up isn't gonna run us into a wall*/
-    while (check_front()) {
-      turn_right_linetracker();
-    }
-  }
-
-  /*If there is NO ROBOT then traverse the maze via right hand wall following*/
-  else {
-
-    /*If we are at an intersection*/
-    if (atIntersection()) {
-      /*Check if there is a wall to the right of us*/
-      if (!check_right()) {
-        adjust();
-        update_position();
-        scan_walls();
-        rf();
-        turn_right_linetracker();
-      }
-
-      /*If there is no wall to the right of us and no wall in front of us */
-      else if (!check_front()) {
-        adjust(); //adjust here takes us off the intersection allowing us to linefollow
-        update_position();
-        scan_walls();
-        rf();
-      }
-
-      /*There IS A WALL to the right of us AND in front of us*/
-      else {
-        adjust();
-        update_position();
-        scan_walls();
-        rf();
-        turn_left_linetracker();
-        /*Following if statement allows for robot to turn around at dead end*/
-        if (check_front()) {
-          turn_left_linetracker();
-        }
-      }
-    }
-
-    /*If we are not at an intersection then line follow*/
-    linefollow();
-  }
-}
-
-
-
-void dfs() {
+/*Traverses a maze via depth first search while line following. Updates GUI via radio communication*/
+void maze_traversal_dfs() {
   //idk what would be the best thing to push, the coordinates?
   StackArray <type> stack;
   /*Update sees_robot*/
@@ -560,9 +506,6 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
-
-  //  scan_walls();
-  //  rf();
 }
 
 
@@ -573,8 +516,8 @@ void loop() {
   while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
     audio_detection();
   }
-//  /*Update sees_robot*/
-//  IR_detection();
+  /*Update sees_robot*/
+  IR_detection();
 
   /*Traverse the maze*/
   maze_traversal();
