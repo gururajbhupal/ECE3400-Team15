@@ -31,7 +31,8 @@ unsigned int data; // rf message
 int x = 0;
 int y = 0;
 
-
+/*2d array which is the size of the maze to traverse.
+  maze[i][j]=1 means that square has been traversed*/
 bool maze[9][9];
 
 /* Orientation of robot with respect to the way it is initially facing (north)
@@ -519,9 +520,6 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
-
-  //  scan_walls();
-  //  rf();
 }
 
 
@@ -529,9 +527,9 @@ void setup() {
 void loop() {
     /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
       has been detected*/
-//    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-//      audio_detection();
-//    }
+    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+      audio_detection();
+    }
     /*Update sees_robot*/
     IR_detection();
   

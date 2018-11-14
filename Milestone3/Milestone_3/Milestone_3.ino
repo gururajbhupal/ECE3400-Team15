@@ -32,6 +32,8 @@ unsigned int data; // rf message
 int x = 0;
 int y = 0;
 
+/*2d array which is the size of the maze to traverse.
+  maze[i][j]=1 means that square has been traversed*/
 bool maze[9][9];
 
 /* Orientation of robot with respect to the way it is initially facing (north)
