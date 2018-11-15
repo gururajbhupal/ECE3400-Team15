@@ -59,7 +59,7 @@ int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
-int wall_thresh = 150; //if ABOVE this we detect a wall
+int wall_thresh = 200;//150; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
 
@@ -250,12 +250,13 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s2); //MSB s2
   digitalWrite(2, s1); //s1
   digitalWrite(3, s0); //LSB s0
-  delay(15); //small delay allows mux enough time to select appropriate input
+  delay(45); //small delay allows mux enough time to select appropriate input
 }
 
 
 /*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
+
   mux_select(1, 0, 1);
   if (analogRead(A0) > wall_thresh) {
     return true;
@@ -431,6 +432,14 @@ bool atIntersection() {
   }
 }
 
+void robot_at_intersection_start() {
+  /*If there is no wall to the right of us and no wall in front of us */
+  if (check_front()) {
+    scan_walls();
+    rf();
+    turn_left_linetracker();
+  }
+}
 
 /*Traverses a maze via right hand wall following while line following. Updates GUI via radio communication*/
 void maze_traversal() {
@@ -446,7 +455,6 @@ void maze_traversal() {
 
   /*If there is NO ROBOT then traverse the maze via right hand wall following*/
   else {
-
     /*If we are at an intersection*/
     if (atIntersection()) {
       /*Check if there is a wall to the right of us*/
@@ -479,7 +487,6 @@ void maze_traversal() {
         }
       }
     }
-
     /*If we are not at an intersection then line follow*/
     linefollow();
   }
@@ -520,21 +527,26 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
+
+  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
+    has been detected*/
+  //  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+  //    audio_detection();
+  //  }
+  // robot_at_intersection_start();
+
 }
 
 
 /*Main code to run*/
 void loop() {
-    /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
-      has been detected*/
-    while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-      audio_detection();
-    }
-    /*Update sees_robot*/
-    IR_detection();
-  
-    /*Traverse the maze*/
-    maze_traversal();
+
+  /*Update sees_robot*/
+  IR_detection();
+
+  /*Traverse the maze*/
+  maze_traversal();
+
 }
 
 
