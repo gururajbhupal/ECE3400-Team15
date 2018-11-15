@@ -182,8 +182,5 @@ void setup() {
 }
 
 void loop() {
-//  Serial.println(analogRead(wall_front));
-//  Serial.println(analogRead(wall_right));
-//  Serial.println();
   maze_traversal();
 }
