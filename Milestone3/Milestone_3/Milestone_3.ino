@@ -520,7 +520,7 @@ void loop() {
   IR_detection();
 
   /*Traverse the maze*/
-  maze_traversal();
+  maze_traversal_dfs();
 }
 
 
