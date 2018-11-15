@@ -36,7 +36,7 @@ int y = 0;
   maze[i][j]=1 means that square has been traversed*/
 bool maze[9][9];
 
-/* Orientation of robot with respect to the way it is initially facing (north)
+/* Orientation of robot with respect to the way it is initially facing (South)
    0 = north
    1 = east
    2 = south
@@ -60,7 +60,7 @@ int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
-int wall_thresh = 150; //if ABOVE this we detect a wall
+int wall_thresh = 200; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
 
@@ -184,7 +184,7 @@ void update_position() {
 }
 
 
-/*Scans the walls and updates data accordingly*/
+/*Scans for surrounding walls and updates data accordingly*/
 void scan_walls() {
   switch (heading) {
     case 0: // north
@@ -251,7 +251,9 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s2); //MSB s2
   digitalWrite(2, s1); //s1
   digitalWrite(3, s0); //LSB s0
-  delay(15); //small delay allows mux enough time to select appropriate input
+  /*small delay allows mux enough time to select appropriate input before
+    relevant code executes*/
+  delay(45);
 }
 
 
@@ -417,7 +419,7 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt(); //NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
+    halt(); //MIGHT NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
   }
 }
 
@@ -442,10 +444,10 @@ void maze_traversal_dfs() {
   /*If there is a robot avoid it!!*/
   if (sees_robot) {
     delay(5000);
-  /*If there is NO ROBOT then continue DFS*/
+    /*If there is NO ROBOT then continue DFS*/
   } else {
     if (atIntersection()) {
-      if (!check_right()){
+      if (!check_right()) {
         stack.push(type);
       }
       if (!check_left()) {
@@ -459,14 +461,14 @@ void maze_traversal_dfs() {
       } else {
         //pop from the stack and go forward of left or right in that order
       }
-      
-    // if no wall forward and forward location has not yet been explored, 
+
+      // if no wall forward and forward location has not yet been explored,
       //move forward, call dfs
-    // else if no wall left and left has not yet been explored, 
+      // else if no wall left and left has not yet been explored,
       //move left, call dfs
-    // else if no wall right and right has not been explored
+      // else if no wall right and right has not been explored
       //move left, call dfs
-    // else go back to previous location and see if there is somewhere to explore that has not been explored yet
+      // else go back to previous location and see if there is somewhere to explore that has not been explored yet
     }
     /* not at an intersection */
     linefollow();
@@ -479,7 +481,10 @@ void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup(); //setup the servos
 
-  /*MUX SELECT PINS*/
+  /*Setup LEDS for testing*/
+  pinMode(7, OUTPUT);
+
+  /*Setup MUX Select Pins*/
   pinMode(4, OUTPUT); //S2 - MSB
   pinMode(2, OUTPUT); //S1
   pinMode(3, OUTPUT); //S0 - LSB
@@ -506,16 +511,22 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
-}
 
-
-/*Main code to run*/
-void loop() {
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
   while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
     audio_detection();
   }
+
+  /*This function adjusts robot to traverse the maze from the get go under the 
+    assumption the robot must start at the relative bottom right of the maze facing 
+    relative up*/
+  robot_at_intersection_start();
+}
+
+
+/*Main code to run*/
+void loop() {
   /*Update sees_robot*/
   IR_detection();
 

@@ -35,7 +35,7 @@ int y = 0;
   maze[i][j]=1 means that square has been traversed*/
 bool maze[9][9];
 
-/* Orientation of robot with respect to the way it is initially facing (north)
+/* Orientation of robot with respect to the way it is initially facing (South)
    0 = north
    1 = east
    2 = south
@@ -183,7 +183,7 @@ void update_position() {
 }
 
 
-/*Scans the walls and updates data accordingly*/
+/*Scans for surrounding walls and updates data accordingly*/
 void scan_walls() {
   switch (heading) {
     case 0: // north
@@ -218,6 +218,7 @@ void turn_right_linetracker() {
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   heading--;
+  /*adjust heading accordingly (if we were at heading = 0 we now loop back to heading = 4)*/
   if (heading == -1) heading = 3;
 }
 
@@ -230,6 +231,7 @@ void turn_left_linetracker() {
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   heading++;
+  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
   if (heading == 4) heading = 0;
 }
 
@@ -250,13 +252,14 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s2); //MSB s2
   digitalWrite(2, s1); //s1
   digitalWrite(3, s0); //LSB s0
-  delay(45); //small delay allows mux enough time to select appropriate input
+  /*small delay allows mux enough time to select appropriate input before
+    relevant code executes*/
+  delay(45);
 }
 
 
 /*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
-
   mux_select(1, 0, 1);
   if (analogRead(A0) > wall_thresh) {
     return true;
@@ -285,16 +288,6 @@ bool check_right() {
     return false;
   }
 }
-
-
-//NEED TO IMPLEMENT THIS
-/*Sets button_pressed to true if we press our override button*/
-//void button_detection() {
-//  if () {
-//    button_pushed = true;
-//  }
-//}
-
 
 /*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
   is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
@@ -417,7 +410,7 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt(); //NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
+    halt(); //MIGHT NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
   }
 }
 
@@ -498,6 +491,7 @@ void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup(); //setup the servos
 
+  /*Setup LEDS for testing*/
   pinMode(7, OUTPUT);
 
   /*MUX SELECT PINS*/
@@ -530,17 +524,18 @@ void setup() {
 
   /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
     has been detected*/
-  //  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-  //    audio_detection();
-  //  }
-  // robot_at_intersection_start();
-
+  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
+    audio_detection();
+  }
+  /*This function adjusts robot to traverse the maze from the get go under the
+    assumption the robot must start at the relative bottom right of the maze facing
+    relative up*/
+  robot_at_intersection_start();
 }
 
 
 /*Main code to run*/
 void loop() {
-
   /*Update sees_robot*/
   IR_detection();
 
