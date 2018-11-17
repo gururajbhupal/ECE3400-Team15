@@ -32,12 +32,13 @@ unsigned int data; // rf message
 int x = 0;
 int y = 0;
 
-/*Size of the grid*/
+/*Size of the array grid, i.e maze[m][m]. Used as a boundary
+  to set positions.*/
 int m = 9;
 
 /*2d array which is the size of the maze to traverse.
-  maze[i][j]=1 means that square has been traversed*/
-bool maze[m][m];
+  maze[x][y]=1 means that square has been traversed*/
+bool maze[9][9];
 
 /* Orientation of robot with respect to the way it is initially facing (South)
    0 = north
@@ -150,19 +151,31 @@ void rf() {
   data = data & 0x0000;
 }
 
-
-/*Keeps track of the surrounding coordinates of the robot*/
-struct surrounding_coordinate {
+/*A struct of the x,y coordinates of the maze */
+struct coordinate {
   int x;
   int y;
-}
+};
 
-surrounding_coordinate left;
-surrounding_coordinate front;
-surrounding_coordinate right;
+/*Declare a type coordinate*/
+typedef struct coordinate Coordinate;
 
-/*Updates the position of the robot assuming that the starting position is
-  the bottom right facing north*/
+/*Coordinate to the left of  the robot*/
+Coordinate left;
+
+/*Coordinate in front of  the robot*/
+Coordinate front;
+
+/*Coordinate to the right of  the robot*/
+Coordinate right;
+
+/*v is the current coordinate of the robot*/
+Coordinate v;
+
+/* Updates the position of the robot assuming that the starting position is
+   the bottom right facing north
+   Also updates the coordinates surrounding the robot
+*/
 void update_position() {
   switch (heading) {
     case 0:
@@ -176,8 +189,8 @@ void update_position() {
         front.y = y;
       }
       if (y != m) {
-        right.x = x
-                  right.y = y + 1;
+        right.x = x;
+        right.y = y + 1;
       }
       break;
     case 1:
@@ -199,21 +212,25 @@ void update_position() {
     case 2:
       x++;
       if (y != m) {
-        left.x = x
-                 left.y = y + 1
+        left.x = x;
+        left.y = y + 1;
       }
-      front.x = x + 1;
-      front.y = y;
+      if (x != m) {
+        front.x = x + 1;
+        front.y = y;
+      }
+      if (y != 0) {
+        right.x = x;
+        right.y = y - 1;
+      }
 
-      right.x = x;
-      right.y = y - 1;
       break;
     case 3:
       y++;
       left.x = x + 1;
-      left.y = y
+      left.y = y;
 
-               front.x = x;
+      front.x = x;
       front.y = y - 1;
 
       right.x = x - 1;
@@ -473,29 +490,46 @@ bool atIntersection() {
   }
 }
 
-/*A struct of the x,y coordinates of the maze */
-struct coordinate {
-  int x;
-  int y;
-};
+StackArray <Coordinate> stack;
 
-coordinate v;
-
-StackArray <v> stack;
-
-/*Pushes the unvisited nodes w from current node v*/
+/* Pushes the unvisited nodes w from current node v
+   Pushes in reverse order of the way we visit!
+*/
 void push_unvisited() {
-  if (!check_right && !maze[right]) stack.push(right);
-  if (!check_front && !maze[front]) stack.push(front);
-  if (!check_left && !maze[left]) stack.push(left);
+  if (!check_right && !maze[right.x][right.y]) {
+    stack.push(right);
+  }
+  if (!check_front && !maze[front.x][front.y]) {
+    stack.push(front);
+  }
+  if (!check_left && !maze[left.x][left.y]) {
+    stack.push(left);
+  }
 }
 
-/*Traverses a maze via depth first search while line following. Updates GUI via radio communication*/
+
+/* Traverses a maze via depth first search while line following. Updates GUI via radio communication
+        At each intersection the robot will scan the walls around it.
+          It will always explore the left branch first,
+          then the front branch,
+          then the right branch
+        At a dead end the robot turns 180 degrees and begins DFS again
+*/
 void maze_traversal_dfs() {
+  /*push the surrounding unvisited nodes to the stack*/
   push_unvisited();
+
+  /*while the stack is NOT empty*/
   while (!stack.isEmpty()) {
-    v = stack.pop; //v is the set of coordinates. so v.x, v.y
+    /*v = location the robot MIGHT go to visit*/
+    v = stack.pop();
+
+    /*If the robot has NOT BEEN TO v,*/
     if (!maze[v.x][v.y]) {
+
+      /*Go to v*/
+
+      /*Mark v as visited*/
       maze[v.x][v.y] = 1;
       push_unvisited();
     }
@@ -549,7 +583,7 @@ void setup() {
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up*/
-  robot_at_intersection_start();
+  //robot_at_intersection_start();
 }
 
 
