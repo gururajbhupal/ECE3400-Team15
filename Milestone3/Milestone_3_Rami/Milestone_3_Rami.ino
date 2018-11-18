@@ -26,8 +26,11 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
+/*boolean which is true if the robot is at a dead end, false otherwise*/
+bool at_dead_end = false;
+
 /* The rf message*/
-unsigned int data; 
+unsigned int data;
 
 /*Current coordinates - robot starts at {0,0} and can go up to {m,m}*/
 int x = 0;
@@ -39,7 +42,7 @@ int m = 9;
 
 /*2d array which is the size of the maze to traverse.
   maze[x][y]=1 means that square has been traversed*/
-bool maze[m][m];
+bool maze[9][9];
 
 /* Orientation of robot with respect to the way it is initially facing (South for GUI but relative north)
    0 = north
@@ -251,15 +254,15 @@ void update_position() {
       break;
     case 3:
       y++;
-      if(x != m){
+      if (x != m) {
         left.x = x + 1;
-        left.y = y;    
+        left.y = y;
       }
-      if(y != 0){
+      if (y != 0) {
         front.x = x;
         front.y = y - 1;
       }
-      if(x!=0){
+      if (x != 0) {
         right.x = x - 1;
         right.y = y;
       }
@@ -520,15 +523,20 @@ void push_unvisited() {
 void maze_traversal_dfs() {
 
   /*If we are NOT at an intersection we linefollow*/
-  if(!atIntersection()){
+  if (!atIntersection()) {
     linefollow();
   }
 
-  /*ELSE WE TRAVERSE THE MAZE VIA DFS*/
+  /*If we are at a dead end*/
+  if (check_front() && check_right() && check_left()){
+    turn_left_linetracker();
+    turn_left_linetracker();
+  }
 
+  /*ELSE WE TRAVERSE THE MAZE VIA DFS*/
   /*updates the robots position*/
   update_position();
-  
+
   /*push the surrounding unvisited nodes to the stack*/
   push_unvisited();
 
@@ -540,18 +548,18 @@ void maze_traversal_dfs() {
     /*If the robot has NOT BEEN TO v,*/
     if (!maze[v.x][v.y]) {
       /*Go to v. NOTE: Must compare individual members of v and left since == is NOT defined for our struct*/
-      if(v.x == left.x && v.y == left.y){
+      if (v.x == left.x && v.y == left.y) {
         adjust();
         scan_walls();
         rf();
         turn_left_linetracker();
       }
-      else if (v.x == front.x && v.y == front.y){
+      else if (v.x == front.x && v.y == front.y) {
         adjust();
         scan_walls();
         rf();
       }
-      else if (v.x == right.x && v.y == right.y){
+      else if (v.x == right.x && v.y == right.y) {
         adjust();
         scan_walls();
         rf();
