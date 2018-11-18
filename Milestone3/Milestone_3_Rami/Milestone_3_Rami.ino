@@ -26,7 +26,8 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
-unsigned int data; // rf message
+/* The rf message*/
+unsigned int data; 
 
 /*Current coordinates - robot starts at {0,0} and can go up to {m,m}*/
 int x = 0;
