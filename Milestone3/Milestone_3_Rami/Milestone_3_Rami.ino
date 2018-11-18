@@ -38,11 +38,11 @@ int y = 0;
 
 /*Size of the array grid, i.e maze[m][m]. Used as a boundary
   to set positions.*/
-int m = 9;
+int m = 8;
 
 /*2d array which is the size of the maze to traverse.
   maze[x][y]=1 means that square has been traversed*/
-bool maze[9][9];
+bool maze[8][8];
 
 /* Orientation of robot with respect to the way it is initially facing (South for GUI but relative north)
    0 = north
@@ -512,6 +512,19 @@ void push_unvisited() {
   }
 }
 
+void at_deadEnd() {
+  turn_left_linetracker();
+  turn_left_linetracker();
+  /*0 - North
+    1-  East
+    2 - South
+    3 - West*/
+  /*When the robot switches directions the heading is incremented twice*/
+  heading += 2;
+  if (heading == 4) heading = 0;
+  if (heading == 5) heading = 1;
+}
+
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication
         At each intersection the robot will scan the walls around it.
           It will always explore the left branch first,
@@ -527,10 +540,11 @@ void maze_traversal_dfs() {
     linefollow();
   }
 
-  /*If we are at a dead end*/
-  if (check_front() && check_right() && check_left()){
-    turn_left_linetracker();
-    turn_left_linetracker();
+  /*If we are at a dead end, turn around and UPDATE ORIENTATION accordingly
+    Note: after switching directions, we must continue to perform DFS, but the robot has already
+    been to that location. */
+  if (check_front() && check_right() && check_left()) {
+    at_deadEnd();
   }
 
   /*ELSE WE TRAVERSE THE MAZE VIA DFS*/
@@ -567,6 +581,11 @@ void maze_traversal_dfs() {
       }
       /*Mark v as visited*/
       maze[v.x][v.y] = 1;
+    }
+    /*if the robot has been to v that means we hit a "dead end" and need to get
+      back on track to exploring more of the maze*/
+    else if (maze[v.x][v.y]) {
+      //need to figure out what we want to do
     }
   }
 }
