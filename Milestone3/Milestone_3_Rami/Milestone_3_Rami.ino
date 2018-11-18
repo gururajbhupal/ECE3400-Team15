@@ -497,13 +497,13 @@ void robot_at_intersection_start() {
    Pushes in reverse order of the way we visit!
 */
 void push_unvisited() {
-  if (!check_right && !maze[right.x][right.y]) {
+  if (!check_right() && !maze[right.x][right.y]) {
     stack.push(right);
   }
-  if (!check_front && !maze[front.x][front.y]) {
+  if (!check_front() && !maze[front.x][front.y]) {
     stack.push(front);
   }
-  if (!check_left && !maze[left.x][left.y]) {
+  if (!check_left() && !maze[left.x][left.y]) {
     stack.push(left);
   }
 }
