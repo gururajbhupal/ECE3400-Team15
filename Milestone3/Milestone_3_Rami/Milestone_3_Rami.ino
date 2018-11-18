@@ -38,7 +38,7 @@ int m = 9;
 
 /*2d array which is the size of the maze to traverse.
   maze[x][y]=1 means that square has been traversed*/
-bool maze[9][9];
+bool maze[m][m];
 
 /* Orientation of robot with respect to the way it is initially facing (South for GUI but relative north)
    0 = north
