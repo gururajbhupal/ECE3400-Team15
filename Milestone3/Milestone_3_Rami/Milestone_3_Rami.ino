@@ -49,7 +49,6 @@ bool maze[9][9];
 int heading = 2;
 
 
-
 /*Line sensors*/
 int sensor_left = A3;
 int sensor_middle = A4;
@@ -187,8 +186,6 @@ void rf() {
 
   Serial.println(data, HEX);
 
-  /* Mark tile as visited */
-  maze[x][y] = 1;
   /*Clear the data*/
   data = data & 0x0000;
 }
@@ -534,19 +531,19 @@ void maze_traversal_dfs() {
 
     /*If the robot has NOT BEEN TO v,*/
     if (!maze[v.x][v.y]) {
-      /*Go to v*/
-      if(v == left){
+      /*Go to v. NOTE: Must compare individual members of v and left since == is NOT defined for our struct*/
+      if(v.x == left.x && v.y == left.y){
         adjust();
         scan_walls();
         rf();
         turn_left_linetracker();
       }
-      else if (v == front){
+      else if (v.x == front.x && v.y == front.y){
         adjust();
         scan_walls();
         rf();
       }
-      else if (v == right){
+      else if (v.x == right.x && v.y == right.y){
         adjust();
         scan_walls();
         rf();
