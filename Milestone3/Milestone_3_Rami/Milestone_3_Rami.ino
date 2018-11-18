@@ -192,7 +192,11 @@ void rf() {
 
 /* Updates the position of the robot assuming that the starting position is
    the bottom right facing north
-   Also updates the coordinates surrounding the robot
+   Also updates the coordinates surrounding the robot.
+   Note: Robot can't go more North then x = 0
+         Robot can't go more South then x = m
+         Robot can't go more West then y = 0
+         Robot can't go more East then y = m
 */
 void update_position() {
   switch (heading) {
@@ -516,7 +520,7 @@ void maze_traversal_dfs() {
     linefollow();
   }
 
-  /*ELSE WE TRAVERSE THE MAZE DFS*/
+  /*ELSE WE TRAVERSE THE MAZE VIA DFS*/
   
   /*push the surrounding unvisited nodes to the stack*/
   push_unvisited();
