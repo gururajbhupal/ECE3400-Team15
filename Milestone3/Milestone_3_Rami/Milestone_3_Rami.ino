@@ -28,7 +28,7 @@ bool button_pressed = false;
 
 unsigned int data; // rf message
 
-/*Current coordinates*/
+/*Current coordinates - robot starts at {0,0} and can go up to {m,m}*/
 int x = 0;
 int y = 0;
 
@@ -40,7 +40,7 @@ int m = 9;
   maze[x][y]=1 means that square has been traversed*/
 bool maze[9][9];
 
-/* Orientation of robot with respect to the way it is initially facing (South)
+/* Orientation of robot with respect to the way it is initially facing (South for GUI but relative north)
    0 = north
    1 = east
    2 = south
@@ -55,18 +55,35 @@ int sensor_left = A3;
 int sensor_middle = A4;
 int sensor_right = A5;
 
-/* NOTE: Sensors hooked up to MUX which outputs to Analog pin A0
-   Audio
-   IR
-   Left, Middle, Right wall sensor
-*/
-
 
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
 int wall_thresh = 200; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
+/*A struct of the x,y coordinates of the maze */
+struct coordinate {
+  int x;
+  int y;
+};
+
+/*Declare a type coordinate*/
+typedef struct coordinate Coordinate;
+
+/*Coordinate to the left of  the robot*/
+Coordinate left;
+
+/*Coordinate in front of  the robot*/
+Coordinate front;
+
+/*Coordinate to the right of  the robot*/
+Coordinate right;
+
+/*v is the potential coordinate of the robot*/
+Coordinate v;
+
+/*A stack of coordinates (type Coordinate)*/
+StackArray <Coordinate> stack;
 
 /*Initializes the servo*/
 void servo_setup() {
@@ -119,12 +136,37 @@ void turn_place_right() {
 }
 
 
+/*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
+void turn_right_linetracker() {
+  turn_place_right();
+  delay(300); //delay to get off the line
+  /*Following while loops keep the robot turning until we find the line to the right of us*/
+  while (analogRead(sensor_middle) < line_thresh);
+  while (analogRead(sensor_middle) > line_thresh);
+  heading--;
+  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
+  if (heading == -1) heading = 3;
+}
+
+
+/*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
+void turn_left_linetracker() {
+  turn_place_left();
+  delay(300); //delay to get off the line
+  /*Following while loops keep the robot turning until we find the line to the left of us*/
+  while (analogRead(sensor_middle) < line_thresh);
+  while (analogRead(sensor_middle) > line_thresh);
+  heading++;
+  /*adjust heading accordingly (if we were at heading = 0 we now loop back to heading = 4)*/
+  if (heading == 4) heading = 0;
+}
+
+
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
   delay(600); //delay value to reach specification
 }
-
 
 /*Turns the information into data and start listening*/
 void rf() {
@@ -150,27 +192,6 @@ void rf() {
   /*Clear the data*/
   data = data & 0x0000;
 }
-
-/*A struct of the x,y coordinates of the maze */
-struct coordinate {
-  int x;
-  int y;
-};
-
-/*Declare a type coordinate*/
-typedef struct coordinate Coordinate;
-
-/*Coordinate to the left of  the robot*/
-Coordinate left;
-
-/*Coordinate in front of  the robot*/
-Coordinate front;
-
-/*Coordinate to the right of  the robot*/
-Coordinate right;
-
-/*v is the potential coordinate of the robot*/
-Coordinate v;
 
 /* Updates the position of the robot assuming that the starting position is
    the bottom right facing north
@@ -207,7 +228,6 @@ void update_position() {
         right.x = x + 1;
         right.y = y;
       }
-
       break;
     case 2:
       x++;
@@ -223,22 +243,24 @@ void update_position() {
         right.x = x;
         right.y = y - 1;
       }
-
       break;
     case 3:
       y++;
-      left.x = x + 1;
-      left.y = y;
-
-      front.x = x;
-      front.y = y - 1;
-
-      right.x = x - 1;
-      right.y = y;
+      if(x != m){
+        left.x = x + 1;
+        left.y = y;    
+      }
+      if(y != 0){
+        front.x = x;
+        front.y = y - 1;
+      }
+      if(x!=0){
+        right.x = x - 1;
+        right.y = y;
+      }
       break;
   }
 }
-
 
 /*Scans for surrounding walls and updates data accordingly*/
 void scan_walls() {
@@ -266,33 +288,6 @@ void scan_walls() {
   }
 }
 
-
-/*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
-void turn_right_linetracker() {
-  turn_place_right();
-  delay(300); //delay to get off the line
-  /*Following while loops keep the robot turning until we find the line to the right of us*/
-  while (analogRead(sensor_middle) < line_thresh);
-  while (analogRead(sensor_middle) > line_thresh);
-  heading--;
-  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
-  if (heading == -1) heading = 3;
-}
-
-
-/*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
-void turn_left_linetracker() {
-  turn_place_left();
-  delay(300); //delay to get off the line
-  /*Following while loops keep the robot turning until we find the line to the left of us*/
-  while (analogRead(sensor_middle) < line_thresh);
-  while (analogRead(sensor_middle) > line_thresh);
-  heading++;
-  /*adjust heading accordingly (if we were at heading = 0 we now loop back to heading = 4)*/
-  if (heading == 4) heading = 0;
-}
-
-
 /*
   Select output of mux based on select bits.
   Order is s2 s1 s0 from 000 to 111
@@ -314,7 +309,6 @@ void mux_select(int s2, int s1, int s0) {
   delay(45);
 }
 
-
 /*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
   mux_select(1, 0, 1);
@@ -324,7 +318,6 @@ bool check_left() {
     return false;
   }
 }
-
 
 /*Sets mux_select to front wall sensor information, and returns true and turns on LED if there is a wall in front. */
 bool check_front() {
@@ -346,7 +339,6 @@ bool check_right() {
   }
 }
 
-
 //NEED TO IMPLEMENT THIS
 /*Sets button_pressed to true if we press our override button*/
 //void button_detection() {
@@ -354,7 +346,6 @@ bool check_right() {
 //    button_pushed = true;
 //  }
 //}
-
 
 /*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
   is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
@@ -408,7 +399,6 @@ void audio_detection() {
 
   mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
-
 
 /*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
   mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
@@ -464,7 +454,6 @@ void IR_detection() {
   mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
-
 /*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
 void linefollow() {
   if (analogRead(sensor_middle) < line_thresh) {
@@ -480,7 +469,6 @@ void linefollow() {
     halt(); //MIGHT NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
   }
 }
-
 
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
@@ -501,9 +489,6 @@ void robot_at_intersection_start() {
   }
 }
 
-/*A stack of coordinates (type Coordinate)*/
-StackArray <Coordinate> stack;
-
 /* Pushes the unvisited nodes w from current node v
    Pushes in reverse order of the way we visit!
 */
@@ -518,7 +503,6 @@ void push_unvisited() {
     stack.push(left);
   }
 }
-
 
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication
         At each intersection the robot will scan the walls around it.
@@ -574,8 +558,6 @@ void maze_traversal_dfs() {
   }
 }
 
-
-
 /*Set up necessary stuff for our code to work*/
 void setup() {
   Serial.begin(115200); // use the serial port
@@ -623,7 +605,6 @@ void setup() {
     relative up*/
   robot_at_intersection_start();
 }
-
 
 /*Main code to run*/
 void loop() {
