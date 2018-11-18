@@ -521,12 +521,12 @@ void maze_traversal_dfs() {
   }
 
   /*ELSE WE TRAVERSE THE MAZE VIA DFS*/
-  
-  /*push the surrounding unvisited nodes to the stack*/
-  push_unvisited();
 
   /*updates the robots position*/
   update_position();
+  
+  /*push the surrounding unvisited nodes to the stack*/
+  push_unvisited();
 
   /*if the stack is NOT empty*/
   if (!stack.isEmpty()) {
