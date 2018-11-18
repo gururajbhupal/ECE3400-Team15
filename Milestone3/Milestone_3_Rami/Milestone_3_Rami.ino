@@ -69,6 +69,9 @@ struct coordinate {
 /*Declare a type coordinate*/
 typedef struct coordinate Coordinate;
 
+
+/*All coordinates are only updated at intersections and based on surrounding walls*/
+
 /*Coordinate to the left of the way the robot is moving*/
 Coordinate left;
 
