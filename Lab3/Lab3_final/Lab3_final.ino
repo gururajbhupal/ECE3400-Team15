@@ -140,8 +140,6 @@ void rf() {
 
   Serial.println(data, HEX);
 
-  /* Mark tile as visited */
-  maze[x][y] = 1;
   /*Clear the data*/
   data = data & 0x0000;
 }
@@ -426,7 +424,7 @@ bool atIntersection() {
 }
 
 void robot_at_intersection_start() {
-  /*If there is no wall to the right of us and no wall in front of us */
+  /*If there is no wall to the right of us and a wall in front of us */
   if (check_front()) {
     scan_walls();
     rf();

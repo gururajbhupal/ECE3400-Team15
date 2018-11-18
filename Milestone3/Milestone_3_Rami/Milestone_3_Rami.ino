@@ -169,7 +169,7 @@ Coordinate front;
 /*Coordinate to the right of  the robot*/
 Coordinate right;
 
-/*v is the current coordinate of the robot*/
+/*v is the potential coordinate of the robot*/
 Coordinate v;
 
 /* Updates the position of the robot assuming that the starting position is
@@ -275,6 +275,7 @@ void turn_right_linetracker() {
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   heading--;
+  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
   if (heading == -1) heading = 3;
 }
 
@@ -287,6 +288,7 @@ void turn_left_linetracker() {
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   heading++;
+  /*adjust heading accordingly (if we were at heading = 0 we now loop back to heading = 4)*/
   if (heading == 4) heading = 0;
 }
 
@@ -490,6 +492,16 @@ bool atIntersection() {
   }
 }
 
+void robot_at_intersection_start() {
+  /*If there is no wall to the right of us and a wall in front of us */
+  if (check_front()) {
+    scan_walls();
+    rf();
+    turn_left_linetracker();
+  }
+}
+
+/*A stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
 
 /* Pushes the unvisited nodes w from current node v
@@ -514,24 +526,50 @@ void push_unvisited() {
           then the front branch,
           then the right branch
         At a dead end the robot turns 180 degrees and begins DFS again
+        NEEDS TO BE UPDATED FOR ROBOT AVOIDANCE
 */
 void maze_traversal_dfs() {
+
+  /*If we are NOT at an intersection we linefollow*/
+  if(!atIntersection()){
+    linefollow();
+  }
+
+  /*ELSE WE TRAVERSE THE MAZE DFS*/
+  
   /*push the surrounding unvisited nodes to the stack*/
   push_unvisited();
 
-  /*while the stack is NOT empty*/
-  while (!stack.isEmpty()) {
+  /*updates the robots position*/
+  update_position();
+
+  /*if the stack is NOT empty*/
+  if (!stack.isEmpty()) {
     /*v = location the robot MIGHT go to visit*/
     v = stack.pop();
 
     /*If the robot has NOT BEEN TO v,*/
     if (!maze[v.x][v.y]) {
-
       /*Go to v*/
-
+      if(v == left){
+        adjust();
+        scan_walls();
+        rf();
+        turn_left_linetracker();
+      }
+      else if (v == front){
+        adjust();
+        scan_walls();
+        rf();
+      }
+      else if (v == right){
+        adjust();
+        scan_walls();
+        rf();
+        turn_right_linetracker();
+      }
       /*Mark v as visited*/
       maze[v.x][v.y] = 1;
-      push_unvisited();
     }
   }
 }
@@ -583,7 +621,7 @@ void setup() {
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up*/
-  //robot_at_intersection_start();
+  robot_at_intersection_start();
 }
 
 
