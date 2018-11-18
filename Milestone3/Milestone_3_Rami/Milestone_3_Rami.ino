@@ -69,13 +69,13 @@ struct coordinate {
 /*Declare a type coordinate*/
 typedef struct coordinate Coordinate;
 
-/*Coordinate to the left of  the robot*/
+/*Coordinate to the left of the way the robot is moving*/
 Coordinate left;
 
-/*Coordinate in front of  the robot*/
+/*Coordinate in front of the way the robot is movingt*/
 Coordinate front;
 
-/*Coordinate to the right of  the robot*/
+/*Coordinate to the right of the way the robot is moving*/
 Coordinate right;
 
 /*v is the potential coordinate of the robot*/
