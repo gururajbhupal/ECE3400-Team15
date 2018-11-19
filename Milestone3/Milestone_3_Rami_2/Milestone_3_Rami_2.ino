@@ -12,7 +12,7 @@
 RF24 radio(9, 10);
 
 /* Radio pipe addresses for the 2 nodes to communicate.*/
-const uint64_t pipes[2] = { 0x000000002ALL, 0x000000002BLL };
+const uint64_t pipes[2] = { 0x000000002ALL, 0x000000002BLL};
 
 Servo servo_left; // pin 6
 Servo servo_right; // pin 5
@@ -47,18 +47,19 @@ int sensor_left = A3;
 int sensor_middle = A4;
 int sensor_right = A5;
 
-
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
 int wall_thresh = 150; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
-/*A struct of the x,y coordinates of the maze */
+/*A coordinate contains the an x,y location as well as information
+  of the surroundings at that coordinate, as well as whether that
+  coordinate has been explored*/
 struct coordinate {
   int x;
   int y;
   bool explored;
-  bool n_wall; 
+  bool n_wall;
   bool e_wall;
   bool s_wall;
   bool w_wall;
@@ -67,27 +68,29 @@ struct coordinate {
 /*Declare a type coordinate*/
 typedef struct coordinate Coordinate;
 
-
 /*All coordinates are only updated at intersections and based on surrounding walls*/
 
-/*Coordinate to the left of the way the robot is moving*/
-int left[2];
+/*Coordinate to the left of the way the robot is moving (note we only care about x,y value here)*/
+Coordinate left;
 
-/*Coordinate in front of the way the robot is movingt*/
-int front[2];
+/*Coordinate in front of the way the robot is moving (note we only care about x,y value here)*/
+Coordinate front;
 
-/*Coordinate to the right of the way the robot is moving*/
-int right[2];
+/*Coordinate to the right of the way the robot is moving (note we only care about x,y value here)*/
+Coordinate right;
 
-/*v is the potential coordinate of the robot*/
-Coordinate v;
+/*m is the maximum index of the 2d maze array*/
+int m = 3;
 
-/*2d array which is the size of the maze to traverse.
-  maze[x][y]=1 means that square has been traversed*/
+/*2d array which is the size of the maze to traverse. Each
+  index of the maze contains the x,y coordinate
+  (i.e in maze[0][1] x=0, y=1) as well as the wall information
+  at that coordinate, as well as if that coordinate has been explored*/
 Coordinate maze[4][4];
 
-/*A stack of coordinates (type Coordinate)*/
+/*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
+
 
 /*Initializes the servo*/
 void servo_setup() {
@@ -112,14 +115,13 @@ void halt() {
 }
 
 
-/*Simple left turn*/
+/*Simple left turn adjust for linefollow*/
 void turn_left() {
   servo_left.write(93);
   servo_right.write(70);
 }
 
-
-/*Simple right turn*/
+/*Simple right turn adjust for linefollow*/
 void turn_right() {
   servo_left.write(110);
   servo_right.write(87);
@@ -165,35 +167,12 @@ void turn_left_linetracker() {
   if (heading == 4) heading = 0;
 }
 
-
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
   delay(600); //delay value to reach specification
 }
 
-/*Turns the information into data and start listening*/
-void rf() {
-  /* format info into data*/
-  data = data | y;
-  data = data | x << 4;
-
-  radio.stopListening();
-  bool ok = radio.write( &data, sizeof(unsigned int) );
-
-  if (ok)
-    printf("ok...\n");
-  else
-    printf("failed.\n\r");
-
-  /*Now, continue listening*/
-  radio.startListening();
-
-  Serial.println(data, HEX);
-
-  /*Clear the data*/
-  data = data & 0x0000;
-}
 
 /* Updates the position of the robot assuming that the starting position is
    the bottom right facing north
@@ -206,45 +185,59 @@ void rf() {
 void update_position() {
   switch (heading) {
     case 0:
-      x--; 
-      left[0] = x;
-      left[1] = y-1;
-      front[0] = x - 1;
-      front[1] = y;
-      right[0] = x;
-      right[1] = y + 1;
+      x--;
+      if(y!=0){
+        left = {x, y - 1};
+      }
+      if(x!=0){
+        front = {x - 1, y};       
+      }
+      if(y!=m){
+        right = {x, y + 1};
+      }
       break;
     case 1:
       y--;
-      left[0] = x-1;
-      left[1] = y;
-      front[0] = x;
-      front [1]= y + 1;
-      right[0] = x + 1;
-      right[1] = y;
+      if(x!=0){
+        left = {x - 1, y};
+      }
+      if(y!=m){
+        front = {x, y + 1};
+      }
+      if(x!=m){
+        right = {x + 1, y};
+      }
       break;
     case 2:
       x++;
-      left[0] = x;
-      left[1] = y+1;
-      front[0] = x+1;
-      front[1] = y;
-      right[0] = x;
-      right[1] = y-1;
+      if(y!=m){
+        left = {x, y + 1};
+      }
+      if(x!=m){
+        front = {x + 1, y};
+      }
+      if(y!=0){
+        right = {x, y - 1};
+      }
       break;
     case 3:
       y++;
-      left[0] = x+1;
-      left[1] = y;
-      front[0] = x;
-      front[1] = y-1;
-      right[0] = x-1;
-      right[1] = y;
+      if(x!=m){
+        left = {x + 1, y};
+      }
+      if(y!=0){
+        front = {x, y - 1};
+      }
+      if(x!=0){
+        right = {x - 1, y};
+      }
       break;
   }
 }
 
-/*Scans for surrounding walls and updates data accordingly*/
+
+/*Scans for surrounding walls and updates data accordingly.
+  Also updates wall info in Maze for the current {x,y} coordinate*/
 void scan_walls() {
   switch (heading) {
     case 0: // north
@@ -274,6 +267,31 @@ void scan_walls() {
   maze[x][y].w_wall = (data >> 8) & 0x0001;
 }
 
+
+/*Turns the information into data and starts listening*/
+void rf() {
+  /* format info into data*/
+  data = data | y;
+  data = data | x << 4;
+
+  radio.stopListening();
+  bool ok = radio.write( &data, sizeof(unsigned int) );
+
+  if (ok)
+    printf("ok...\n");
+  else
+    printf("failed.\n\r");
+
+  /*Now, continue listening*/
+  radio.startListening();
+
+  Serial.println(data, HEX);
+
+  /*Clear the data*/
+  data = data & 0x0000;
+}
+
+
 /*
   Select output of mux based on select bits.
   Order is s2 s1 s0 from 000 to 111
@@ -294,6 +312,7 @@ void mux_select(int s2, int s1, int s0) {
     relevant code executes*/
   delay(45);
 }
+
 
 /*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
@@ -325,120 +344,6 @@ bool check_right() {
   }
 }
 
-//NEED TO IMPLEMENT THIS
-/*Sets button_pressed to true if we press our override button*/
-//void button_detection() {
-//  if () {
-//    button_pushed = true;
-//  }
-//}
-
-/*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
-  is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
-void audio_detection() {
-  mux_select(0, 0, 0); //select correct mux output
-
-  /*Set temporary values for relevant registers*/
-  int temp1 = TIMSK0;
-  int temp2 = ADCSRA;
-  int temp3 = ADMUX;
-  int temp4 = DIDR0;
-
-
-  /*Set register values to required values for IR detection*/
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    while (!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i + 1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
-
-  /*When audio is detected, detects_audio is set to true. Once detected
-    this value is never set back to false*/
-  for (byte i = 0; i < FFT_N / 2; i++) {
-    if (i == 5 && fft_log_out[i] > 135) {
-      detects_audio = true;
-    }
-  }
-
-  /*Restore the register values*/
-  TIMSK0 = temp1;
-  ADCSRA = temp2;
-  ADMUX = temp3;
-  DIDR0 =  temp4;
-
-  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
-}
-
-/*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
-  mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
-void IR_detection() {
-  mux_select(0, 0, 1); //select correct mux output
-
-  /*Set temporary values for relevant registers*/
-  int t1 = TIMSK0;
-  int t2 = ADCSRA;
-  int t3 = ADMUX;
-  int t4 = DIDR0;
-
-  /*Set register values to required values for IR detection*/
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    while (!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i + 1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
-
-  for (byte i = 0 ; i < FFT_N / 2 ; i++) {
-    /*If there is a robot*/
-    if (i == 43 && fft_log_out[i] > IR_threshold) {
-      sees_robot = true;
-    }
-    /*If there is no robot detected (care about not seeing IR case because in our implementation we need to exit our lock)*/
-    if (i == 43 && fft_log_out[i] < IR_threshold) {
-      sees_robot = false;
-    }
-  }
-
-  /*Restore the register values*/
-  TIMSK0 = t1;
-  ADCSRA = t2;
-  ADMUX = t3;
-  DIDR0 =  t4;
-  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
-}
 
 /*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
 void linefollow() {
@@ -456,6 +361,7 @@ void linefollow() {
   }
 }
 
+
 /*Returns true if the robot is at an intersection, else false*/
 bool atIntersection() {
   if ((analogRead(sensor_right) < line_thresh) && (analogRead(sensor_left) < line_thresh) && (analogRead(sensor_middle) < line_thresh)) {
@@ -466,93 +372,89 @@ bool atIntersection() {
   }
 }
 
-void robot_at_intersection_start() {
-  /*If there is no wall to the right of us and a wall in front of us */
-  if (check_front()) {
-    scan_walls();
-    rf();
+
+/*Since the robot starts after the {0,0} intersection we manually take care of this special case.
+  We must scan the walls at 0,0  and the*/
+void robot_start() {
+  /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
+  maze[0][0].explored = 1;
+  /*scan the walls and update the GUI*/
+  scan_walls();
+  rf();
+  /*If there is NO wall to the left of us begin going that way to stay consistent with DFS*/
+  if (!check_left) {
     turn_left_linetracker();
   }
 }
 
-/* Pushes the unvisited nodes w from current node v
-   Pushes in reverse order of the way we visit!
-*/
+/* Pushes the unvisited intersections w from current intersection v
+   Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
-  if (!check_right() && !maze[right[0]][right[1]].explored) {
-    Coordinate temp = maze[right[0]][right[1]];
-    temp.x = right[0];
-    temp.y = right[1];
-    stack.push(temp);
+  if (!check_right() && !maze[right.x][right.y].explored) {
+    stack.push(right);
   }
-  if (!check_front() && !maze[front[0]][front[1]].explored) {
-    Coordinate temp = maze[front[0]][front[1]];
-    temp.x = front[0];
-    temp.y = front[1];
-    stack.push(temp);
+  if (!check_front() && !maze[front.x][front.y].explored) {
+    stack.push(front);
   }
-  if (!check_left() && !maze[left[0]][left[1]].explored) {
-    Coordinate temp = maze[left[0]][left[1]];
-    temp.x = left[0];
-    temp.y = left[1];
-    stack.push(temp);
+  if (!check_left() && !maze[left.x][left.y].explored) {
+    stack.push(left);
   }
 }
 
-void at_deadEnd() {
-  turn_left_linetracker();
-  turn_left_linetracker();
+
+/*This function allows the robot to go to a location IT HAS ALREADY VISITED*/
+void go_To(int x, int y){
+  //IMPLEMENT ME
 }
+
 
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication
         At each intersection the robot will scan the walls around it.
           It will always explore the left branch first,
           then the front branch,
           then the right branch
-        At a dead end the robot turns 180 degrees and begins DFS again
-        NEEDS TO BE UPDATED FOR ROBOT AVOIDANCE
 */
 void maze_traversal_dfs() {
-
-  /*If we are NOT at an intersection we linefollow*/
+  /*If we are at an intersection*/
   if (atIntersection()) {
     halt();
     /*updates the robots position*/
     update_position();
-
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
-      /*v = location the robot MIGHT go to visit*/
-      v = stack.pop();
+      /*Coordinate v is the coordinate the robot is about to visit*/
+      Coordinate v = stack.pop();
       /*If the robot has NOT BEEN TO v,*/
-      if (!v.explored) {
-        /*Go to v. NOTE: Must compare individual members of v and left since == is NOT defined for our struct*/
-        if (v.x == left[0] && v.y == left[1]) {
-          adjust();
+      if (!maze[v.x][v.y].explored) {
+        /*Go to v*/
+        if (v.x == left.x && v.y == left.y) {
           scan_walls();
           rf();
+          adjust();
           turn_left_linetracker();
         }
-        else if (v.x == front[0] && v.y == front[1]) {
-          adjust();
+        else if (v.x == front.x && v.y == front.y) {
           scan_walls();
           rf();
+          adjust();
         }
-        else if (v.x == right[0] && v.y == right[1]) {
-          adjust();
+        else if (v.x == right.x && v.y == right.y) {
           scan_walls();
           rf();
+          adjust();
           turn_right_linetracker();
         }
         /*Mark v as visited*/
-        maze[v.x][v.y].explored = true;
+        maze[v.x][v.y].explored = 1;
       }
     }
   }
+  /*If we are NOT at an intersection we linefollow*/
   linefollow();
 }
+
 
 /*Set up necessary stuff for our code to work*/
 void setup() {
@@ -590,28 +492,13 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-  /*Loop until we hear a 660Hz signal. Loop allows us to skip audio detection code on reiteration once the signal
-    has been detected*/
-  //  while (!detects_audio) { //UPDATE ONCE BUTTON OVERRIDE IS IN PLACE
-  //    audio_detection();
-  //  }
-
-  maze[0][0].explored = 1;
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
-    relative up*/
-  //robot_at_intersection_start();
+    relative up. Also updates GUI accordingly and begins DFS accordingly.*/
+  robot_start();
 }
 
-/*Main code to run*/
 void loop() {
-  /*Update sees_robot*/
-  //  IR_detection();
-  /*Traverse the maze*/
   maze_traversal_dfs();
-  
+
 }
-
-
-
-
