@@ -92,7 +92,7 @@ int m = 3;
   index of the maze contains the x,y coordinate
   (i.e in maze[0][1] x=0, y=1) as well as the wall information
   at that coordinate, as well as if that coordinate has been explored*/
-Info maze[9][9];
+Info maze[4][4];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -269,6 +269,7 @@ void scan_walls() {
       if (check_right()) data = data | 0x0800;// south=true
       break;
   }
+  /*Update the wall information at current coordinate*/
   maze[x][y].n_wall = (data >> 9) & 0x0001;
   maze[x][y].e_wall = (data >> 10) & 0x0001;
   maze[x][y].s_wall = (data >> 11) & 0x0001;
