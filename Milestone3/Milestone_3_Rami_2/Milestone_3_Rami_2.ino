@@ -425,6 +425,12 @@ void go_To(int x, int y){
           It will always explore the left branch first,
           then the front branch,
           then the right branch
+
+   THERE IS A HUGE CHANGE WITH THIS COMPARED TO REGULAR DFS. Since all of this code runs in a while loop in loop() we would
+   have nested while loops. But we only ever push unvisited nodes from intersections. We either gotta fix that while loop from
+   standard DFS to only push to the stack at an intersection or go with what I'm doing. What I'm doing should work if we fix
+   robot_start() the right way to push to the stack in setup before maze_traversal_dfs() runs.
+   
 */
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
@@ -515,7 +521,7 @@ void setup() {
   robot_start();
 }
 
+/*Run main code*/
 void loop() {
   maze_traversal_dfs();
-
 }
