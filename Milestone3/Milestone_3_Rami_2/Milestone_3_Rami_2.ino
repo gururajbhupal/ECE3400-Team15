@@ -1,8 +1,7 @@
 #define FFT_N 256 // set to 256 point fft
 #define LOG_OUT 1 // use the log output function
 
-#include <Servo.h> // include servo library
-#include <FFT.h> // include the library
+#include <Servo.h>
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -76,11 +75,11 @@ typedef struct info Info;
 
 /*All coordinates are only updated at intersections and based on surrounding walls*/
 
-/*Coordinate to the left of the way the robot is moving (note we only care about x,y value here)*/
-Coordinate left;
+/*Coordinate to the left of the way the robot is moving (initially the left of {0,0})*/
+Coordinate left = {0,1};
 
-/*Coordinate in front of the way the robot is moving (note we only care about x,y value here)*/
-Coordinate front;
+/*Coordinate in front of the way the robot is moving (initially the front of {0,0})*/
+Coordinate front = {1,0};
 
 /*Coordinate to the right of the way the robot is moving (note we only care about x,y value here)*/
 Coordinate right;
@@ -384,16 +383,27 @@ bool atIntersection() {
 
 
 /*Since the robot starts after the {0,0} intersection we manually take care of this special case.
-  We must scan the walls at 0,0  and the*/
+  We must scan the walls at {0,0} and evaluate unvisited nodes from the get go.
+  
+  Note: left, front and right are initialized to be values assuming you start at the bottom right at {0,0}*/
 void robot_start() {
   /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
   maze[0][0].explored = 1;
   /*scan the walls and update the GUI*/
   scan_walls();
   rf();
+  /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there 
+    is always a wall to the right initially)*/
+  push_unvisited(); 
   /*If there is NO wall to the left of us begin going that way to stay consistent with DFS*/
   if (!check_left) {
     turn_left_linetracker();
+    /*need to mark the immediate left coordinate as explored otherwise it will mess up exploration later*/
+    maze[left.x][left.y].explored = 1;
+  }
+  else if (!check_front()){
+    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
+    maze[front.x][front.y].explored = 1;
   }
 }
 
