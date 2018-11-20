@@ -52,12 +52,18 @@ int line_thresh = 400; //if BELOW this we detect a white line
 int wall_thresh = 150; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
-/*A coordinate contains the an x,y location as well as information
-  of the surroundings at that coordinate, as well as whether that
-  coordinate has been explored*/
+/*A coordinate contains an x,y location*/
 struct coordinate {
   int x;
   int y;
+};
+
+/*Declare a type coordinate*/
+typedef struct coordinate Coordinate;
+
+/*Info contains information at an x,y coordinate. Information includes
+  whether the coordinate has been explored as well as wall information*/
+struct info {
   bool explored;
   bool n_wall;
   bool e_wall;
@@ -66,7 +72,7 @@ struct coordinate {
 };
 
 /*Declare a type coordinate*/
-typedef struct coordinate Coordinate;
+typedef struct info Info;
 
 /*All coordinates are only updated at intersections and based on surrounding walls*/
 
@@ -86,7 +92,7 @@ int m = 3;
   index of the maze contains the x,y coordinate
   (i.e in maze[0][1] x=0, y=1) as well as the wall information
   at that coordinate, as well as if that coordinate has been explored*/
-Coordinate maze[4][4];
+Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -181,6 +187,8 @@ void adjust() {
          Robot can't go more South then x = m
          Robot can't go more West then y = 0
          Robot can't go more East then y = m
+   Note: We don't know any information about the surrounding
+         coordinates walls, nor do we care (for now)
 */
 void update_position() {
   switch (heading) {
@@ -428,19 +436,24 @@ void maze_traversal_dfs() {
       Coordinate v = stack.pop();
       /*If the robot has NOT BEEN TO v,*/
       if (!maze[v.x][v.y].explored) {
-        /*Go to v*/
+        /*If v is the left coordinate*/
         if (v.x == left.x && v.y == left.y) {
+          /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
           adjust();
           turn_left_linetracker();
         }
+        /*else if v is the front coordinate*/
         else if (v.x == front.x && v.y == front.y) {
+          /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
           adjust();
         }
+        /*else if v is the right coordinate*/
         else if (v.x == right.x && v.y == right.y) {
+          /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
           adjust();
