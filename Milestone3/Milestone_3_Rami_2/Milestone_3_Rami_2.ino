@@ -57,7 +57,7 @@ struct coordinate {
   int y;
 };
 
-/*Declare a type coordinate*/
+/*Declare a type coordinate as Coordinate*/
 typedef struct coordinate Coordinate;
 
 /*Info contains information at an x,y coordinate. Information includes
@@ -70,7 +70,7 @@ struct info {
   bool w_wall;
 };
 
-/*Declare a type coordinate*/
+/*Declare a type info as Info*/
 typedef struct info Info;
 
 /*All coordinates are only updated at intersections and based on surrounding walls*/
@@ -81,7 +81,7 @@ Coordinate left = {0,1};
 /*Coordinate in front of the way the robot is moving (initially the front of {0,0})*/
 Coordinate front = {1,0};
 
-/*Coordinate to the right of the way the robot is moving (note we only care about x,y value here)*/
+/*Coordinate to the right of the way the robot is moving (no initial right coordinate until we leave x = 0 column)*/
 Coordinate right;
 
 /*m is the maximum index of the 2d maze array*/
