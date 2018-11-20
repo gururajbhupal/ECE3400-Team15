@@ -187,6 +187,7 @@ void adjust() {
          Robot can't go more South then x = m
          Robot can't go more West then y = 0
          Robot can't go more East then y = m
+         CONDITIONS MATTER FOR INDEXING THE ARRAY
    Note: We don't know any information about the surrounding
          coordinates walls, nor do we care (for now)
 */
@@ -411,7 +412,9 @@ void push_unvisited() {
 }
 
 
-/*This function allows the robot to go to a location IT HAS ALREADY VISITED*/
+/*This function allows the robot to go to a location. We may wanna do this by searching our array for an unexplored spot
+  near where we are? Not to sure how we wanna go about this. It may make more sense for this to be
+  implemented as a go to function for coordinates WE HAVE ALREADY VISITED*/
 void go_To(int x, int y){
   //IMPLEMENT ME
 }
