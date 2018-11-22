@@ -76,22 +76,25 @@ typedef struct info Info;
 /*All coordinates are only updated at intersections and based on surrounding walls*/
 
 /*Coordinate to the left of the way the robot is moving (initially the left of {0,0})*/
-Coordinate left = {0,1};
+Coordinate left = {0, 1};
 
 /*Coordinate in front of the way the robot is moving (initially the front of {0,0})*/
-Coordinate front = {1,0};
+Coordinate front = {1, 0};
 
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate until we leave x = 0 column)*/
 Coordinate right;
 
+/*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
+Coordinate v;
+
 /*m is the maximum index of the 2d maze array*/
-int m = 3;
+int m = 8;
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze contains the x,y coordinate
   (i.e in maze[0][1] x=0, y=1) as well as the wall information
   at that coordinate, as well as if that coordinate has been explored*/
-Info maze[4][4];
+Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -194,49 +197,49 @@ void update_position() {
   switch (heading) {
     case 0:
       x--;
-      if(y!=0){
+      if (y != 0) {
         left = {x, y - 1};
       }
-      if(x!=0){
-        front = {x - 1, y};       
+      if (x != 0) {
+        front = {x - 1, y};
       }
-      if(y!=m){
+      if (y != m) {
         right = {x, y + 1};
       }
       break;
     case 1:
       y--;
-      if(x!=0){
+      if (x != 0) {
         left = {x - 1, y};
       }
-      if(y!=m){
+      if (y != m) {
         front = {x, y + 1};
       }
-      if(x!=m){
+      if (x != m) {
         right = {x + 1, y};
       }
       break;
     case 2:
       x++;
-      if(y!=m){
+      if (y != m) {
         left = {x, y + 1};
       }
-      if(x!=m){
+      if (x != m) {
         front = {x + 1, y};
       }
-      if(y!=0){
+      if (y != 0) {
         right = {x, y - 1};
       }
       break;
     case 3:
       y++;
-      if(x!=m){
+      if (x != m) {
         left = {x + 1, y};
       }
-      if(y!=0){
+      if (y != 0) {
         front = {x, y - 1};
       }
-      if(x!=0){
+      if (x != 0) {
         right = {x - 1, y};
       }
       break;
@@ -381,66 +384,100 @@ bool atIntersection() {
   }
 }
 
-
-/*Since the robot starts after the {0,0} intersection we manually take care of this special case.
-  We must scan the walls at {0,0} and evaluate unvisited nodes from the get go.
-  
-  Note: left, front and right are initialized to be values assuming you start at the bottom right at {0,0}*/
-void robot_start() {
-  /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
-  maze[0][0].explored = 1;
-  /*scan the walls and update the GUI*/
-  scan_walls();
-  rf();
-  /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there 
-    is always a wall to the right initially)*/
-  push_unvisited(); 
-  /*If there is NO wall to the left of us begin going that way to stay consistent with DFS*/
-  if (!check_left) {
-    turn_left_linetracker();
-    /*need to mark the immediate left coordinate as explored otherwise it will mess up exploration later*/
-    maze[left.x][left.y].explored = 1;
-  }
-  else if (!check_front()){
-    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
-    maze[front.x][front.y].explored = 1;
-  }
-}
-
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
   if (!check_right() && !maze[right.x][right.y].explored) {
     stack.push(right);
   }
-  if (!check_front() && !maze[front.x][front.y].explored) {
-    stack.push(front);
-  }
   if (!check_left() && !maze[left.x][left.y].explored) {
     stack.push(left);
   }
+  if (!check_front() && !maze[front.x][front.y].explored) {
+    stack.push(front);
+  }
+
 }
 
+/*Since the robot starts after the {0,0} intersection we manually take care of this special case.
+  We must scan the walls at {0,0} and evaluate unvisited nodes from the get go.
+
+  Note: left, front and right are initialized to be values assuming you start at the bottom right at {0,0}
+        after robot_start() DFS begins*/
+void robot_start() {
+  /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
+  maze[0][0].explored = 1;
+  /*scan the walls and update the GUI*/
+  scan_walls();
+  rf();
+  /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there
+    is always a wall to the right initially)*/
+  push_unvisited();
+  /*If there is NO wall to the front of us begin going that way to stay consistent with DFS*/
+  if (!check_front()) {
+    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
+    maze[front.x][front.y].explored = 1;
+  }
+  else if (!check_left()) {
+    /*turn left if there is a wall in front and no wall to the left*/
+    turn_left_linetracker();
+    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
+    maze[left.x][left.y].explored = 1;
+  }
+}
 
 /*This function allows the robot to go to a location. We may wanna do this by searching our array for an unexplored spot
-  near where we are? Not to sure how we wanna go about this. It may make more sense for this to be
-  implemented as a go to function for coordinates WE HAVE ALREADY VISITED*/
-void go_To(int x, int y){
-  //IMPLEMENT ME
+  near where we are? Not to sure how we wanna go about this.
+  
+  heading = 1,3 robot traverses y-axis
+  heading = 0,2 robot traverses x-axis
+  
+   At       To
+  (8,3) -> (5,5)
+  
+  leftof =
+  rightof =
+  frontof =
+  southof = 
+  */
+void goTo(int x, int y) {
+  Coordinate current = {x,y};
+  /*v is the coordinate to go to which was set in maze_traversal_dfs()*/
+
+  /*left of means that the robot needs heading = 3 to get there*/
+  bool leftof = v.x < x;
+  /*right of means that the robot needs heading = 1 to get there*/
+  bool rightof = v.x > x;
+  /*front of means that the robot needs heading = 2 to get there*/
+  bool frontof = v.y > y;
+  /*south of means that the robot needs heading = 0 to get there*/
+  bool southof = v.y < y;
+
+  /*while we are NOT at the coordinate we need to traverse towards it
+  
+    This is gonna be tricky and a lot of conditionals but possible.
+    The maze is of type Info so each {x,y} coordinate has the wall information
+    and we will be likely wanna traceback through already explored coordinates
+    
+    I think we will just wanna update current.x and current.y and then set x,y to
+    v.x and v.y once we reach it so we can begin updating again*/
+  while (v.x != x && v.y != y){
+    
+  }
 }
 
 
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication
         At each intersection the robot will scan the walls around it.
-          It will always explore the left branch first,
-          then the front branch,
-          then the right branch
+          It will always explore the front branch first,
+          then go left and back to the straight branch,
+          then go right and back to the straight branch
 
    THERE IS A HUGE CHANGE WITH THIS COMPARED TO REGULAR DFS. Since all of this code runs in a while loop in loop() we would
    have nested while loops. But we only ever push unvisited nodes from intersections. We either gotta fix that while loop from
    standard DFS to only push to the stack at an intersection or go with what I'm doing. What I'm doing should work if we fix
    robot_start() the right way to push to the stack in setup before maze_traversal_dfs() runs.
-   
+
 */
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
@@ -453,19 +490,19 @@ void maze_traversal_dfs() {
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
       /*Coordinate v is the coordinate the robot is about to visit*/
-      Coordinate v = stack.pop();
+      v = stack.pop();
       /*If the robot has NOT BEEN TO v,*/
       if (!maze[v.x][v.y].explored) {
-        /*If v is the left coordinate*/
-        if (v.x == left.x && v.y == left.y) {
+        /*If v is the front coordinate*/
+        if (v.x == front.x && v.y == front.y) {
           /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
           adjust();
           turn_left_linetracker();
         }
-        /*else if v is the front coordinate*/
-        else if (v.x == front.x && v.y == front.y) {
+        /*else if v is the left coordinate*/
+        else if (v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
@@ -478,6 +515,12 @@ void maze_traversal_dfs() {
           rf();
           adjust();
           turn_right_linetracker();
+        }
+        /*else if v is neither the front, left, or right coordinate
+          of the robot we have explored a whole branch and need to go
+          back to the coordinate where the robot branched from*/
+        else {
+          goTo(v.x, v.y);
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
