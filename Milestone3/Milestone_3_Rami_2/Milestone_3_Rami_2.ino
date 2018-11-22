@@ -426,8 +426,8 @@ void robot_start() {
   }
 }
 
-/*This function allows the robot to go to a location. We may wanna do this by searching our array for an unexplored spot
-  near where we are? Not to sure how we wanna go about this.
+/*This function allows the robot to go to a location. 
+  WE ONLY GO TO A NODE VIA NODES WE HAVE VISITED
 
   heading = 1,3 robot traverses y-axis
   heading = 0,2 robot traverses x-axis
@@ -441,7 +441,7 @@ void robot_start() {
   southof => false
   northof => true
 
-  booleans are absolute directions from GUI perspective AND ARE ABSOLUTE
+  booleans are directions from GUI perspective AND ARE ABSOLUTE
   i.e not relative to how the robot is facing
 
 
@@ -463,8 +463,6 @@ void robot_start() {
   wall is always a wall in that coordinate facing North
 */
 void goTo(int x, int y) {
-  /*local heading variable*/
-  int h = heading;
   /*local variable current keeps track of current coordinate. {x,y} will
     be updated once we reach v*/
   Coordinate current = {x, y};
