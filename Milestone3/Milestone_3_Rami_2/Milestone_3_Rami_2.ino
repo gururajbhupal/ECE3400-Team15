@@ -434,24 +434,29 @@ void robot_start() {
   
    At       To
   (8,3) -> (5,5)
-  
-  leftof =
-  rightof =
-  frontof =
-  southof = 
+
+  Coordinates below are immediate coordinates and boolean evaluation shown next to it
+  westof => {8,2} false
+  eastof => {8,4} true
+  southof => {not possible} false
+  northof => {7,3} true
   */
 void goTo(int x, int y) {
+  /*local variable current keeps track of current coordinate. {x,y} will
+    be updated once we reach v*/
   Coordinate current = {x,y};
   /*v is the coordinate to go to which was set in maze_traversal_dfs()*/
 
+  /*booleans are absolute directions from GUI perspective*/
+  
   /*left of means that the robot needs heading = 3 to get there*/
-  bool leftof = v.x < x;
+  bool westof = v.y < current.y;
   /*right of means that the robot needs heading = 1 to get there*/
-  bool rightof = v.x > x;
+  bool eastof = v.y > current.y;
   /*front of means that the robot needs heading = 2 to get there*/
-  bool frontof = v.y > y;
+  bool southof = v.x > current.x;
   /*south of means that the robot needs heading = 0 to get there*/
-  bool southof = v.y < y;
+  bool northof = v.x < current.x;
 
   /*while we are NOT at the coordinate we need to traverse towards it
   
