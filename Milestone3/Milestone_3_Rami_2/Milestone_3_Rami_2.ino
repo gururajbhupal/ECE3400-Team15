@@ -428,46 +428,97 @@ void robot_start() {
 
 /*This function allows the robot to go to a location. We may wanna do this by searching our array for an unexplored spot
   near where we are? Not to sure how we wanna go about this.
-  
+
   heading = 1,3 robot traverses y-axis
   heading = 0,2 robot traverses x-axis
-  
+
    At       To
-  (8,3) -> (5,5)
+  (5,4) -> (3,3)
 
   Coordinates below are immediate coordinates and boolean evaluation shown next to it
-  westof => {8,2} false
-  eastof => {8,4} true
-  southof => {not possible} false
-  northof => {7,3} true
-  */
+  westof => true
+  eastof => false
+  southof => false
+  northof => true
+
+  booleans are absolute directions from GUI perspective AND ARE ABSOLUTE
+  i.e not relative to how the robot is facing
+
+
+  {0,0}        y        {0,5}
+    ---------------------       N
+    |st |   |   |   |   |     W   E
+    ---------------------       S
+    |   |   |   |   |   |
+    ---------------------     northof
+  x |   |   |to |   |   | leftof   rightof
+    ---------------------     southof
+    |   |   |   |   |   |
+    ---------------------
+    |   |   |   |   | at|
+    ---------------------
+  {5,0}                 {5,5}
+
+  WALL INFORMATION IN THE INFO MAZE IS UPDATED ABSOLUTELY! So a north
+  wall is always a wall in that coordinate facing North
+*/
 void goTo(int x, int y) {
+  /*local heading variable*/
+  int h = heading;
   /*local variable current keeps track of current coordinate. {x,y} will
     be updated once we reach v*/
-  Coordinate current = {x,y};
+  Coordinate current = {x, y};
   /*v is the coordinate to go to which was set in maze_traversal_dfs()*/
 
-  /*booleans are absolute directions from GUI perspective*/
-  
+
+
   /*left of means that the robot needs heading = 3 to get there*/
-  bool westof = v.y < current.y;
+  bool westof = ((v.x == current.x) && (v.y < current.y));
   /*right of means that the robot needs heading = 1 to get there*/
-  bool eastof = v.y > current.y;
+  bool eastof = ((v.x == current.x) && (v.y > current.y));
   /*front of means that the robot needs heading = 2 to get there*/
-  bool southof = v.x > current.x;
+  bool southof = ((v.x > current.x) && (v.y == current.y));
   /*south of means that the robot needs heading = 0 to get there*/
-  bool northof = v.x < current.x;
+  bool northof = ((v.x < current.x) && (v.y == current.y));
+
+  /*self explanatory. true if at meets the recquirement from current*/
+  bool northeastof ((v.x < current.x) && (v.y > current.y));
+  bool northwestof ((v.x < current.x) && (v.y < current.y));
+  bool southeastof ((v.x > current.x) && (v.y > current.y));
+  bool southwestof ((v.x > current.x) && (v.y < current.y));
+
+  /*at is true when we have reached our destination*/
+  bool at = ((v.x == current.x) && (v.y == current.y));
 
   /*while we are NOT at the coordinate we need to traverse towards it
-  
+
     This is gonna be tricky and a lot of conditionals but possible.
     The maze is of type Info so each {x,y} coordinate has the wall information
     and we will be likely wanna traceback through already explored coordinates
-    
+
     I think we will just wanna update current.x and current.y and then set x,y to
     v.x and v.y once we reach it so we can begin updating again*/
-  while (v.x != x && v.y != y){
-    
+  while (v.x != x && v.y != y) {
+    /*how we move depends on our heading*/
+    switch (heading) {
+      /*If we are facing north*/
+      case 0:
+
+        break;
+      /*If we are facing east*/
+      case 1:
+
+        break;
+      /*If we are facing south*/
+      case 2:
+
+
+        break;
+      /*If we are facing west*/       
+      case 3:
+
+        break;
+    }
   }
 }
 
@@ -487,8 +538,9 @@ void goTo(int x, int y) {
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
   if (atIntersection()) {
+    /*stop so we have time to think*/
     halt();
-    /*updates the robots position*/
+    /*update the robots position*/
     update_position();
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
