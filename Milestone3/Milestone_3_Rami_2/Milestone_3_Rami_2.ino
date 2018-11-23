@@ -153,21 +153,8 @@ void turn_place_right() {
 /*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
 void turn_right_linetracker() {
   turn_place_right();
-  delay(300); //delay to get off the line
+  delay(100); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the right of us*/
-  while (analogRead(sensor_middle) < line_thresh);
-  while (analogRead(sensor_middle) > line_thresh);
-  heading--;
-  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
-  if (heading == -1) heading = 3;
-}
-
-
-/*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
-void turn_left_linetracker() {
-  turn_place_left();
-  delay(300); //delay to get off the line
-  /*Following while loops keep the robot turning until we find the line to the left of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   heading++;
@@ -175,11 +162,26 @@ void turn_left_linetracker() {
   if (heading == 4) heading = 0;
 }
 
+
+/*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
+void turn_left_linetracker() {
+  turn_place_left();
+  delay(100); //delay to get off the line - used to be 300 tried reducing it
+  /*Following while loops keep the robot turning until we find the line to the left of us*/
+  while (analogRead(sensor_middle) < line_thresh);
+  while (analogRead(sensor_middle) > line_thresh);
+  heading--;
+  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
+  if (heading == -1) heading = 3;
+}
+
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
   delay(600); //delay value to reach specification
 }
+
+/*Pulls a U-turn, updates heading accordinglyy*/
 
 
 /* Updates the position of the robot assuming that the starting position is
@@ -426,7 +428,7 @@ void robot_start() {
   }
 }
 
-/*This function allows the robot to go to a location. 
+/*This function allows the robot to go to a location.
   WE ONLY GO TO A NODE VIA NODES WE HAVE VISITED
 
   heading = 1,3 robot traverses y-axis
@@ -497,26 +499,7 @@ void goTo(int x, int y) {
     I think we will just wanna update current.x and current.y and then set x,y to
     v.x and v.y once we reach it so we can begin updating again*/
   while (v.x != x && v.y != y) {
-    /*how we move depends on our heading*/
-    switch (heading) {
-      /*If we are facing north*/
-      case 0:
-
-        break;
-      /*If we are facing east*/
-      case 1:
-
-        break;
-      /*If we are facing south*/
-      case 2:
-
-
-        break;
-      /*If we are facing west*/       
-      case 3:
-
-        break;
-    }
+    //IMPLEMENT ME?
   }
 }
 
@@ -532,6 +515,7 @@ void goTo(int x, int y) {
    standard DFS to only push to the stack at an intersection or go with what I'm doing. What I'm doing should work if we fix
    robot_start() the right way to push to the stack in setup before maze_traversal_dfs() runs.
 
+  Have to remember all of this is in a while loop
 */
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
@@ -573,9 +557,11 @@ void maze_traversal_dfs() {
         }
         /*else if v is neither the front, left, or right coordinate
           of the robot we have explored a whole branch and need to go
-          back to the coordinate where the robot branched from*/
+          back to the coordinate where the robot branched from.
+          This is hard, so we should just turn around and rerun DFS.
+          Does something just to show behavior for now.*/
         else {
-          goTo(v.x, v.y);
+          turn_place_right();
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
