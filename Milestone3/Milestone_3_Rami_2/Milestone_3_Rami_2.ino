@@ -94,7 +94,7 @@ Coordinate left = {0, 1};
 /*Coordinate in front of the way the robot is moving (initially the front of {0,0})*/
 Coordinate front = {1, 0};
 
-/*Coordinate to the right of the way the robot is moving (no initial right coordinate until we leave x = 0 column)*/
+/*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
 
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
