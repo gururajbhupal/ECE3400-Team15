@@ -495,19 +495,12 @@ void goTo(int x, int y) {
 }
 
 
-/* Traverses a maze via depth first search while line following. Updates GUI via radio communication
+/* Traverses a maze via depth first search while line following. Updates GUI via radio communication.
         At each intersection the robot will scan the walls around it.
           It will always explore the front branch first,
           then go left and back to the straight branch,
           then go right and back to the straight branch
-
-   THERE IS A HUGE CHANGE WITH THIS COMPARED TO REGULAR DFS. Since all of this code runs in a while loop in loop() we would
-   have nested while loops. But we only ever push unvisited nodes from intersections. We either gotta fix that while loop from
-   standard DFS to only push to the stack at an intersection or go with what I'm doing. What I'm doing should work if we fix
-   robot_start() the right way to push to the stack in setup before maze_traversal_dfs() runs.
-
   Have to remember all of this is in a while loop
-
   NEED TO ADD IR CODE IN THE TRAVERSAL
 */
 void maze_traversal_dfs() {
