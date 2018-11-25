@@ -461,8 +461,6 @@ void goTo(int x, int y) {
   Coordinate current = {x, y};
   /*v is the coordinate to go to which was set in maze_traversal_dfs()*/
 
-
-
   /*west of means that the robot needs heading = 3 to get there*/
   bool westof = ((v.x == current.x) && (v.y < current.y));
   /*east of means that the robot needs heading = 1 to get there*/
@@ -508,7 +506,7 @@ void maze_traversal_dfs() {
   if (atIntersection()) {
     /*stop so we have time to think*/
     halt();
-    /*update the robots position*/
+    /*update the robots position and the surrounding coordinates*/
     update_position();
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
