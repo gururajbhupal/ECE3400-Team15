@@ -32,11 +32,26 @@ unsigned int data;
 int x = 0;
 int y = 0;
 
-/* Orientation of robot with respect to the way it is initially facing (South for GUI but relative north)
+/* Orientation of robot with respect to where we start
+   in the GUI. Directions are absolute relative to GUI.
    0 = north
    1 = east
    2 = south
    3 = west
+
+  {0,0}        y        {0,m}
+    ---------------------       N(0)
+  start |   |   |   |   |    W(3)  E(1)
+    ---------------------       S(2)
+    |   |   |   |   |   |
+    ---------------------     
+  x |   |   |   |   |   | 
+    ---------------------     
+    |   |   |   |   |   |
+    ---------------------
+    |   |   |   |   |   |
+    ---------------------
+  {m,0}                 {m,m}
 */
 int heading = 2;
 
@@ -56,7 +71,6 @@ struct coordinate {
   int x;
   int y;
 };
-
 /*Declare a type coordinate as Coordinate*/
 typedef struct coordinate Coordinate;
 
@@ -69,7 +83,6 @@ struct info {
   bool s_wall;
   bool w_wall;
 };
-
 /*Declare a type info as Info*/
 typedef struct info Info;
 
@@ -92,8 +105,9 @@ int m = 8;
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze contains the x,y coordinate
-  (i.e in maze[0][1] x=0, y=1) as well as the wall information
-  at that coordinate, as well as if that coordinate has been explored*/
+  (i.e for maze[0][1] x=0, y=1) as well as the wall information
+  at that coordinate, as well as if that coordinate has been explored.
+  Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]*/
 Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
@@ -157,8 +171,8 @@ void turn_right_linetracker() {
   /*Following while loops keep the robot turning until we find the line to the right of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
+  /*After we turn right our heading changes. N->E, E->S, S->W, W->N*/
   heading++;
-  /*adjust heading accordingly (if we were at heading = 0 we now loop back to heading = 4)*/
   if (heading == 4) heading = 0;
 }
 
@@ -170,8 +184,8 @@ void turn_left_linetracker() {
   /*Following while loops keep the robot turning until we find the line to the left of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
+  /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/  
   heading--;
-  /*adjust heading accordingly (if we were at heading = 4 we now loop back to heading = 0)*/
   if (heading == -1) heading = 3;
 }
 
@@ -184,66 +198,43 @@ void adjust() {
 /*Pulls a U-turn, updates heading accordinglyy*/
 
 
-/* Updates the position of the robot assuming that the starting position is
-   the bottom right facing north
+/* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}. 
    Also updates the coordinates surrounding the robot.
+   FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
    Note: Robot can't go more North then x = 0
          Robot can't go more South then x = m
          Robot can't go more West then y = 0
          Robot can't go more East then y = m
-         CONDITIONS MATTER FOR INDEXING THE ARRAY
+
    Note: We don't know any information about the surrounding
-         coordinates walls, nor do we care (for now)
+         coordinates walls at the time of updating, but that
+         will be updated as soon as the robot reaches that coordinate
 */
 void update_position() {
   switch (heading) {
     case 0:
       x--;
-      if (y != 0) {
-        left = {x, y - 1};
-      }
-      if (x != 0) {
-        front = {x - 1, y};
-      }
-      if (y != m) {
-        right = {x, y + 1};
-      }
+      if (y != 0) {left = {x, y - 1};}
+      if (x != 0) {front = {x - 1, y};}
+      if (y != m) {right = {x, y + 1};}
       break;
     case 1:
       y--;
-      if (x != 0) {
-        left = {x - 1, y};
-      }
-      if (y != m) {
-        front = {x, y + 1};
-      }
-      if (x != m) {
-        right = {x + 1, y};
-      }
+      if (x != 0) {left = {x - 1, y};}
+      if (y != m) {front = {x, y + 1};}
+      if (x != m) {right = {x + 1, y};}
       break;
     case 2:
       x++;
-      if (y != m) {
-        left = {x, y + 1};
-      }
-      if (x != m) {
-        front = {x + 1, y};
-      }
-      if (y != 0) {
-        right = {x, y - 1};
-      }
+      if (y != m) {left = {x, y + 1};}
+      if (x != m) {front = {x + 1, y};}
+      if (y != 0) {right = {x, y - 1};}
       break;
     case 3:
       y++;
-      if (x != m) {
-        left = {x + 1, y};
-      }
-      if (y != 0) {
-        front = {x, y - 1};
-      }
-      if (x != 0) {
-        right = {x - 1, y};
-      }
+      if (x != m) {left = {x + 1, y};}
+      if (y != 0) {front = {x, y - 1};}
+      if (x != 0) {right = {x - 1, y};}
       break;
   }
 }
@@ -274,7 +265,7 @@ void scan_walls() {
       if (check_right()) data = data | 0x0800;// south=true
       break;
   }
-  /*Update the wall information at current coordinate*/
+  /*Update the wall information at current coordinate. The directions here are absolute relative to GUI*/
   maze[x][y].n_wall = (data >> 9) & 0x0001;
   maze[x][y].e_wall = (data >> 10) & 0x0001;
   maze[x][y].s_wall = (data >> 11) & 0x0001;
@@ -472,13 +463,13 @@ void goTo(int x, int y) {
 
 
 
-  /*left of means that the robot needs heading = 3 to get there*/
+  /*west of means that the robot needs heading = 3 to get there*/
   bool westof = ((v.x == current.x) && (v.y < current.y));
-  /*right of means that the robot needs heading = 1 to get there*/
+  /*east of means that the robot needs heading = 1 to get there*/
   bool eastof = ((v.x == current.x) && (v.y > current.y));
-  /*front of means that the robot needs heading = 2 to get there*/
+  /*south of means that the robot needs heading = 2 to get there*/
   bool southof = ((v.x > current.x) && (v.y == current.y));
-  /*south of means that the robot needs heading = 0 to get there*/
+  /*north of means that the robot needs heading = 0 to get there*/
   bool northof = ((v.x < current.x) && (v.y == current.y));
 
   /*self explanatory. true if at meets the recquirement from current*/
@@ -516,6 +507,8 @@ void goTo(int x, int y) {
    robot_start() the right way to push to the stack in setup before maze_traversal_dfs() runs.
 
   Have to remember all of this is in a while loop
+
+  NEED TO ADD IR CODE IN THE TRAVERSAL
 */
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
@@ -608,6 +601,8 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
+
+  /*ADD AUDIO CODE HERE*/
 
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
