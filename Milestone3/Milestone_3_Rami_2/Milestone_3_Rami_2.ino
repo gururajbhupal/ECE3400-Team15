@@ -538,7 +538,6 @@ void maze_traversal_dfs() {
           scan_walls();
           rf();
           adjust();
-          turn_left_linetracker();
         }
         /*else if v is the left coordinate*/
         else if (v.x == left.x && v.y == left.y) {
@@ -546,6 +545,7 @@ void maze_traversal_dfs() {
           scan_walls();
           rf();
           adjust();
+          turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
         else if (v.x == right.x && v.y == right.y) {
