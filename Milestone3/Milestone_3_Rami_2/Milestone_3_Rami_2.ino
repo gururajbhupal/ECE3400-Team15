@@ -32,10 +32,6 @@ unsigned int data;
 int x = 0;
 int y = 0;
 
-/*Current depth the robot is at. Depth doesn't change along a y-axis,
-  but ranges from 0 to m along the x-axis.*/
-int depth = 0;
-
 /* Orientation of robot with respect to where we start
    in the GUI. Directions are absolute relative to GUI.
    0 = north
@@ -221,7 +217,6 @@ void update_position() {
   switch (heading) {
     case 0:
       x--;
-      depth--;
       if (y != 0) left = {x, y - 1};
       if (x != 0) front = {x - 1, y};
       if (y != m) right = {x, y + 1};
@@ -234,7 +229,6 @@ void update_position() {
       break;
     case 2:
       x++;
-      depth++;
       if (y != m) left = {x, y + 1};
       if (x != m) front = {x + 1, y};
       if (y != 0) right = {x, y - 1};
@@ -502,11 +496,6 @@ void goTo(int x, int y) {
 }
 
 
-/*backTracks to the last location the robot branched from*/
-void backTrack() {
-  //IMPLEMENT ME
-}
-
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication.
         At each intersection the robot will scan the walls around it.
           It will always explore the front branch first,
@@ -559,7 +548,6 @@ void maze_traversal_dfs() {
           This is hard, so we should just turn around and rerun DFS.
           Does something just to show behavior for now.*/
         else {
-          //backTrack();
           turn_place_right();
         }
         /*Mark v as visited*/
