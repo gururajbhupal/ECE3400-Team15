@@ -48,9 +48,9 @@ int depth = 0;
   start |   |   |   |   |    W(3)  E(1)
     ---------------------       S(2)
     |   |   |   |   |   |
-    ---------------------     
-  x |   |   |   |   |   | 
-    ---------------------     
+    ---------------------
+  x |   |   |   |   |   |
+    ---------------------
     |   |   |   |   |   |
     ---------------------
     |   |   |   |   |   |
@@ -110,7 +110,7 @@ int m = 8;
 /*2d array which is the size of the maze to traverse. Each
   index of the maze (maze[x][y]) contains the wall information
   at that coordinate, as well as if that coordinate has been explored.
-  
+
   Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]
   If at location maze[x][y], depth = x*/
 Info maze[9][9];
@@ -191,7 +191,7 @@ void turn_left_linetracker() {
   /*Following while loops keep the robot turning until we find the line to the left of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
-  /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/  
+  /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/
   heading--;
   if (heading == -1) heading = 3;
 }
@@ -205,7 +205,7 @@ void adjust() {
 /*Pulls a U-turn, updates heading accordinglyy*/
 
 
-/* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}. 
+/* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}.
    Also updates the coordinates surrounding the robot.
    FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
    Note: Robot can't go more North then x = 0
@@ -222,28 +222,28 @@ void update_position() {
     case 0:
       x--;
       depth--;
-      if (y != 0) {left = {x, y - 1};}
-      if (x != 0) {front = {x - 1, y};}
-      if (y != m) {right = {x, y + 1};}
+      if (y != 0) left = {x, y - 1};
+      if (x != 0) front = {x - 1, y};
+      if (y != m) right = {x, y + 1};
       break;
     case 1:
       y--;
-      if (x != 0) {left = {x - 1, y};}
-      if (y != m) {front = {x, y + 1};}
-      if (x != m) {right = {x + 1, y};}
+      if (x != 0) left = {x - 1, y};
+      if (y != m) front = {x, y + 1};
+      if (x != m) right = {x + 1, y};
       break;
     case 2:
       x++;
       depth++;
-      if (y != m) {left = {x, y + 1};}
-      if (x != m) {front = {x + 1, y};}
-      if (y != 0) {right = {x, y - 1};}
+      if (y != m) left = {x, y + 1};
+      if (x != m) front = {x + 1, y};
+      if (y != 0) right = {x, y - 1};
       break;
     case 3:
       y++;
-      if (x != m) {left = {x + 1, y};}
-      if (y != 0) {front = {x, y - 1};}
-      if (x != 0) {right = {x - 1, y};}
+      if (x != m) left = {x + 1, y};
+      if (y != 0) front = {x, y - 1};
+      if (x != 0) right = {x - 1, y};
       break;
   }
 }
@@ -503,7 +503,7 @@ void goTo(int x, int y) {
 
 
 /*backTracks to the last location the robot branched from*/
-void backTrack(){
+void backTrack() {
   //IMPLEMENT ME
 }
 
@@ -532,14 +532,14 @@ void maze_traversal_dfs() {
       if (!maze[v.x][v.y].explored) {
         /*If v is the front coordinate*/
         if (v.x == front.x && v.y == front.y) {
-          /*send relevant information to GUI, turn left*/
+          /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
           adjust();
         }
         /*else if v is the left coordinate*/
         else if (v.x == left.x && v.y == left.y) {
-          /*send relevant information to GUI, go straight*/
+          /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
           adjust();
