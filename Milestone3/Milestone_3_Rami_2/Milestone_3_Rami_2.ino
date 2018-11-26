@@ -114,9 +114,6 @@ Info maze[9][9];
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
 
-/*Initialize a stack which keeps track of previously visited coordinates - allows for backtracking*/
-StackArray <Coordinate> back_stack;
-
 /*Initializes the servo*/
 void servo_setup() {
   servo_right.attach(5);
@@ -597,7 +594,7 @@ void setup() {
   radio.openReadingPipe(1, pipes[1]);
 
   /*ADD AUDIO CODE HERE*/
-
+  
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up. Also updates GUI accordingly and begins DFS accordingly.*/
