@@ -28,7 +28,7 @@ bool button_pressed = false;
 /* The rf message*/
 unsigned int data;
 
-/*Current coordinates - robot starts at {0,0} and can go up to {m,m}*/
+/*Current coordinates - robot starts at {0,0} and can go up to {mx,my}*/
 int x = 0;
 int y = 0;
 
@@ -101,15 +101,16 @@ Coordinate right;
 Coordinate v;
 
 /*m is the maximum index of the 2d maze array*/
-int m = 8;
+int mx = 4;
+int my = 3;
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze (maze[x][y]) contains the wall information
   at that coordinate, as well as if that coordinate has been explored.
 
-  Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]
+  Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[9][9];
+Info maze[5][4];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -202,9 +203,9 @@ void adjust() {
    Also updates the coordinates surrounding the robot.
    FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
    Note: Robot can't go more North then x = 0
-         Robot can't go more South then x = m
+         Robot can't go more South then x = mx
          Robot can't go more West then y = 0
-         Robot can't go more East then y = m
+         Robot can't go more East then y = my
 
    Note: We don't know any information about the surrounding
          coordinates walls at the time of updating, but that
@@ -212,27 +213,27 @@ void adjust() {
 */
 void update_position() {
   switch (heading) {
-    case 0:
+    case 0: //NORTH
       x--;
       if (y != 0) left = {x, y - 1};
       if (x != 0) front = {x - 1, y};
-      if (y != m) right = {x, y + 1};
+      if (y != my) right = {x, y + 1};
       break;
-    case 1:
-      y--;
+    case 1: //EAST
+      y++;
       if (x != 0) left = {x - 1, y};
-      if (y != m) front = {x, y + 1};
-      if (x != m) right = {x + 1, y};
+      if (y != my) front = {x, y + 1};
+      if (x != mx) right = {x + 1, y};
       break;
-    case 2:
+    case 2: //SOUTH
       x++;
-      if (y != m) left = {x, y + 1};
-      if (x != m) front = {x + 1, y};
+      if (y != my) left = {x, y + 1};
+      if (x != mx) front = {x + 1, y};
       if (y != 0) right = {x, y - 1};
       break;
-    case 3:
-      y++;
-      if (x != m) left = {x + 1, y};
+    case 3: //WEST
+      y--;
+      if (x != mx) left = {x + 1, y};
       if (y != 0) front = {x, y - 1};
       if (x != 0) right = {x - 1, y};
       break;
@@ -249,20 +250,20 @@ void scan_walls() {
       if (check_front()) data = data | 0x0200; // north=true
       if (check_right()) data = data | 0x0400; // east=true
       break;
-    case 1: // west
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
+    case 1: // east
+      if (check_left()) data = data | 0x0200;// north=true
+      if (check_front()) data = data | 0x0400;// east=true
+      if (check_right()) data = data | 0x0800;// south=true
       break;
     case 2: // south
       if (check_left()) data = data | 0x0400;// east=true
       if (check_front()) data = data | 0x0800;// south=true
       if (check_right()) data = data | 0x0100;// west=true
       break;
-    case 3: // east
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
+    case 3: // west
+      if (check_left()) data = data | 0x0800; // south=true
+      if (check_front()) data = data | 0x0100; // west=true
+      if (check_right()) data = data | 0x0200;// north=true
       break;
   }
   /*Update the wall information at current coordinate. The directions here are absolute relative to GUI*/
@@ -380,12 +381,15 @@ bool atIntersection() {
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
+  /*If the coordinate to the right has not been explored and there is no wall to the right, push right coordinate to stack*/
   if (!check_right() && !maze[right.x][right.y].explored) {
     stack.push(right);
   }
+  /*If the coordinate to the left has not been explored and there is no wall to the right, push left coordinate to stack*/  
   if (!check_left() && !maze[left.x][left.y].explored) {
     stack.push(left);
   }
+  /*If the coordinate in front has not been explored and there is no wall in front, push front coordinate to stack*/  
   if (!check_front() && !maze[front.x][front.y].explored) {
     stack.push(front);
   }
@@ -402,6 +406,8 @@ void robot_start() {
   maze[0][0].explored = 1;
   /*scan the walls and update the GUI*/
   scan_walls();
+  /*manually set wall behind us for GUI*/
+  data = data | 0x0200;
   rf();
   /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there
     is always a wall to the right initially)*/
@@ -545,7 +551,8 @@ void maze_traversal_dfs() {
           This is hard, so we should just turn around and rerun DFS.
           Does something just to show behavior for now.*/
         else {
-          turn_place_right();
+          scan_walls();
+          rf();
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
@@ -594,7 +601,7 @@ void setup() {
   radio.openReadingPipe(1, pipes[1]);
 
   /*ADD AUDIO CODE HERE*/
-  
+
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up. Also updates GUI accordingly and begins DFS accordingly.*/
