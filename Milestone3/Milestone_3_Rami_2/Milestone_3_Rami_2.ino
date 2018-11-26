@@ -32,6 +32,10 @@ unsigned int data;
 int x = 0;
 int y = 0;
 
+/*Current depth the robot is at. Depth doesn't change along a y-axis,
+  but ranges from 0 to m along the x-axis.*/
+int depth = 0;
+
 /* Orientation of robot with respect to where we start
    in the GUI. Directions are absolute relative to GUI.
    0 = north
@@ -104,15 +108,18 @@ Coordinate v;
 int m = 8;
 
 /*2d array which is the size of the maze to traverse. Each
-  index of the maze contains the x,y coordinate
-  (i.e for maze[0][1] x=0, y=1) as well as the wall information
+  index of the maze (maze[x][y]) contains the wall information
   at that coordinate, as well as if that coordinate has been explored.
-  Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]*/
+  
+  Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]
+  If at location maze[x][y], depth = x*/
 Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
 
+/*Initialize a stack which keeps track of previously visited coordinates - allows for backtracking*/
+StackArray <Coordinate> back_stack;
 
 /*Initializes the servo*/
 void servo_setup() {
@@ -214,6 +221,7 @@ void update_position() {
   switch (heading) {
     case 0:
       x--;
+      depth--;
       if (y != 0) {left = {x, y - 1};}
       if (x != 0) {front = {x - 1, y};}
       if (y != m) {right = {x, y + 1};}
@@ -226,6 +234,7 @@ void update_position() {
       break;
     case 2:
       x++;
+      depth++;
       if (y != m) {left = {x, y + 1};}
       if (x != m) {front = {x + 1, y};}
       if (y != 0) {right = {x, y - 1};}
@@ -493,6 +502,11 @@ void goTo(int x, int y) {
 }
 
 
+/*backTracks to the last location the robot branched from*/
+void backTrack(){
+  //IMPLEMENT ME
+}
+
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication.
         At each intersection the robot will scan the walls around it.
           It will always explore the front branch first,
@@ -545,6 +559,7 @@ void maze_traversal_dfs() {
           This is hard, so we should just turn around and rerun DFS.
           Does something just to show behavior for now.*/
         else {
+          //backTrack();
           turn_place_right();
         }
         /*Mark v as visited*/
