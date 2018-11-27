@@ -197,6 +197,14 @@ void adjust() {
 }
 
 /*Pulls a U-turn, updates heading accordinglyy*/
+void turn_around() {
+    turn_right_linetracker();
+    turn_right_linetracker();
+}
+
+
+
+
 
 
 /* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}.
@@ -215,27 +223,27 @@ void update_position() {
   switch (heading) {
     case 0: //NORTH
       x--;
-      if (y != 0) left = {x, y - 1};
-      if (x != 0) front = {x - 1, y};
-      if (y != my) right = {x, y + 1};
+      left = {x, y - 1};
+      front = {x - 1, y};
+      right = {x, y + 1};
       break;
     case 1: //EAST
       y++;
-      if (x != 0) left = {x - 1, y};
-      if (y != my) front = {x, y + 1};
-      if (x != mx) right = {x + 1, y};
+      left = {x - 1, y};
+      front = {x, y + 1};
+      right = {x + 1, y};
       break;
     case 2: //SOUTH
       x++;
-      if (y != my) left = {x, y + 1};
-      if (x != mx) front = {x + 1, y};
-      if (y != 0) right = {x, y - 1};
+      left = {x, y + 1};
+      front = {x + 1, y};
+      right = {x, y - 1};
       break;
     case 3: //WEST
       y--;
-      if (x != mx) left = {x + 1, y};
-      if (y != 0) front = {x, y - 1};
-      if (x != 0) right = {x - 1, y};
+      left = {x + 1, y};
+      front = {x, y - 1};
+      right = {x - 1, y};
       break;
   }
 }
@@ -425,6 +433,13 @@ void robot_start() {
   }
 }
 
+bool is_in_bounds(Coordinate v) {
+    if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
+        return true;
+    }
+    return false;
+}
+
 StackArray <Coordinate> find_path(Coordinate v) {
   StackArray <Coordinate> path;
   Coordinate next = current;
@@ -563,10 +578,8 @@ void traverse_path(StackArray <Coordinate> path) {
         turn_right_linetracker();
       }
       else {
-        // turn around
         adjust();
-        turn_right_linetracker();
-        turn_right_linetracker();
+        turn_around();
       }
     }
     linefollow();
@@ -600,14 +613,14 @@ void maze_traversal_dfs() {
       /*If the robot has NOT BEEN TO v,*/
       if (!maze[v.x][v.y].explored) {
         /*If v is the front coordinate*/
-        if (v.x == front.x && v.y == front.y) {
+        if (is_in_bounds(front) && v.x == front.x && v.y == front.y) {
           /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
           adjust();
         }
         /*else if v is the left coordinate*/
-        else if (v.x == left.x && v.y == left.y) {
+        else if (is_in_bounds(left) && v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
@@ -615,7 +628,7 @@ void maze_traversal_dfs() {
           turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
-        else if (v.x == right.x && v.y == right.y) {
+        else if (is_in_bounds(right) && v.x == right.x && v.y == right.y) {
           /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
