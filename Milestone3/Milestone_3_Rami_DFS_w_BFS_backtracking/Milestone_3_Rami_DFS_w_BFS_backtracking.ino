@@ -6,6 +6,7 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <StackArray.h>
+#include <QueueArray.h>
 
 /*Set up nRF24L01 radio on SPI bus plus pins 9 & 10*/
 RF24 radio(9, 10);
@@ -28,7 +29,7 @@ bool button_pressed = false;
 /* The rf message*/
 unsigned int data;
 
-/*Current coordinates - robot starts at {0,0} and can go up to {m,m}*/
+/*Current coordinates - robot starts at {0,0} and can go up to {mx,my}*/
 int x = 0;
 int y = 0;
 
@@ -38,6 +39,8 @@ int y = 0;
    1 = east
    2 = south
    3 = west
+
+   Robot starts at the North-Western most point of the maze facing South
 
   {0,0}        y        {0,m}
     ---------------------       N(0)
@@ -82,7 +85,8 @@ struct info {
   bool e_wall;
   bool s_wall;
   bool w_wall;
-  byte bheading;
+  /*h is the heading the robot had when it last crossed an {x,y} coordinate*/
+  int h;
 };
 /*Declare a type info as Info*/
 typedef struct info Info;
@@ -101,22 +105,25 @@ Coordinate right;
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
 Coordinate v;
 
-/*m is the maximum index of the 2d maze array*/
-int m = 8;
+Coordinate current = {0, 0};
+
+/*mx and my are the maximum indices of the x,y components of the 2d maze*/
+int mx = 4;
+int my = 3;
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze (maze[x][y]) contains the wall information
   at that coordinate, as well as if that coordinate has been explored.
 
-  Size of 2d array is 9x9 so indexes range from maze[0][0] to maze[8][8]
+  Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[9][9];
+Info maze[5][4];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
 
-/*Initialize a stack which keeps track of previously visited coordinates - allows for backtracking*/
-StackArray <Coordinate> back_track_stack;
+/*Initialize a queue of coordinates (type Coordinate)*/
+QueueArray <Coordinate> queue;
 
 /*Initializes the servo*/
 void servo_setup() {
@@ -171,9 +178,8 @@ void turn_place_right() {
 /*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
 void turn_right_linetracker() {
   turn_place_right();
-  delay(100); //delay to get off the line - used to be 300 tried reducing it
+  delay(300); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the right of us*/
-  while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   /*After we turn right our heading changes. N->E, E->S, S->W, W->N*/
   heading++;
@@ -184,9 +190,8 @@ void turn_right_linetracker() {
 /*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
 void turn_left_linetracker() {
   turn_place_left();
-  delay(100); //delay to get off the line - used to be 300 tried reducing it
+  delay(300); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the left of us*/
-  while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
   /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/
   heading--;
@@ -201,6 +206,7 @@ void adjust() {
 
 /*Pulls a U-turn, updates heading accordinglyy*/
 void turnAround() {
+  adjust();
   turn_left_linetracker();
   turn_left_linetracker();
 }
@@ -209,45 +215,48 @@ void turnAround() {
    Also updates the coordinates surrounding the robot.
    FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
    Note: Robot can't go more North then x = 0
-         Robot can't go more South then x = m
+         Robot can't go more South then x = mx
          Robot can't go more West then y = 0
-         Robot can't go more East then y = m
+         Robot can't go more East then y = my
 
    Note: We don't know any information about the surrounding
          coordinates walls at the time of updating, but that
          will be updated as soon as the robot reaches that coordinate
 */
 void update_position() {
+  left = {10,10};
+  right = {10,10};
+  front = {10,10};
   switch (heading) {
-    case 0:
+    case 0: //NORTH
       x--;
-      /*set the heading needed to backtrack this coordinate*/
-      maze[x][y].bheading = ((heading + 2) <= 3) ? (heading + 2) : (heading - 2);
-      if (y != 0) left = {x, y - 01};
+      current.x = x;
+      current.y = y;
+      if (y != 0) left = {x, y - 1};
       if (x != 0) front = {x - 1, y};
-      if (y != m) right = {x, y + 1};
+      if (y != my) right = {x, y + 1};
       break;
-    case 1:
-      y--;
-      /*set the heading needed to backtrack this coordinate*/
-      maze[x][y].bheading = ((heading + 2) <= 3) ? (heading + 2) : (heading - 2);
+    case 1: //EAST
+      y++;
+      current.x = x;
+      current.y = y;
       if (x != 0) left = {x - 1, y};
-      if (y != m) front = {x, y + 1};
-      if (x != m) right = {x + 1, y};
+      if (y != my) front = {x, y + 1};
+      if (x != mx) right = {x + 1, y};
       break;
-    case 2:
+    case 2: //SOUTH
       x++;
-      /*set the heading needed to backtrack this coordinate*/
-      maze[x][y].bheading = ((heading + 2) <= 3) ? (heading + 2) : (heading - 2);
-      if (y != m) left = {x, y + 1};
-      if (x != m) front = {x + 1, y};
+      current.x = x;
+      current.y = y;
+      if (y != my) left = {x, y + 1};
+      if (x != mx) front = {x + 1, y};
       if (y != 0) right = {x, y - 1};
       break;
-    case 3:
-      y++;
-      /*set the heading needed to backtrack this coordinate*/
-      maze[x][y].bheading = ((heading + 2) <= 3) ? (heading + 2) : (heading - 2);
-      if (x != m) left = {x + 1, y};
+    case 3: //WEST
+      y--;
+      current.x = x;
+      current.y = y;
+      if (x != mx) left = {x + 1, y};
       if (y != 0) front = {x, y - 1};
       if (x != 0) right = {x - 1, y};
       break;
@@ -259,32 +268,63 @@ void update_position() {
   Also updates wall info in Maze for the current {x,y} coordinate*/
 void scan_walls() {
   switch (heading) {
-    case 0: // north
-      if (check_left()) data = data | 0x0100; // west=true
-      if (check_front()) data = data | 0x0200; // north=true
-      if (check_right()) data = data | 0x0400; // east=true
+    case 0: //NORTH
+      if (check_left()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0200; // north=true
+        maze[x][y].n_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0400; // east=true
+        maze[x][y].e_wall = 1;
+      }
       break;
-    case 1: // west
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
+    case 1: //EAST
+      if (check_left()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      }
       break;
-    case 2: // south
-      if (check_left()) data = data | 0x0400;// east=true
-      if (check_front()) data = data | 0x0800;// south=true
-      if (check_right()) data = data | 0x0100;// west=true
+    case 2: //SOUTH
+      if (check_left()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0100;// west=true
+        maze[x][y].w_wall = 1;
+      }
       break;
-    case 3: // east
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
+    case 3: //WEST
+      if (check_left()) {
+        data = data | 0x0800; // south=true
+        maze[x][y].s_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      }
       break;
   }
-  /*Update the wall information at current coordinate. The directions here are absolute relative to GUI*/
-  maze[x][y].n_wall = (data >> 9) & 0x0001;
-  maze[x][y].e_wall = (data >> 10) & 0x0001;
-  maze[x][y].s_wall = (data >> 11) & 0x0001;
-  maze[x][y].w_wall = (data >> 8) & 0x0001;
 }
 
 
@@ -395,12 +435,15 @@ bool atIntersection() {
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
+  /*If the coordinate to the right has not been explored and there is no wall to the right, push right coordinate to stack*/
   if (!check_right() && !maze[right.x][right.y].explored) {
     stack.push(right);
   }
+  /*If the coordinate to the left has not been explored and there is no wall to the right, push left coordinate to stack*/
   if (!check_left() && !maze[left.x][left.y].explored) {
     stack.push(left);
   }
+  /*If the coordinate in front has not been explored and there is no wall in front, push front coordinate to stack*/
   if (!check_front() && !maze[front.x][front.y].explored) {
     stack.push(front);
   }
@@ -415,26 +458,27 @@ void push_unvisited() {
 void robot_start() {
   /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
   maze[0][0].explored = 1;
+  queue.enqueue(current);
   /*scan the walls and update the GUI*/
   scan_walls();
+  /*manually set wall behind us for GUI*/
+  data = data | 0x0200;
   rf();
   /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there
     is always a wall to the right initially)*/
   push_unvisited();
   /*If there is NO wall to the front of us begin going that way to stay consistent with DFS*/
   if (!check_front()) {
-    /*we visit the front coordinate so add it to the stack of visited coordinates*/
-    back_track_stack.push(front);
     /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
     maze[front.x][front.y].explored = 1;
+    queue.enqueue(front);
   }
   else if (!check_left()) {
     /*turn left if there is a wall in front and no wall to the left*/
     turn_left_linetracker();
-    /*we visit the front coordinate so add it to the stack of visited coordinates*/
-    back_track_stack.push(left);
     /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
     maze[left.x][left.y].explored = 1;
+    queue.enqueue(left);
   }
 }
 
@@ -473,51 +517,70 @@ void robot_start() {
 
   WALL INFORMATION IN THE INFO MAZE IS UPDATED ABSOLUTELY! So a north
   wall is always a wall in that coordinate facing North
+
+  a -> v.x coordinate to go to
+  b -> v.y coordinate to go to
 */
-void goTo(int x, int y) {
-  /*local variable current keeps track of current coordinate. {x,y} will
-    be updated once we reach v*/
-  Coordinate current = {x, y};
-  /*v is the coordinate to go to which was set in maze_traversal_dfs()*/
+void BFS_To() {
+  /*we are breadth first searching to coordinate {a,b}*/
+  Coordinate temp = queue.dequeue();
 
-  /*west of means that the robot needs heading = 3 to get there*/
-  bool westof = ((v.x == current.x) && (v.y < current.y));
-  /*east of means that the robot needs heading = 1 to get there*/
-  bool eastof = ((v.x == current.x) && (v.y > current.y));
-  /*south of means that the robot needs heading = 2 to get there*/
-  bool southof = ((v.x > current.x) && (v.y == current.y));
-  /*north of means that the robot needs heading = 0 to get there*/
-  bool northof = ((v.x < current.x) && (v.y == current.y));
-
-  /*self explanatory. true if at meets the recquirement from current*/
-  bool northeastof ((v.x < current.x) && (v.y > current.y));
-  bool northwestof ((v.x < current.x) && (v.y < current.y));
-  bool southeastof ((v.x > current.x) && (v.y > current.y));
-  bool southwestof ((v.x > current.x) && (v.y < current.y));
-
-  /*at is true when we have reached our destination*/
-  bool at = ((v.x == current.x) && (v.y == current.y));
-
-  /*while we are NOT at the coordinate we need to traverse towards it
-
-    This is gonna be tricky and a lot of conditionals but possible.
-    The maze is of type Info so each {x,y} coordinate has the wall information
-    and we will be likely wanna traceback through already explored coordinates
-
-    I think we will just wanna update current.x and current.y and then set x,y to
-    v.x and v.y once we reach it so we can begin updating again*/
-  while (v.x != x && v.y != y) {
-    //IMPLEMENT ME?
+  /*while the queue is NOT empty*/
+  while (!queue.isEmpty()) {
+    /*If we are at an intersection we do stuff*/
+    if (atIntersection()) {
+      halt();
+      /*q is the last coordinate the robot was at*/
+      Coordinate q = queue.dequeue();
+      /*update the position*/
+      update_position();
+      /*if we are there we exit the loop*/
+      if (x == v.x+1) {
+        if (v.x == front.x && v.y == front.y) {
+          /*send wall information to GUI, go straight*/
+          adjust();
+          break;
+        }
+        /*else if v is the left coordinate*/
+        else if (v.x == left.x && v.y == left.y) {
+          /*send wall information to GUI, turn left*/
+          adjust();
+          turn_left_linetracker();
+          break;
+        }
+        /*else if v is the right coordinate*/
+        else if (v.x == right.x && v.y == right.y) {
+          /*send wall information to GUI, turn right*/
+          adjust();
+          turn_right_linetracker();
+          break;
+        }
+      }
+      /*else we traverse towards it*/
+      else {
+        if (q.x == front.x && q.y == front.y) {
+          /*send wall information to GUI, go straight*/
+          adjust();
+        }
+        /*else if v is the left coordinate*/
+        else if (q.x == left.x && q.y == left.y) {
+          /*send wall information to GUI, turn left*/
+          adjust();
+          turn_left_linetracker();
+        }
+        /*else if v is the right coordinate*/
+        else if (q.x == right.x && q.y == right.y) {
+          /*send wall information to GUI, turn right*/
+          adjust();
+          turn_right_linetracker();
+        }
+      }
+    }
+    /*else linefollow*/
+    linefollow();
   }
 }
 
-
-/*backTracks to the last location the robot branched from via coordinates we have already been too*/
-void backTrack() {
-  /*Coordinate b is the last coordinate we were at*/
-  Coordinate b = back_track_stack.pop();
-   
-}
 
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication.
         At each intersection the robot will scan the walls around it.
@@ -540,40 +603,43 @@ void maze_traversal_dfs() {
     if (!stack.isEmpty()) {
       /*Coordinate v is the coordinate the robot is about to visit*/
       v = stack.pop();
-      /*If the robot has NOT BEEN TO v,*/
+      /*If the robot has NOT BEEN TO v*/
       if (!maze[v.x][v.y].explored) {
         /*If v is the front coordinate*/
         if (v.x == front.x && v.y == front.y) {
-          /*send relevant information to GUI, go straigh*/
+          /*send wall information to GUI, go straight*/
           scan_walls();
           rf();
+          /*push current coordinate to the queue*/
+          queue.enqueue(current);
           adjust();
-          back_track_stack.push(v);
         }
         /*else if v is the left coordinate*/
         else if (v.x == left.x && v.y == left.y) {
-          /*send relevant information to GUI, turn left*/
+          /*send wall information to GUI, turn left*/
           scan_walls();
           rf();
+          /*push current coordinate to the queue*/
+          queue.enqueue(current);
           adjust();
           turn_left_linetracker();
-          back_track_stack.push(v);
         }
         /*else if v is the right coordinate*/
         else if (v.x == right.x && v.y == right.y) {
-          /*send relevant information to GUI, turn right*/
+          /*send wall information to GUI, turn right*/
           scan_walls();
           rf();
+          /*push current coordinate to the queue*/
+          queue.enqueue(current);
           adjust();
           turn_right_linetracker();
-          back_track_stack.push(v);
         }
         /*else if v is neither the front, left, or right coordinate
           of the robot we have explored a whole branch and need to go
           back to the coordinate where the robot branched from.*/
         else {
-          //backTrack();
-          turn_place_right();
+          turnAround();
+          BFS_To();
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
