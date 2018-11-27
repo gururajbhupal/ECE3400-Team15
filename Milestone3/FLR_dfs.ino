@@ -6,6 +6,7 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <StackArray.h>
+#include <QueueList.h>
 
 /*Set up nRF24L01 radio on SPI bus plus pins 9 & 10*/
 RF24 radio(9, 10);
@@ -435,6 +436,7 @@ void robot_start() {
   }
 }
 
+// True if given coordinate is legal
 bool is_in_bounds(Coordinate v) {
   if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
     return true;
@@ -442,8 +444,9 @@ bool is_in_bounds(Coordinate v) {
   return false;
 }
 
-StackArray <Coordinate> find_path(Coordinate v) {
-  StackArray <Coordinate> path;
+/* Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
+QueueList <Coordinate> find_path(Coordinate v) {
+  QueueList <Coordinate> path;
   Coordinate next = current;
   Coordinate prev = current;
   int h = heading;
@@ -551,9 +554,9 @@ StackArray <Coordinate> find_path(Coordinate v) {
 }
 
 
-
+// Follows given path
 // Maybe push_unvisited as you go?
-void traverse_path(StackArray <Coordinate> path) {
+void traverse_path(QueueList <Coordinate> path) {
   Coordinate p;
   while (!path.isEmpty()) {
     if (atIntersection()) {
