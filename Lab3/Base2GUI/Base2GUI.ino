@@ -117,7 +117,7 @@ void loop(void)
       WallWest = (data >> 8) & 0x0001;
       if (WallWest) {
         Serial.print(",");
-        Serial.print("west=true");
+        Serial.print("east=true");
       }
 
       WallNorth = (data >> 9) & 0x0001;
@@ -129,7 +129,7 @@ void loop(void)
       WallEast = (data >> 10) & 0x0001;
       if (WallEast) {
         Serial.print(",");
-        Serial.print("east=true");
+        Serial.print("west=true");
       }
 
       WallSouth = (data >> 11) & 0x0001;

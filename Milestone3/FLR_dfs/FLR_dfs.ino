@@ -98,6 +98,7 @@ Coordinate front = {1, 0};
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
 
+/*The current coordinate the robot is at*/
 Coordinate current;
 
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
@@ -256,32 +257,63 @@ void update_position() {
   Also updates wall info in Maze for the current {x,y} coordinate*/
 void scan_walls() {
   switch (heading) {
-    case 0: // north
-      if (check_left()) data = data | 0x0100; // west=true
-      if (check_front()) data = data | 0x0200; // north=true
-      if (check_right()) data = data | 0x0400; // east=true
+    case 0: //NORTH
+      if (check_left()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0200; // north=true
+        maze[x][y].n_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0400; // east=true
+        maze[x][y].e_wall = 1;
+      }
       break;
-    case 1: // east
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
+    case 1: //EAST
+      if (check_left()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      }
       break;
-    case 2: // south
-      if (check_left()) data = data | 0x0400;// east=true
-      if (check_front()) data = data | 0x0800;// south=true
-      if (check_right()) data = data | 0x0100;// west=true
+    case 2: //SOUTH
+      if (check_left()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0100;// west=true
+        maze[x][y].w_wall = 1;
+      }
       break;
-    case 3: // west
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
+    case 3: //WEST
+      if (check_left()) {
+        data = data | 0x0800; // south=true
+        maze[x][y].s_wall = 1;
+      }
+      if (check_front()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      }
+      if (check_right()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      }
       break;
   }
-  /*Update the wall information at current coordinate. The directions here are absolute relative to GUI*/
-  maze[x][y].n_wall = (data >> 9) & 0x0001;
-  maze[x][y].e_wall = (data >> 10) & 0x0001;
-  maze[x][y].s_wall = (data >> 11) & 0x0001;
-  maze[x][y].w_wall = (data >> 8) & 0x0001;
 }
 
 
@@ -389,6 +421,14 @@ bool atIntersection() {
   }
 }
 
+/*returns true if coordinate v is a legal coordinate*/
+bool is_in_bounds(Coordinate v) {
+  if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
+    return true;
+  }
+  return false;
+}
+
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
@@ -434,14 +474,6 @@ void robot_start() {
     /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
     maze[left.x][left.y].explored = 1;
   }
-}
-
-// True if given coordinate is legal
-bool is_in_bounds(Coordinate v) {
-  if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
-    return true;
-  }
-  return false;
 }
 
 /* Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
