@@ -520,18 +520,18 @@ void maze_traversal_dfs() {
     if (!stack.isEmpty()) {
       /*Coordinate v is the coordinate the robot is about to visit*/
       v = stack.pop();
-      /*If the robot has NOT BEEN TO v*/
+      /*If the robot has NOT BEEN TO v,*/
       if (!maze[v.x][v.y].explored) {
         /*If v is the front coordinate*/
         if (v.x == front.x && v.y == front.y) {
-          /*send wall information to GUI, go straight*/
+          /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
           adjust();
         }
         /*else if v is the left coordinate*/
         else if (v.x == left.x && v.y == left.y) {
-          /*send wall information to GUI, turn left*/
+          /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
           adjust();
@@ -539,7 +539,7 @@ void maze_traversal_dfs() {
         }
         /*else if v is the right coordinate*/
         else if (v.x == right.x && v.y == right.y) {
-          /*send wall information to GUI, turn right*/
+          /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
           adjust();
@@ -601,7 +601,7 @@ void setup() {
   radio.openReadingPipe(1, pipes[1]);
 
   /*ADD AUDIO CODE HERE*/
-  
+
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up. Also updates GUI accordingly and begins DFS accordingly.*/

@@ -98,7 +98,6 @@ Coordinate front = {1, 0};
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
 
-/*The current coordinate the robot is at*/
 Coordinate current;
 
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
@@ -257,63 +256,32 @@ void update_position() {
   Also updates wall info in Maze for the current {x,y} coordinate*/
 void scan_walls() {
   switch (heading) {
-    case 0: //NORTH
-      if (check_left()) {
-        data = data | 0x0100; // west=true
-        maze[x][y].w_wall = 1;
-      }
-      if (check_front()) {
-        data = data | 0x0200; // north=true
-        maze[x][y].n_wall = 1;
-      }
-      if (check_right()) {
-        data = data | 0x0400; // east=true
-        maze[x][y].e_wall = 1;
-      }
+    case 0: // north
+      if (check_left()) data = data | 0x0100; // west=true
+      if (check_front()) data = data | 0x0200; // north=true
+      if (check_right()) data = data | 0x0400; // east=true
       break;
-    case 1: //EAST
-      if (check_left()) {
-        data = data | 0x0200;// north=true
-        maze[x][y].n_wall = 1;
-      }
-      if (check_front()) {
-        data = data | 0x0400;// east=true
-        maze[x][y].e_wall = 1;
-      }
-      if (check_right()) {
-        data = data | 0x0800;// south=true
-        maze[x][y].s_wall = 1;
-      }
+    case 1: // east
+      if (check_left()) data = data | 0x0200;// north=true
+      if (check_front()) data = data | 0x0400;// east=true
+      if (check_right()) data = data | 0x0800;// south=true
       break;
-    case 2: //SOUTH
-      if (check_left()) {
-        data = data | 0x0400;// east=true
-        maze[x][y].e_wall = 1;
-      }
-      if (check_front()) {
-        data = data | 0x0800;// south=true
-        maze[x][y].s_wall = 1;
-      }
-      if (check_right()) {
-        data = data | 0x0100;// west=true
-        maze[x][y].w_wall = 1;
-      }
+    case 2: // south
+      if (check_left()) data = data | 0x0400;// east=true
+      if (check_front()) data = data | 0x0800;// south=true
+      if (check_right()) data = data | 0x0100;// west=true
       break;
-    case 3: //WEST
-      if (check_left()) {
-        data = data | 0x0800; // south=true
-        maze[x][y].s_wall = 1;
-      }
-      if (check_front()) {
-        data = data | 0x0100; // west=true
-        maze[x][y].w_wall = 1;
-      }
-      if (check_right()) {
-        data = data | 0x0200;// north=true
-        maze[x][y].n_wall = 1;
-      }
+    case 3: // west
+      if (check_left()) data = data | 0x0800; // south=true
+      if (check_front()) data = data | 0x0100; // west=true
+      if (check_right()) data = data | 0x0200;// north=true
       break;
   }
+  /*Update the wall information at current coordinate. The directions here are absolute relative to GUI*/
+  maze[x][y].n_wall = (data >> 9) & 0x0001;
+  maze[x][y].e_wall = (data >> 10) & 0x0001;
+  maze[x][y].s_wall = (data >> 11) & 0x0001;
+  maze[x][y].w_wall = (data >> 8) & 0x0001;
 }
 
 
@@ -421,14 +389,6 @@ bool atIntersection() {
   }
 }
 
-/*returns true if coordinate v is a legal coordinate*/
-bool is_in_bounds(Coordinate v) {
-  if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
-    return true;
-  }
-  return false;
-}
-
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
 void push_unvisited() {
@@ -474,6 +434,14 @@ void robot_start() {
     /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
     maze[left.x][left.y].explored = 1;
   }
+}
+
+// True if given coordinate is legal
+bool is_in_bounds(Coordinate v) {
+  if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
+    return true;
+  }
+  return false;
 }
 
 /* Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
@@ -568,7 +536,7 @@ QueueList <Coordinate> find_path(Coordinate v) {
         }
         break;
     }
-
+      
     // Set heading of next
     if (prev.x < next.x) {
       h = 2;
@@ -592,14 +560,9 @@ QueueList <Coordinate> find_path(Coordinate v) {
 // Maybe push_unvisited as you go?
 void traverse_path(QueueList <Coordinate> path) {
   Coordinate p;
-  bool first_run = true;
-    
   while (!path.isEmpty()) {
     if (atIntersection()) {
-
-      // don't update position the first time
-      first_run ? first_run = false : update_position();
-
+      update_position();
       p = path.pop();
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
