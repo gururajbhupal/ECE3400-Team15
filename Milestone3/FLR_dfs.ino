@@ -536,6 +536,8 @@ QueueList <Coordinate> find_path(Coordinate v) {
         }
         break;
     }
+      
+    // Set heading of next
     if (prev.x < next.x) {
       h = 2;
     } else if (prev.x > next.x) {
