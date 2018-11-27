@@ -568,7 +568,7 @@ QueueList <Coordinate> find_path(Coordinate v) {
         }
         break;
     }
-      
+
     // Set heading of next
     if (prev.x < next.x) {
       h = 2;
@@ -592,9 +592,14 @@ QueueList <Coordinate> find_path(Coordinate v) {
 // Maybe push_unvisited as you go?
 void traverse_path(QueueList <Coordinate> path) {
   Coordinate p;
+  bool first_run = true;
+    
   while (!path.isEmpty()) {
     if (atIntersection()) {
-      update_position();
+
+      // don't update position the first time
+      first_run ? first_run = false : update_position();
+
       p = path.pop();
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
