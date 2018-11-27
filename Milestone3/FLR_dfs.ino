@@ -97,6 +97,8 @@ Coordinate front = {1, 0};
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
 
+Coordinate current;
+
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
 Coordinate v;
 
@@ -198,8 +200,8 @@ void adjust() {
 
 /*Pulls a U-turn, updates heading accordinglyy*/
 void turn_around() {
-    turn_right_linetracker();
-    turn_right_linetracker();
+  turn_right_linetracker();
+  turn_right_linetracker();
 }
 
 
@@ -393,11 +395,11 @@ void push_unvisited() {
   if (!check_right() && !maze[right.x][right.y].explored) {
     stack.push(right);
   }
-  /*If the coordinate to the left has not been explored and there is no wall to the right, push left coordinate to stack*/  
+  /*If the coordinate to the left has not been explored and there is no wall to the right, push left coordinate to stack*/
   if (!check_left() && !maze[left.x][left.y].explored) {
     stack.push(left);
   }
-  /*If the coordinate in front has not been explored and there is no wall in front, push front coordinate to stack*/  
+  /*If the coordinate in front has not been explored and there is no wall in front, push front coordinate to stack*/
   if (!check_front() && !maze[front.x][front.y].explored) {
     stack.push(front);
   }
@@ -434,18 +436,18 @@ void robot_start() {
 }
 
 bool is_in_bounds(Coordinate v) {
-    if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
-        return true;
-    }
-    return false;
+  if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
+    return true;
+  }
+  return false;
 }
 
 StackArray <Coordinate> find_path(Coordinate v) {
   StackArray <Coordinate> path;
   Coordinate next = current;
-  Coordinate prev;
+  Coordinate prev = current;
   int h = heading;
-  while (next != v) {
+  while (next.x != v.x || next.y != v.y) {
     /*west of means that the robot needs heading = 3 to get there*/
     bool westof = (v.y < next.y);
     /*east of means that the robot needs heading = 1 to get there*/
@@ -542,6 +544,7 @@ StackArray <Coordinate> find_path(Coordinate v) {
     } else {
       digitalWrite(7, HIGH);
     }
+    prev = next;
     path.push(next);
   }
   return path;
@@ -551,6 +554,7 @@ StackArray <Coordinate> find_path(Coordinate v) {
 
 // Maybe push_unvisited as you go?
 void traverse_path(StackArray <Coordinate> path) {
+  Coordinate p;
   while (!path.isEmpty()) {
     if (atIntersection()) {
       update_position();
