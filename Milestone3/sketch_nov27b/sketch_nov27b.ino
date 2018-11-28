@@ -429,20 +429,6 @@ void robot_start() {
   /*manually set wall behind us for GUI*/
   data = data | 0x0200;
   rf();
-  /*pushes front and left coordinate from 0,0 initially (should NEVER push right because there
-    is always a wall to the right initially)*/
-  push_unvisited();
-  /*If there is NO wall to the front of us begin going that way to stay consistent with DFS*/
-  if (!check_front()) {
-    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
-    maze[front.x][front.y].explored = 1;
-  }
-  else if (!check_left()) {
-    /*turn left if there is a wall in front and no wall to the left*/
-    turn_left_linetracker();
-    /*need to mark the immediate front coordinate as explored otherwise it will mess up exploration later*/
-    maze[left.x][left.y].explored = 1;
-  }
 }
 
 
@@ -592,6 +578,10 @@ void find_path(Coordinate v) {
     /*Set the previous coordinate to the coordinate the robot was just at*/
     prev = next;
     /*push next coordinate to the queue*/
+    Serial.print("x: ");
+    Serial.println(next.x);
+    Serial.print("y: ");
+    Serial.println(next.y);
     path.push(next);
   }
 }
@@ -661,13 +651,20 @@ void traverse_path(QueueList <Coordinate> path) {
   Have to remember all of this is in a while loop
   NEED TO ADD IR CODE IN THE TRAVERSAL
 */
+bool first_run = true;
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
   if (atIntersection()) {
     /*stop so we have time to think*/
     halt();
     /*update the robots position and the surrounding coordinates*/
-    update_position();
+    if(first_run){
+      first_run = false;
+    }
+    else{
+      update_position();
+    }
+    
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
     /*if the stack is NOT empty*/
