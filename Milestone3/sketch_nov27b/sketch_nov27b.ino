@@ -258,9 +258,9 @@ void scan_walls() {
       if (check_right()) data = data | 0x0400; // east=true
       break;
     case 1: // west
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
+      if (check_left()) data = data | 0x0200;// north=true
+      if (check_front()) data = data | 0x0400;// east=true
+      if (check_right()) data = data | 0x0800;// south=true
       break;
     case 2: // south
       if (check_left()) data = data | 0x0400;// east=true
@@ -268,9 +268,9 @@ void scan_walls() {
       if (check_right()) data = data | 0x0100;// west=true
       break;
     case 3: // east
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
+      if (check_left()) data = data | 0x0800; // south=true
+      if (check_front()) data = data | 0x0100; // west=true
+      if (check_right()) data = data | 0x0200;// north=true
       break;
   }
   maze[x][y].n_wall = (data >> 9) & 0x0001;
@@ -340,7 +340,7 @@ bool check_left() {
 bool check_front() {
   mux_select(1, 1, 1);
   if (analogRead(A0) > wall_thresh) {
-    digitalWrite(7, HIGH);
+//    digitalWrite(7, HIGH);
     return true;
   } else {
     return false;
@@ -590,14 +590,14 @@ void find_path(Coordinate v) {
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> path) {
   /*don't wanna update position the first time so we set a flag variable*/
-  bool first_run = true;
+  bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!path.isEmpty()) {
     /*if we are at an intersection*/
     if (atIntersection()) {
       halt();
-      if (first_run) {
-        first_run = false;
+      if (first_run2) {
+        first_run2 = false;
       }
       else {
         update_position();
@@ -700,12 +700,14 @@ void maze_traversal_dfs() {
           of the robot we have explored a whole branch and need to go
           back to the coordinate where the robot branched from.*/
         else {
-//          digitalWrite(7, HIGH);
+
           /*bto is the queuelist which contains the path back to v*/
           find_path(v);
-//          digitalWrite(7, LOW);
+          
           /*traverse the "shortest" path to b */
+                    digitalWrite(7, HIGH);
           traverse_path(path);
+          digitalWrite(7, LOW);
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
