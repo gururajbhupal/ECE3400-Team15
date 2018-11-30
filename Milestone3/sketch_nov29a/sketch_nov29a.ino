@@ -55,7 +55,7 @@ int y = 0;
   {m,0}                 {m,m}
 */
 int heading = 2;
-int counter = 1;
+int counter = 0;
 
 /*Line sensors*/
 int sensor_left = A3;
@@ -64,7 +64,7 @@ int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
-int wall_thresh = 120; //if ABOVE this we detect a wall
+int wall_thresh = 150; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
 /*A coordinate contains an x,y location*/
@@ -102,8 +102,9 @@ Coordinate right;
 Coordinate v;
 
 /*m is the maximum index of the 2d maze array*/
-int mx = 4;
-int my = 3;
+int mx = 3;
+int my = 4;
+int area = (mx + 1) * (my + 1);
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze (maze[x][y]) contains the wall information
@@ -111,7 +112,7 @@ int my = 3;
 
   Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[5][4];
+Info maze[4][5];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -419,7 +420,7 @@ void rf() {
   /*Now, continue listening*/
   radio.startListening();
 
-  Serial.println(data, HEX);
+//  Serial.println(data, HEX);
 
   /*Clear the data*/
   data = data & 0x0000;
@@ -540,31 +541,32 @@ void find_path(Coordinate v) {
       GOING WEST  -> Y--
       GOING EAST  -> Y++*/
 
+// add is_in_bounds to ifs
     /*Choose next coordinate*/
     switch (h) {
       case 0: //NORTH (reject South)
         /*if there is no wall to the north at the current coordinate and v coordinate is north of us*/
-        if (!n && northof) {
+        if (!n && northof && is_in_bounds(front)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate and v is west of us*/
-        else if (!w && westof) {
+        else if (!w && westof && is_in_bounds(left)) {
           next = move_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate and v is to the east of us*/
-        else if (!e && eastof) {
+        else if (!e && eastof && is_in_bounds(right)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
-        else if (!n) {
+        else if (!n && is_in_bounds(front)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate*/
-        else if (!w) {
+        else if (!w && is_in_bounds(left)) {
           next = move_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate*/
-        else if (!e) {
+        else if (!e && is_in_bounds(right)) {
           next = move_coord(next, 1);
         }
         /*else there is a wall at all surrounding coordinates and we need to go to south*/
@@ -574,27 +576,27 @@ void find_path(Coordinate v) {
         break;
       case 1: //EAST (reject West)
         /*if there is no wall to the east at the current coordinate and v is east of us*/
-        if (!e && eastof) {
+        if (!e && eastof && is_in_bounds(front)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate and v is to the north of us*/
-        else if (!n && northof) {
+        else if (!n && northof && is_in_bounds(left)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the south of us at the current coordinate and v is south of us*/
-        else if (!s && southof) {
+        else if (!s && southof && is_in_bounds(right)) {
           next = move_coord(next, 2);
         }
         /*else if there is no wall to the east at the current coordinate*/
-        else if (!e) {
+        else if (!e && is_in_bounds(front)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
-        else if (!n) {
+        else if (!n && is_in_bounds(left)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the south at the current coordinate*/
-        else if (!s) {
+        else if (!s && is_in_bounds(right)) {
           next = move_coord(next, 2);
         }
         /*else there is a wall to the north, south, and east at the current coordinate and we need to go west*/
@@ -603,35 +605,35 @@ void find_path(Coordinate v) {
         }
         break;
       case 2: //SOUTH (reject North)
-        if (!s && southof) {
+        if (!s && southof && is_in_bounds(front)) {
 //          digitalWrite(7, HIGH);
           next = move_coord(next, 2);
-        } else if (!e && eastof) {
+        } else if (!e && eastof && is_in_bounds(left)) {
           next = move_coord(next, 1);
-        } else if (!w && westof) {
+        } else if (!w && westof && is_in_bounds(right)) {
           next = move_coord(next, 3);
-        } else if (!s) {
+        } else if (!s && is_in_bounds(front)) {
           next = move_coord(next, 2);
-        } else if (!e) {
+        } else if (!e && is_in_bounds(left)) {
           next = move_coord(next, 1);
-        } else if (!w) {
+        } else if (!w && is_in_bounds(right)) {
           next = move_coord(next, 3);
         } else {
           next = move_coord(next, 0);
         }
         break;
       case 3: //WEST (reject East)
-        if (!w && westof) {
+        if (!w && westof && is_in_bounds(front)) {
           next = move_coord(next, 3);
-        } else if (!s && southof) {
+        } else if (!s && southof && is_in_bounds(left)) {
           next = move_coord(next, 2);
-        } else if (!n && northof) {
+        } else if (!n && northof && is_in_bounds(right)) {
           next = move_coord(next, 0);
-        } else if (!w) {
+        } else if (!w && is_in_bounds(front)) {
           next = move_coord(next, 3);
-        } else if (!s) {
+        } else if (!s && is_in_bounds(left)) {
           next = move_coord(next, 2);
-        } else if (!n) {
+        } else if (!n && is_in_bounds(right)) {
           next = move_coord(next, 0);
         } else {
           next = move_coord(next, 1);
@@ -668,7 +670,7 @@ void traverse_path(QueueList <Coordinate> path) {
   while (!path.isEmpty()) {
     /*if we are at an intersection*/
     if (atIntersection()) {
-      adjust();
+//      adjust();
       halt();
       if(first_run2){
         first_run2 = false;
@@ -681,22 +683,32 @@ void traverse_path(QueueList <Coordinate> path) {
       /*if p is the coordinate in front of us*/
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
+        scan_walls();
+        rf();
         adjust();
       }
       /*else if p is the left coordinate*/
       else if (p.x == left.x && p.y == left.y) {
         /*send relevant information to GUI, turn left*/
+        scan_walls();
+        rf();
         adjust();
         turn_left_linetracker();
       }
       /*else if p is the right coordinate*/
       else if (p.x == right.x && p.y == right.y) {
         /*send relevant information to GUI, turn right*/
+        
+        scan_walls();
+        rf();
         adjust();
         turn_right_linetracker();
       }
       /*else the coordinate to go to is behind us so we turn around*/
       else {
+        scan_walls();
+        rf();
+        adjust();
         turn_around();
       }
     }
@@ -740,19 +752,23 @@ void maze_traversal_dfs() {
       v = stack.pop();
       /*If the robot has NOT BEEN TO v,*/
       if (!maze[v.x][v.y].explored) {
+        Serial.print("Right: ");
+        Serial.print(right.x);
+        Serial.print(" ");
+        Serial.println(right.y);
         /*If v is the front coordinate*/
         if (is_in_bounds(front) && v.x == front.x && v.y == front.y) {
           /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
         }
         /*else if v is the left coordinate*/
         else if (is_in_bounds(left) && v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
           turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
@@ -760,7 +776,7 @@ void maze_traversal_dfs() {
           /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
           turn_right_linetracker();
         }
         /*else if v is neither the front, left, or right coordinate
@@ -776,6 +792,8 @@ void maze_traversal_dfs() {
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
         counter++;
+         Serial.print("Count: ");
+ Serial.println(counter);
       }
     }
   }
@@ -830,7 +848,9 @@ void setup() {
 
 /*Run main code*/
 void loop() {
- if (counter != ( (mx + 1) * (my + 1) )) maze_traversal_dfs();
+ maze_traversal_dfs();
+ while (counter == (area + 1)) halt();
+
 //  Serial.print("Left: ");
 //  Serial.println(analogRead(A2));
 //  Serial.print("Middle: ");
@@ -839,3 +859,4 @@ void loop() {
 //  Serial.println(analogRead(A0));
 //  delay(1000);
 }
+
