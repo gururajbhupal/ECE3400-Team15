@@ -98,9 +98,6 @@ Coordinate front = {1, 0};
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
 
-/*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
-Coordinate back;
-
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
 Coordinate v;
 
@@ -205,16 +202,6 @@ void adjust() {
 void turn_around() {
   turn_right_linetracker();
   turn_right_linetracker();
-}
-
-/* Periodically switches rotation to help debug */
-void error() {
-  while (1) {
-    turn_place_left();
-    delay(300);
-    turn_place_right();
-    delay(300);
-  }
 }
 
 
@@ -528,11 +515,6 @@ void find_path(Coordinate v) {
   /*set next and prev to current coordinate*/
   Coordinate next = {x, y};
   Coordinate prev = {x, y};
-
-  Coordinate f = front;
-  Coordinate l = left;
-  Coordinate r = right;
-  
   /*h is the heading the robot needs to traverse a point*/
   int h = heading;
 
@@ -559,56 +541,32 @@ void find_path(Coordinate v) {
       GOING WEST  -> Y--
       GOING EAST  -> Y++*/
 
-
-   switch (h) {
-    case 0: //NORTH
-      l = {next.x, next.y - 1};
-      f = {next.x - 1, next.y};
-      r = {next.x, next.y + 1};
-      break;
-    case 1: //EAST
-      l = {next.x - 1, next.y};
-      f = {next.x, next.y + 1};
-      r = {next.x + 1, next.y};
-      break;
-    case 2: //SOUTH
-      l = {next.x, next.y + 1};
-      f = {next.x + 1, next.y};
-      r = {next.x, next.y - 1};
-      break;
-    case 3: //WEST
-      l = {next.x + 1, next.y};
-      f = {next.x, next.y - 1};
-      r = {next.x - 1, next.y};
-      break;
-  }
-
 // add is_in_bounds to ifs
     /*Choose next coordinate*/
     switch (h) {
       case 0: //NORTH (reject South)
         /*if there is no wall to the north at the current coordinate and v coordinate is north of us*/
-        if (!n && northof && is_in_bounds(f)) {
+        if (!n && northof && is_in_bounds(front)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate and v is west of us*/
-        else if (!w && westof && is_in_bounds(l)) {
+        else if (!w && westof && is_in_bounds(left)) {
           next = move_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate and v is to the east of us*/
-        else if (!e && eastof && is_in_bounds(r)) {
+        else if (!e && eastof && is_in_bounds(right)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
-        else if (!n && is_in_bounds(f)) {
+        else if (!n && is_in_bounds(front)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate*/
-        else if (!w && is_in_bounds(l)) {
+        else if (!w && is_in_bounds(left)) {
           next = move_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate*/
-        else if (!e && is_in_bounds(r)) {
+        else if (!e && is_in_bounds(right)) {
           next = move_coord(next, 1);
         }
         /*else there is a wall at all surrounding coordinates and we need to go to south*/
@@ -618,27 +576,27 @@ void find_path(Coordinate v) {
         break;
       case 1: //EAST (reject West)
         /*if there is no wall to the east at the current coordinate and v is east of us*/
-        if (!e && eastof && is_in_bounds(f)) {
+        if (!e && eastof && is_in_bounds(front)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate and v is to the north of us*/
-        else if (!n && northof && is_in_bounds(l)) {
+        else if (!n && northof && is_in_bounds(left)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the south of us at the current coordinate and v is south of us*/
-        else if (!s && southof && is_in_bounds(r)) {
+        else if (!s && southof && is_in_bounds(right)) {
           next = move_coord(next, 2);
         }
         /*else if there is no wall to the east at the current coordinate*/
-        else if (!e && is_in_bounds(f)) {
+        else if (!e && is_in_bounds(front)) {
           next = move_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
-        else if (!n && is_in_bounds(l)) {
+        else if (!n && is_in_bounds(left)) {
           next = move_coord(next, 0);
         }
         /*else if there is no wall to the south at the current coordinate*/
-        else if (!s && is_in_bounds(r)) {
+        else if (!s && is_in_bounds(right)) {
           next = move_coord(next, 2);
         }
         /*else there is a wall to the north, south, and east at the current coordinate and we need to go west*/
@@ -647,34 +605,35 @@ void find_path(Coordinate v) {
         }
         break;
       case 2: //SOUTH (reject North)
-        if (!s && southof && is_in_bounds(f)) {
+        if (!s && southof && is_in_bounds(front)) {
+//          digitalWrite(7, HIGH);
           next = move_coord(next, 2);
-        } else if (!e && eastof && is_in_bounds(l)) {
+        } else if (!e && eastof && is_in_bounds(left)) {
           next = move_coord(next, 1);
-        } else if (!w && westof && is_in_bounds(r)) {
+        } else if (!w && westof && is_in_bounds(right)) {
           next = move_coord(next, 3);
-        } else if (!s && is_in_bounds(f)) {
+        } else if (!s && is_in_bounds(front)) {
           next = move_coord(next, 2);
-        } else if (!e && is_in_bounds(l)) {
+        } else if (!e && is_in_bounds(left)) {
           next = move_coord(next, 1);
-        } else if (!w && is_in_bounds(r)) {
+        } else if (!w && is_in_bounds(right)) {
           next = move_coord(next, 3);
         } else {
           next = move_coord(next, 0);
         }
         break;
       case 3: //WEST (reject East)
-        if (!w && westof && is_in_bounds(f)) {
+        if (!w && westof && is_in_bounds(front)) {
           next = move_coord(next, 3);
-        } else if (!s && southof && is_in_bounds(l)) {
+        } else if (!s && southof && is_in_bounds(left)) {
           next = move_coord(next, 2);
-        } else if (!n && northof && is_in_bounds(r)) {
+        } else if (!n && northof && is_in_bounds(right)) {
           next = move_coord(next, 0);
-        } else if (!w && is_in_bounds(f)) {
+        } else if (!w && is_in_bounds(front)) {
           next = move_coord(next, 3);
-        } else if (!s && is_in_bounds(l)) {
+        } else if (!s && is_in_bounds(left)) {
           next = move_coord(next, 2);
-        } else if (!n && is_in_bounds(r)) {
+        } else if (!n && is_in_bounds(right)) {
           next = move_coord(next, 0);
         } else {
           next = move_coord(next, 1);
@@ -745,17 +704,12 @@ void traverse_path(QueueList <Coordinate> path) {
         adjust();
         turn_right_linetracker();
       }
-      /*else the coordinate to go to is behind us*/
-      else if ((p.x == back.x && p.y == back.y)) {
-        /*send relevant information to GUI, turn around*/
+      /*else the coordinate to go to is behind us so we turn around*/
+      else {
 //        scan_walls();
         rf();
-        adjust();
+//        adjust();
         turn_around();
-      }
-      /*else given bad path*/
-      else {
-        error();
       }
     }
     /*if we are not at an intersection we line follow*/
@@ -824,14 +778,6 @@ void maze_traversal_dfs() {
           rf();
           adjust();
           turn_right_linetracker();
-        }
-        /*else if v is the coordinate behind*/
-        else if (is_in_bounds(back) && v.x == back.x && v.y == back.y) {
-          /*send relevant information to GUI, turn around*/
-          scan_walls();
-          rf();
-          adjust();
-          turn_around();
         }
         /*else if v is neither the front, left, or right coordinate
           of the robot we have explored a whole branch and need to go

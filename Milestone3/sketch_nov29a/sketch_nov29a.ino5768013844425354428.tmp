@@ -207,16 +207,6 @@ void turn_around() {
   turn_right_linetracker();
 }
 
-/* Periodically switches rotation to help debug */
-void error() {
-  while (1) {
-    turn_place_left();
-    delay(300);
-    turn_place_right();
-    delay(300);
-  }
-}
-
 
 /*
   Select output of mux based on select bits.
@@ -745,17 +735,12 @@ void traverse_path(QueueList <Coordinate> path) {
         adjust();
         turn_right_linetracker();
       }
-      /*else the coordinate to go to is behind us*/
+      /*else the coordinate to go to is behind us so we turn around*/
       else if ((p.x == back.x && p.y == back.y)) {
-        /*send relevant information to GUI, turn around*/
 //        scan_walls();
         rf();
-        adjust();
+//        adjust();
         turn_around();
-      }
-      /*else given bad path*/
-      else {
-        error();
       }
     }
     /*if we are not at an intersection we line follow*/
@@ -824,14 +809,6 @@ void maze_traversal_dfs() {
           rf();
           adjust();
           turn_right_linetracker();
-        }
-        /*else if v is the coordinate behind*/
-        else if (is_in_bounds(back) && v.x == back.x && v.y == back.y) {
-          /*send relevant information to GUI, turn around*/
-          scan_walls();
-          rf();
-          adjust();
-          turn_around();
         }
         /*else if v is neither the front, left, or right coordinate
           of the robot we have explored a whole branch and need to go
