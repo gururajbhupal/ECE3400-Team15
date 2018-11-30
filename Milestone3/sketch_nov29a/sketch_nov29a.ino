@@ -209,11 +209,12 @@ void turn_around() {
 
 /* Periodically switches rotation to help debug */
 void error() {
+  int d = 500;
   while (1) {
     turn_place_left();
-    delay(300);
+    delay(d);
     turn_place_right();
-    delay(300);
+    delay(d);
   }
 }
 
@@ -915,6 +916,7 @@ void setup() {
 
 /*Run main code*/
 void loop() {
+//  error();
   maze_traversal_dfs();
   // while (counter == (area + 1)) halt();
   // while(stack.isEmpty()) halt();
