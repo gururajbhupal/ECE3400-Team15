@@ -105,8 +105,8 @@ Coordinate back;
 Coordinate v;
 
 /*m is the maximum index of the 2d maze array*/
-int mx = 4;
-int my = 3;
+int mx = 8;
+int my = 8;
 int area = (mx + 1) * (my + 1);
 
 /*2d array which is the size of the maze to traverse. Each
@@ -115,7 +115,7 @@ int area = (mx + 1) * (my + 1);
 
   Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[5][4];
+Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -474,6 +474,21 @@ bool atIntersection() {
   }
 }
 
+/*Returns true if the robot is at an intersection for n readings, else false*/
+bool atIntersection_avg() {
+  bool flag = false;
+  int n = 5;
+  if (atIntersection()) {
+    flag = true;
+    for (int i = 0; i < n; i++) {
+      if (!atIntersection()) {
+        flag = false;
+      }
+    }
+  }
+  return flag;
+}
+
 /*True if v is in the bounds of the maze*/
 bool is_in_bounds(Coordinate v) {
   if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
@@ -506,29 +521,29 @@ void push_unvisited() {
 }
 
 
-Coordinate move_coord(Coordinate v, int h) {
+Coordinate move_coord(Coordinate a, int h) {
   switch (h) {
     case 0:
-      v.x = v.x - 1;
+      a.x = a.x - 1;
       break;
     case 1:
-      v.y = v.y + 1;
+      a.y = a.y + 1;
       break;
     case 2:
-      v.x = v.x + 1;
+      a.x = a.x + 1;
       break;
     case 3:
-      v.y = v.y - 1;
+      a.y = a.y - 1;
       break;
   }
-  return v;
+  return a;
 }
 
 
 /*path is the path to return*/
 QueueList <Coordinate> path;
 /* Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
-void find_path(Coordinate v) {
+void find_path(Coordinate b) {
 
   /*set next and prev to current coordinate*/
   Coordinate next = {x, y};
@@ -542,15 +557,15 @@ void find_path(Coordinate v) {
   int h = heading;
 
   /*while the next coordinate to add to the queue is not v*/
-  while (next.x != v.x || next.y != v.y) {
+  while (next.x != b.x || next.y != b.y) {
     /*west of means that the robot needs heading = 3 to get there*/
-    bool westof = (v.y < next.y);
+    bool westof = (b.y < next.y);
     /*east of means that the robot needs heading = 1 to get there*/
-    bool eastof = (v.y > next.y);
+    bool eastof = (b.y > next.y);
     /*south of means that the robot needs heading = 2 to get there*/
-    bool southof = (v.x > next.x);
+    bool southof = (b.x > next.x);
     /*north of means that the robot needs heading = 0 to get there*/
-    bool northof = (v.x < next.x);
+    bool northof = (b.x < next.x);
 
     /*following booleans are true if there is a wall at the {x,y} coordinate in that direction.
       DIRECTION HERE IS ABSOLUTE*/
@@ -709,25 +724,25 @@ void find_path(Coordinate v) {
 }
 
 /*traverses the given path*/
-void traverse_path(QueueList <Coordinate> path) {
+void traverse_path(QueueList <Coordinate> route) {
   //  /*don't wanna update position the first time so we set a flag variable*/
-  //  bool first_run2 = true;
+   bool first_run2 = true;
   /*while the path to traverse is not empty*/
-  while (!path.isEmpty()) {
+  while (!route.isEmpty()) {
     /*if we are at an intersection*/
     if (atIntersection()) {
       //      adjust();
       halt();
-      //      if(first_run2){
-      //        first_run2 = false;
-      //      } else{
+      if (first_run2) {
+        first_run2 = false;
+      } else {
 
-      // since adjust has been added to dfs else, always need to update position
-      update_position();
-      //      }
+        // since adjust has been added to dfs else, always need to update position
+        update_position();
+      }
 
       /*Coordinate p is what is popped off the queue*/
-      Coordinate p = path.pop();
+      Coordinate p = route.pop();
       /*if p is the coordinate in front of us*/
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
@@ -847,10 +862,8 @@ void maze_traversal_dfs() {
         else {
           scan_walls();
           rf();
-          adjust();
           find_path(v);
           traverse_path(path);
-
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
@@ -858,12 +871,13 @@ void maze_traversal_dfs() {
         //         Serial.print("Count: ");
         // Serial.println(counter);
       }
+    }
       // else stack is empty
       // halt when all nodes are explored
       // can easily be removed
-    } else {
-      while (1) halt();
-    }
+     // else {
+      //      while (1) halt();
+      //    }
   }
   /*If we are NOT at an intersection we linefollow*/
   linefollow();
@@ -916,7 +930,6 @@ void setup() {
 
 /*Run main code*/
 void loop() {
-//  error();
   maze_traversal_dfs();
   // while (counter == (area + 1)) halt();
   // while(stack.isEmpty()) halt();
