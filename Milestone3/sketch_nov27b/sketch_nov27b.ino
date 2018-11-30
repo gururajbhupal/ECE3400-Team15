@@ -714,14 +714,14 @@ void maze_traversal_dfs() {
           /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
         }
         /*else if v is the left coordinate*/
         else if (is_in_bounds(left) && v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
           turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
@@ -729,7 +729,7 @@ void maze_traversal_dfs() {
           /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
-          //adjust();
+          adjust();
           turn_right_linetracker();
         }
         /*else if v is neither the front, left, or right coordinate
@@ -740,7 +740,6 @@ void maze_traversal_dfs() {
           rf();
           find_path(v);
           traverse_path(path);
-    
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
