@@ -726,7 +726,7 @@ void find_path(Coordinate b) {
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> route) {
   //  /*don't wanna update position the first time so we set a flag variable*/
-   bool first_run2 = true;
+  bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
     /*if we are at an intersection*/
@@ -872,12 +872,12 @@ void maze_traversal_dfs() {
         // Serial.println(counter);
       }
     }
-      // else stack is empty
-      // halt when all nodes are explored
-      // can easily be removed
-     // else {
-      //      while (1) halt();
-      //    }
+    // else stack is empty
+    // halt when all nodes are explored
+    // can easily be removed
+    // else {
+    //      while (1) halt();
+    //    }
   }
   /*If we are NOT at an intersection we linefollow*/
   linefollow();
