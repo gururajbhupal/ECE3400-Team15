@@ -477,8 +477,9 @@ bool atIntersection() {
 /*Returns true if the robot is at an intersection for n readings, else false*/
 bool atIntersection_avg() {
   bool flag = false;
-  int n = 5;
+  int n = 250;
   if (atIntersection()) {
+    go();
     flag = true;
     for (int i = 0; i < n; i++) {
       if (!atIntersection()) {
@@ -486,6 +487,20 @@ bool atIntersection_avg() {
       }
     }
   }
+  return flag;
+}
+
+/*Used to calibrate n in atIntersection_avg()*/
+bool atIntersection_test() {
+  bool flag = false;
+  int c = 0;
+  while (atIntersection()) {
+    go();
+    flag = true;
+    c++;
+  }
+  if (c != 0) Serial.println(c);
+  //  if (c > 250) Serial.println();
   return flag;
 }
 
@@ -730,7 +745,7 @@ void traverse_path(QueueList <Coordinate> route) {
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
     /*if we are at an intersection*/
-    if (atIntersection()) {
+    if (atIntersection_avg()) {
       //      adjust();
       halt();
       if (first_run2) {
@@ -799,7 +814,7 @@ void traverse_path(QueueList <Coordinate> route) {
 bool first_run = true;
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
-  if (atIntersection()) {
+  if (atIntersection_avg()) {
     //adjust();
     /*stop so we have time to think*/
     halt();
@@ -928,19 +943,33 @@ void setup() {
   //  robot_start();
 }
 
+
 /*Run main code*/
 void loop() {
   maze_traversal_dfs();
-  // while (counter == (area + 1)) halt();
-  // while(stack.isEmpty()) halt();
-
-  //  Serial.print("Left: ");
-  //  Serial.println(analogRead(A2));
-  //  Serial.print("Middle: ");
-  //  Serial.println(analogRead(A1));
-  //  Serial.print("Right: ");
-  //  Serial.println(analogRead(A0));
-  //  delay(1000);
 }
+
+//  Serial.print("Left: ");
+//  Serial.println(analogRead(A2));
+//  Serial.print("Middle: ");
+//  Serial.println(analogRead(A1));
+//  Serial.print("Right: ");
+//  Serial.println(analogRead(A0));
+//  delay(1000);
+
+//int c_int = 0;
+//  if (atIntersection_test()) {
+//
+//    adjust();
+//    c_int++;
+//    if (c_int == 2) {
+//      c_int = 0;
+//      Serial.println();
+//      turn_around();
+//    }
+//
+//  } else {
+//    linefollow();
+//  }
 
 
