@@ -105,8 +105,8 @@ Coordinate back;
 Coordinate v;
 
 /*m is the maximum index of the 2d maze array*/
-int mx = 8;
-int my = 8;
+int mx = 3;
+int my = 4;
 int area = (mx + 1) * (my + 1);
 
 /*2d array which is the size of the maze to traverse. Each
@@ -115,7 +115,7 @@ int area = (mx + 1) * (my + 1);
 
   Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[9][9];
+Info maze[5][5];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -564,6 +564,11 @@ void find_path(Coordinate b) {
   Coordinate next = {x, y};
   Coordinate prev = {x, y};
 
+  Serial.print("current.x: ");
+    Serial.println(next.x);
+    Serial.print("current.y: ");
+    Serial.println(next.y);
+
   Coordinate f = front;
   Coordinate l = left;
   Coordinate r = right;
@@ -740,6 +745,11 @@ void find_path(Coordinate b) {
 
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> route) {
+  
+    Serial.print("back.x: ");
+    Serial.println(back.x);
+    Serial.print("back.y: ");
+    Serial.println(back.y);
   //  /*don't wanna update position the first time so we set a flag variable*/
   bool first_run2 = true;
   /*while the path to traverse is not empty*/
@@ -758,6 +768,11 @@ void traverse_path(QueueList <Coordinate> route) {
 
       /*Coordinate p is what is popped off the queue*/
       Coordinate p = route.pop();
+
+    Serial.print("p.x: ");
+    Serial.println(p.x);
+    Serial.print("p.y: ");
+    Serial.println(p.y);
       /*if p is the coordinate in front of us*/
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
@@ -827,6 +842,9 @@ void maze_traversal_dfs() {
       update_position();
     }
 
+    scan_walls();
+    rf();
+
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
 
@@ -843,31 +861,31 @@ void maze_traversal_dfs() {
         /*If v is the front coordinate*/
         if (is_in_bounds(front) && v.x == front.x && v.y == front.y) {
           /*send relevant information to GUI, go straight*/
-          scan_walls();
-          rf();
+//          scan_walls();
+//          rf();
           adjust();
         }
         /*else if v is the left coordinate*/
         else if (is_in_bounds(left) && v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, turn left*/
-          scan_walls();
-          rf();
+//          scan_walls();
+//          rf();
           adjust();
           turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
         else if (is_in_bounds(right) && v.x == right.x && v.y == right.y) {
           /*send relevant information to GUI, turn right*/
-          scan_walls();
-          rf();
+//          scan_walls();
+//          rf();
           adjust();
           turn_right_linetracker();
         }
         /*else if v is the coordinate behind*/
         else if (is_in_bounds(back) && v.x == back.x && v.y == back.y) {
           /*send relevant information to GUI, turn around*/
-          scan_walls();
-          rf();
+//          scan_walls();
+//          rf();
           adjust();
           turn_around();
         }
@@ -875,9 +893,10 @@ void maze_traversal_dfs() {
           of the robot we have explored a whole branch and need to go
           back to the coordinate where the robot branched from.*/
         else {
-          scan_walls();
-          rf();
+//          scan_walls();
+//          rf();
           find_path(v);
+//          error(); // did not get here
           traverse_path(path);
         }
         /*Mark v as visited*/
