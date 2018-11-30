@@ -705,19 +705,21 @@ void find_path(Coordinate v) {
 
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> path) {
-  /*don't wanna update position the first time so we set a flag variable*/
-  bool first_run2 = true;
+//  /*don't wanna update position the first time so we set a flag variable*/
+//  bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!path.isEmpty()) {
     /*if we are at an intersection*/
     if (atIntersection()) {
 //      adjust();
       halt();
-      if(first_run2){
-        first_run2 = false;
-      } else{
+//      if(first_run2){
+//        first_run2 = false;
+//      } else{
+        
+        // since adjust has been added to dfs else, always need to update position
         update_position();        
-      }
+//      }
 
       /*Coordinate p is what is popped off the queue*/
       Coordinate p = path.pop();
@@ -846,7 +848,7 @@ void maze_traversal_dfs() {
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
-//        counter++;
+        counter++;
 //         Serial.print("Count: ");
 // Serial.println(counter);
       }
