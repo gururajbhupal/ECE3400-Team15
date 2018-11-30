@@ -64,7 +64,7 @@ int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
 int line_thresh = 400; //if BELOW this we detect a white line
-int wall_thresh = 150; //if ABOVE this we detect a wall
+int wall_thresh = 120; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
 /*A coordinate contains an x,y location*/
@@ -78,7 +78,7 @@ typedef struct coordinate Coordinate;
 /*Info contains information at an x,y coordinate. Information includes
   whether the coordinate has been explored as well as wall information*/
 struct info {
-  bool explored;
+  bool explored = 0;
   bool n_wall = 1;
   bool e_wall = 1;
   bool s_wall = 1;
@@ -97,8 +97,6 @@ Coordinate front = {1, 0};
 
 /*Coordinate to the right of the way the robot is moving (no initial right coordinate)*/
 Coordinate right;
-
-Coordinate current;
 
 /*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
 Coordinate v;
@@ -206,6 +204,58 @@ void turn_around() {
 }
 
 
+/*
+  Select output of mux based on select bits.
+  Order is s2 s1 s0 from 000 to 111
+  000 is audio
+  001 is IR
+  010
+  011 is right wall sensor
+  100
+  101 is left wall sensor
+  110
+  111 is middle wall sensor
+*/
+void mux_select(int s2, int s1, int s0) {
+  digitalWrite(4, s2); //MSB s2
+  digitalWrite(2, s1); //s1
+  digitalWrite(3, s0); //LSB s0
+  /*small delay allows mux enough time to select appropriate input before
+    relevant code executes*/
+  delay(55);
+}
+
+
+/*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
+bool check_left() {
+  //mux_select(1, 0, 1);
+  if (analogRead(A2) > wall_thresh) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/*Sets mux_select to front wall sensor information, and returns true and turns on LED if there is a wall in front. */
+bool check_front() {
+ // mux_select(1, 1, 1);
+  if (analogRead(A1) > wall_thresh) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/*Sets mux_select to right wall sensor information, and returns true and turns on LED if there is a wall to the right. */
+bool check_right() {
+  //mux_select(0, 1, 1);
+  if (analogRead(A0) > wall_thresh) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}.
    Also updates the coordinates surrounding the robot.
    FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
@@ -252,31 +302,91 @@ void update_position() {
   Also updates wall info in Maze for the current {x,y} coordinate*/
 void scan_walls() {
   switch (heading) {
-    case 0: // north
-      if (check_left()) data = data | 0x0100; // west=true
-      if (check_front()) data = data | 0x0200; // north=true
-      if (check_right()) data = data | 0x0400; // east=true
+    case 0: //NORTH
+      if (check_left()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      } else{
+        maze[x][y].w_wall = 0;
+      }
+      if (check_front()) {
+        data = data | 0x0200; // north=true
+        maze[x][y].n_wall = 1;
+      } else{
+        maze[x][y].n_wall = 0;
+      }
+      if (check_right()) {
+        data = data | 0x0400; // east=true
+        maze[x][y].e_wall = 1;
+      } else{
+        maze[x][y].e_wall = 0;
+      }
+      maze[x][y].s_wall = 0;
       break;
-    case 1: // west
-      if (check_left()) data = data | 0x0200;// north=true
-      if (check_front()) data = data | 0x0400;// east=true
-      if (check_right()) data = data | 0x0800;// south=true
+    case 1: //EAST
+      if (check_left()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      } else{
+        maze[x][y].n_wall = 0;
+      }
+      if (check_front()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      } else{
+        maze[x][y].e_wall = 0;
+      }
+      if (check_right()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      } else{
+        maze[x][y].s_wall = 0;
+      }
+      maze[x][y].w_wall =0;
       break;
-    case 2: // south
-      if (check_left()) data = data | 0x0400;// east=true
-      if (check_front()) data = data | 0x0800;// south=true
-      if (check_right()) data = data | 0x0100;// west=true
+    case 2: //SOUTH
+      if (check_left()) {
+        data = data | 0x0400;// east=true
+        maze[x][y].e_wall = 1;
+      } else{
+        maze[x][y].e_wall = 0;
+      }
+      if (check_front()) {
+        data = data | 0x0800;// south=true
+        maze[x][y].s_wall = 1;
+      } else{
+        maze[x][y].s_wall = 0;
+      }
+      if (check_right()) {
+        data = data | 0x0100;// west=true
+        maze[x][y].w_wall = 1;
+      } else{
+        maze[x][y].w_wall = 0;
+      }
+        maze[x][y].n_wall = 0;
       break;
-    case 3: // east
-      if (check_left()) data = data | 0x0800; // south=true
-      if (check_front()) data = data | 0x0100; // west=true
-      if (check_right()) data = data | 0x0200;// north=true
+    case 3: //WEST
+      if (check_left()) {
+        data = data | 0x0800; // south=true
+        maze[x][y].s_wall = 1;
+      } else{
+        maze[x][y].s_wall = 0;
+      }
+      if (check_front()) {
+        data = data | 0x0100; // west=true
+        maze[x][y].w_wall = 1;
+      } else{
+        maze[x][y].w_wall = 0;
+      }
+      if (check_right()) {
+        data = data | 0x0200;// north=true
+        maze[x][y].n_wall = 1;
+      } else{
+        maze[x][y].n_wall = 0;
+      }
+      maze[x][y].e_wall = 0;
       break;
   }
-  maze[x][y].n_wall = (data >> 9) & 0x0001;
-  maze[x][y].w_wall = (data >> 8) & 0x0001;
-  maze[x][y].s_wall = (data >> 11) & 0x0001;
-  maze[x][y].e_wall = (data >> 10) & 0x0001;
 }
 
 
@@ -304,58 +414,6 @@ void rf() {
 }
 
 
-/*
-  Select output of mux based on select bits.
-  Order is s2 s1 s0 from 000 to 111
-  000 is audio
-  001 is IR
-  010
-  011 is right wall sensor
-  100
-  101 is left wall sensor
-  110
-  111 is middle wall sensor
-*/
-void mux_select(int s2, int s1, int s0) {
-  digitalWrite(4, s2); //MSB s2
-  digitalWrite(2, s1); //s1
-  digitalWrite(3, s0); //LSB s0
-  /*small delay allows mux enough time to select appropriate input before
-    relevant code executes*/
-  delay(55);
-}
-
-
-/*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
-bool check_left() {
-  mux_select(1, 0, 1);
-  if (analogRead(A0) > wall_thresh) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/*Sets mux_select to front wall sensor information, and returns true and turns on LED if there is a wall in front. */
-bool check_front() {
-  mux_select(1, 1, 1);
-  if (analogRead(A0) > wall_thresh) {
-//    digitalWrite(7, HIGH);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/*Sets mux_select to right wall sensor information, and returns true and turns on LED if there is a wall to the right. */
-bool check_right() {
-  mux_select(0, 1, 1);
-  if (analogRead(A0) > wall_thresh) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
 
 /*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
@@ -414,21 +472,6 @@ void push_unvisited() {
       stack.push(front);
     }
   }
-}
-
-/*Since the robot starts after the {0,0} intersection we manually take care of this special case.
-  We must scan the walls at {0,0} and evaluate unvisited nodes from the get go.
-
-  Note: left, front and right are initialized to be values assuming you start at the bottom right at {0,0}
-        after robot_start() DFS begins*/
-void robot_start() {
-  /*At the beginning set the {x,y} = {0,0} coordinate to explored*/
-  maze[0][0].explored = 1;
-  /*scan the walls and update the GUI*/
-  scan_walls();
-  /*manually set wall behind us for GUI*/
-  data = data | 0x0200;
-  rf();
 }
 
 
@@ -530,7 +573,6 @@ void find_path(Coordinate v) {
         break;
       case 2: //SOUTH (reject North)
         if (!s && southof) {
-//          digitalWrite(7, HIGH);
           next = {next.x + 1, next.y};
         } else if (!e && eastof) {
           next = {next.x, next.y + 1};
@@ -595,43 +637,35 @@ void traverse_path(QueueList <Coordinate> path) {
   while (!path.isEmpty()) {
     /*if we are at an intersection*/
     if (atIntersection()) {
+      adjust();
       halt();
-      if (first_run2) {
+      if(first_run2){
         first_run2 = false;
+      } else{
+        update_position();        
       }
-      else {
-        update_position();
-      }
+
       /*Coordinate p is what is popped off the queue*/
       Coordinate p = path.pop();
       /*if p is the coordinate in front of us*/
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
-        scan_walls();
-        rf();
         adjust();
       }
       /*else if p is the left coordinate*/
       else if (p.x == left.x && p.y == left.y) {
         /*send relevant information to GUI, turn left*/
-        scan_walls();
-        rf();
         adjust();
         turn_left_linetracker();
       }
       /*else if p is the right coordinate*/
       else if (p.x == right.x && p.y == right.y) {
         /*send relevant information to GUI, turn right*/
-        scan_walls();
-        rf();
         adjust();
         turn_right_linetracker();
       }
       /*else the coordinate to go to is behind us so we turn around*/
       else {
-        scan_walls();
-        rf();
-        adjust();
         turn_around();
       }
     }
@@ -655,10 +689,12 @@ bool first_run = true;
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
   if (atIntersection()) {
+    //adjust();
     /*stop so we have time to think*/
     halt();
     /*update the robots position and the surrounding coordinates*/
     if(first_run){
+      maze[0][0].explored = 1;
       first_run = false;
     }
     else{
@@ -678,14 +714,14 @@ void maze_traversal_dfs() {
           /*send relevant information to GUI, go straight*/
           scan_walls();
           rf();
-          adjust();
+          //adjust();
         }
         /*else if v is the left coordinate*/
         else if (is_in_bounds(left) && v.x == left.x && v.y == left.y) {
           /*send relevant information to GUI, turn left*/
           scan_walls();
           rf();
-          adjust();
+          //adjust();
           turn_left_linetracker();
         }
         /*else if v is the right coordinate*/
@@ -693,21 +729,18 @@ void maze_traversal_dfs() {
           /*send relevant information to GUI, turn right*/
           scan_walls();
           rf();
-          adjust();
+          //adjust();
           turn_right_linetracker();
         }
         /*else if v is neither the front, left, or right coordinate
           of the robot we have explored a whole branch and need to go
           back to the coordinate where the robot branched from.*/
         else {
-
-          /*bto is the queuelist which contains the path back to v*/
+          scan_walls();
+          rf();
           find_path(v);
-          
-          /*traverse the "shortest" path to b */
-                    digitalWrite(7, HIGH);
           traverse_path(path);
-          digitalWrite(7, LOW);
+    
         }
         /*Mark v as visited*/
         maze[v.x][v.y].explored = 1;
@@ -760,10 +793,17 @@ void setup() {
   /*This function adjusts robot to traverse the maze from the get go under the
     assumption the robot must start at the relative bottom right of the maze facing
     relative up. Also updates GUI accordingly and begins DFS accordingly.*/
-  robot_start();
+//  robot_start();
 }
 
 /*Run main code*/
 void loop() {
-  maze_traversal_dfs();
+ maze_traversal_dfs();
+//  Serial.print("Left: ");
+//  Serial.println(analogRead(A2));
+//  Serial.print("Middle: ");
+//  Serial.println(analogRead(A1));
+//  Serial.print("Right: ");
+//  Serial.println(analogRead(A0));
+//  delay(1000);
 }
