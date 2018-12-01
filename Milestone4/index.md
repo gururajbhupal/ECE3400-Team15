@@ -1,4 +1,4 @@
-#Milestone 4 Report
+# Milestone 4 Report
 
 ## Introduction
 For this milestone, we added shape detection to our camera. There are  6 types of treasures that have to be detected in the competition.
@@ -65,7 +65,7 @@ So below combinations give the output.
 
 
 
-Conclusion
+## Conclusion
 To maintain the same static scanning, we need to be at an exact fixed distance from the treasure. So for the final competition, we have decided to scan it at the intersection where the treasures are almost at the same distance, since walls are almost same distance to intersection. 
 Further tuning needs to be done to find the new parameters La, Lb and Lc for the competition. 
 

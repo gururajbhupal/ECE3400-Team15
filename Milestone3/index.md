@@ -1,4 +1,4 @@
-#Milestone 3 Report
+# Milestone 3 Report
 
 ## Introduction
 For this milestone we modified our robots traversal algorithm. Now instead of exploring a maze via right hand wall following we explore it via a modified depth first search while updating the GUI.
@@ -45,7 +45,7 @@ We then had to update our function update_position() so that at each {x,y} locat
 
 Likewise we also updated our scan_walls() function so that at each {x,y} location the maze[x][y] wall information was set.
 
-###DFS Algorithm
+## DFS Algorithm
 With everything in place algorithm for our modified DFS was now pretty simple.
 
 Some Notes:
@@ -95,7 +95,7 @@ Three videos of random maze traversals have been added below for TA enjoyment.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/4D8HjiL3nQ8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-Conclusion
+## Conclusion
 Everything seems to be wrapping up so quickly! Now we just need to clean up our robot, add the camera, and win the final competition. 
 
 
