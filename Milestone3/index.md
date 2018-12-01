@@ -88,9 +88,12 @@ Most of the algorithm is pretty self explanatory except for planning our path to
 
 We highly recommend you check out our code - Milestone_3_final. It is well commented and easy to follow!
 Three videos of random maze traversals have been added below for TA enjoyment.
-[video 1]
-[video 2]
-[video 3]
+
+<iframe width="560" height="315" src="https://youtu.be/Sisg5mJPmSA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://youtu.be/0EEmw8h-ASg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://youtu.be/4D8HjiL3nQ8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 Conclusion
 Everything seems to be wrapping up so quickly! Now we just need to clean up our robot, add the camera, and win the final competition. 

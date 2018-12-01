@@ -21,9 +21,9 @@ Shape of the treasure
 Shape detection is one of the toughest challenges we had to face in among all the milestones. 
 Majorly because of below reasons.
 Irregularities in camera - due to excessive shaking or lose connections. 
-	We realized that shape detection is more sensitive than color detection, so holding the camera in the hand casued  a lot of variation due to small disturbances.This made us realize that we need to do all experimentation on a stable platform, so we fixed a position for the camera.  
+	We realized that shape detection is more sensitive than color detection, so holding the camera in the hand causued  a lot of variation due to small disturbances.This made us realize that we need to do all experimentation on a stable platform, so we fixed a position for the camera.  
 Irregularity in treasure - due to variations in position, color, and folds on paper
- All teams used differnt cut pieces of paper for shape detection. We faced a lot of issues due to these irregular pieces of paper because of which the relative positions used to vary. Based on the algorithm we used, we need the shapes to be relatively almost in the same position. So we used thicker and standardized shapes as below. 
+ All teams used different cut pieces of paper for shape detection. We faced a lot of issues due to these irregular pieces of paper because of which the relative positions used to vary. Based on the algorithm we used, we need the shapes to be relatively almost in the same position. So we used thicker and standardized shapes as below. 
 
 The above standardizations helped a lot in obtaining the output. 
 
@@ -53,7 +53,7 @@ For stability we hold this output till the next output, this gives stable signal
 
 Below is the video of shape and color detection.
 
-**video**
+<iframe width="560" height="315" src="https://youtu.be/HeEwGeix-AQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 Left LEDs - Red LED - Red treasure 
 	        Green LED - Blue treasure 
