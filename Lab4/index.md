@@ -144,11 +144,11 @@ The below video shows detection of Red color on an oscilloscope.
 
 The below video shows detection of Red color on an oscilloscope.
 
-<iframe width="560" height="315" src="https://youtu.be/U8yDnduLugY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/U8yDnduLugY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 The below video shows detection of Blue color on an oscilloscope.
 
-<iframe width="560" height="315" src="https://youtu.be/BR0PwQLEIVg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BR0PwQLEIVg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 
