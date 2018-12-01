@@ -1,7 +1,7 @@
 # Milestone 3 Report
 
 ## Introduction
-For this milestone we modified our robots traversal algorithm. Now instead of exploring a maze via right hand wall following we explore it via a modified depth first search while updating the GUI.
+For this milestone we modified our robots traversal algorithm. Now, instead of exploring a maze via right hand wall following we explore it via a modified depth first search while updating the GUI.
 Our algorithm is very similar to a depth first search, but instead of directly backtracking once we have no more unexplored nodes around us we plan a path to the nearest unexplored node (via nodes we have already visited) and then traverse that path. Often times this leads to directly backtracking, but there are a lot of scenarios where it actually makes maze exploration a lot faster!
 Implementing Our Modified DFS
 
@@ -87,13 +87,21 @@ Else if not at an intersection
 Most of the algorithm is pretty self explanatory except for planning our path to V. Essentially since we have all the information of coordinates already explored we traverse to V via the shortest route. So from where we are we push to the queue in the order we traverse back. Then we have another function which traverses a given queue.
 
 We highly recommend you check out our code - Milestone_3_final. It is well commented and easy to follow!
-Three videos of random maze traversals have been added below for TA enjoyment.
+Four videos of random maze traversals have been added below for TA enjoyment.
+### Maze 1 
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/4D8HjiL3nQ8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Rysso7Qids8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Maze 2
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/0EEmw8h-ASg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+### Maze 3
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/fjXjdGmUN-Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+### Maze 4
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/of2bVynUP4U" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
