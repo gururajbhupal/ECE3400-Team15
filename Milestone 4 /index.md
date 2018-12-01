@@ -4,7 +4,7 @@
 For this milestone, we added shape detection to our camera. There are  6 types of treasures that have to be detected in the competition.
 
 
- ## Implementation 
+## Implementation 
 The 6 treasure types that need to be detected are as below. 
 Blue Triangle 
 Blue Square 
@@ -12,7 +12,7 @@ Blue Diamond
 Red Triangle 
 Red Square 
 
- Based on this we have to compute several parameters . 
+Based on this we have to compute several parameters . 
 
 Presence of the  treasure 
 Color of the treasure 
