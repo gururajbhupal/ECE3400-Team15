@@ -1009,16 +1009,17 @@ void setup() {
         maze[0][0].explored = 1;
         data = data | 0x0100;
         data = data | 0x0200;
-        if (check_left()) data = data | 0x0400;
+        scan_walls();
+//        if (check_left()) data = data | 0x0400;
         if (!check_front()) {
           maze[1][0].explored = 1;
         } else {
           maze[0][1].explored = 1;
-          data = data | 0x0800;
+//          data = data | 0x0800;
           turn_left_linetracker();
         }
         rf();
-        push_unvisited();
+//        push_unvisited();
         Serial.println("Start");
 }
 
