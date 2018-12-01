@@ -13,3 +13,4 @@ You can view the contract here [contract](https://github.com/gururajbhupal/ECE34
 [Milestone 1](/ECE3400-Team15/Milestone1)  
 [Milestone 2](/ECE3400-Team15/Milestone2)  
 [Milestone 3](/ECE3400-Team15/Milestone3) 
+[Milestone 4](/ECE3400-Team15/Milestone4) 
