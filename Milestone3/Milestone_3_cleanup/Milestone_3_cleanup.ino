@@ -63,7 +63,7 @@ int sensor_middle = A4;
 int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
-int line_thresh = 400; //if BELOW this we detect a white line
+int line_thresh = 440; //if BELOW this we detect a white line
 int wall_thresh = 150; //if ABOVE this we detect a wall
 int IR_threshold = 160; //if ABOVE this we detect IR hat
 
@@ -105,9 +105,8 @@ Coordinate back;
 Coordinate v;
 
 /*m is the maximum index of the 2d maze array*/
-int mx = 9;
-int my = 9;
-int area = (mx + 1) * (my + 1);
+int mx = 8;
+int my = 8;
 
 /*2d array which is the size of the maze to traverse. Each
   index of the maze (maze[x][y]) contains the wall information
@@ -115,7 +114,7 @@ int area = (mx + 1) * (my + 1);
 
   Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
-Info maze[8][9];
+Info maze[9][9];
 
 /*Initializes a stack of coordinates (type Coordinate)*/
 StackArray <Coordinate> stack;
@@ -438,8 +437,6 @@ void rf() {
   /*Now, continue listening*/
   radio.startListening();
 
-  //  Serial.println(data, HEX);
-
   /*Clear the data*/
   data = data & 0x0000;
 }
@@ -459,7 +456,7 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt(); //MIGHT NEED TO CHANGE THIS. IF WE DETECT ONLY BLACK WE NEED A FIND_WHITE FUNCTION
+    halt();
   }
 }
 
@@ -487,20 +484,6 @@ bool atIntersection_avg() {
       }
     }
   }
-  return flag;
-}
-
-/*Used to calibrate n in atIntersection_avg()*/
-bool atIntersection_test() {
-  bool flag = false;
-  int c = 0;
-  while (atIntersection()) {
-    go();
-    flag = true;
-    c++;
-  }
-  if (c != 0) Serial.println(c);
-  //  if (c > 250) Serial.println();
   return flag;
 }
 
@@ -555,30 +538,19 @@ Coordinate move_coord(Coordinate a, int h) {
 }
 
 QueueList <Coordinate> clear_queue() {
-   QueueList <Coordinate> empty;
-   return empty;
+  QueueList <Coordinate> empty;
+  return empty;
 }
 
 
 /*path is the path to return*/
 QueueList <Coordinate> path;
- QueueList <Coordinate> copy;
 /* Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
 void find_path(Coordinate b) {
 
   /*set next and prev to current coordinate*/
   Coordinate next = {x, y};
   Coordinate prev = {x, y};
-
-  Serial.print("current.x: ");
-  Serial.println(next.x);
-  Serial.print("current.y: ");
-  Serial.println(next.y);
-
-  Serial.print("v.x: ");
-  Serial.println(b.x);
-  Serial.print("v.y: ");
-  Serial.println(b.y);
 
   Coordinate f = front;
   Coordinate l = left;
@@ -746,71 +718,37 @@ void find_path(Coordinate b) {
     /*Set the previous coordinate to the coordinate the robot was just at*/
     prev = next;
     /*push next coordinate to the queue*/
-    Serial.print("x: ");
-    Serial.println(next.x);
-    Serial.print("y: ");
-    Serial.println(next.y);
     path.push(next);
-    copy.push(next);
   }
 }
 
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> route) {
-  Coordinate p_copy;
-  Serial.println("Path: ");
-  while (!path.isEmpty()) {
-    p_copy = path.pop();
-    Serial.print("p_copy.x: ");
-    Serial.println(p_copy.x);
-    Serial.print("p_copy.y: ");
-    Serial.println(p_copy.y);
-  }
-  Serial.println();
   Coordinate p;
-//  Serial.print("back.x: ");
-//  Serial.println(back.x);
-//  Serial.print("back.y: ");
-//  Serial.println(back.y);
-  //  /*don't wanna update position the first time so we set a flag variable*/
   bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
     /*if we are at an intersection*/
-    //    Serial.println("test1");
     if (atIntersection_avg()) {
-//      Serial.println("test2");
-      //      adjust();
+      /*halt*/
       halt();
+      /*if this is the first run DO NOT UPDATE POSITION*/
       if (first_run2) {
         first_run2 = false;
       } else {
-
-        // since adjust has been added to dfs else, always need to update position
         update_position();
       }
-//      Serial.println("test3");
       /*Coordinate p is what is popped off the queue*/
       p = route.pop();
-//      Serial.print("back2.x: ");
-//      Serial.println(back.x);
-//      Serial.print("back2.y: ");
-//      Serial.println(back.y);
-      Serial.print("p.x: ");
-      Serial.println(p.x);
-      Serial.print("p.y: ");
-      Serial.println(p.y);
       /*if p is the coordinate in front of us*/
       if (p.x == front.x && p.y == front.y) {
         /*send relevant information to GUI, go straight*/
-        //        scan_walls();
         rf();
         adjust();
       }
       /*else if p is the left coordinate*/
       else if (p.x == left.x && p.y == left.y) {
         /*send relevant information to GUI, turn left*/
-        //        scan_walls();
         rf();
         adjust();
         turn_left_linetracker();
@@ -818,8 +756,6 @@ void traverse_path(QueueList <Coordinate> route) {
       /*else if p is the right coordinate*/
       else if (p.x == right.x && p.y == right.y) {
         /*send relevant information to GUI, turn right*/
-
-        //        scan_walls();
         rf();
         adjust();
         turn_right_linetracker();
@@ -827,7 +763,6 @@ void traverse_path(QueueList <Coordinate> route) {
       /*else the coordinate to go to is behind us*/
       else if ((p.x == back.x && p.y == back.y)) {
         /*send relevant information to GUI, turn around*/
-        //        scan_walls();
         rf();
         adjust();
         turn_around();
@@ -840,11 +775,38 @@ void traverse_path(QueueList <Coordinate> route) {
     /*if we are not at an intersection we line follow*/
     linefollow();
   }
+  /*MUST CLEAR THE PATH WHEN WE ARE DONE BECAUSE ARDUINO IS AN IDIOT*/
   path = clear_queue();
-  copy = clear_queue();
 }
 
 
+void robot_start(){
+  /*set {0,0} to explored*/
+  maze[0][0].explored = 1;
+  /*manually set west and south wall to true*/
+  data = data | 0x0100;
+  data = data | 0x0200;
+  /*scan for other walls*/
+  scan_walls();
+  /*if there is no wall in front of you, you will go forward so that is the starting intersection
+    and we need to set that to explored*/
+  if (!check_front()) {
+    maze[front.x][front.y].explored = 1;
+    /*if there was no wall in front of you and no wall to the left of you the left coordinate must
+      be pushed to the stack*/
+    if(!check_left()){
+      stack.push(left);
+    }
+  } 
+  /*else if there is a wall in front of you and no wall to the left of you*/
+  else if (!check_left()){
+    /*left is the starting intersection so you must set it to explored*/
+    maze[left.x][left.y].explored = 1;
+    turn_left_linetracker();
+  }
+  /*update GUI with correct initial conditions*/
+  rf();
+}
 
 
 /* Traverses a maze via depth first search while line following. Updates GUI via radio communication.
@@ -852,113 +814,63 @@ void traverse_path(QueueList <Coordinate> route) {
           It will always explore the front branch first,
           then go left and back to the straight branch,
           then go right and back to the straight branch
+        When we have reached a point where we are surrounded by walls OR all explored nodes, we traverse a 
+        path to the next unexplored node
   Have to remember all of this is in a while loop
-  NEED TO ADD IR CODE IN THE TRAVERSAL
 */
-bool first_run = true;
 void maze_traversal_dfs() {
   /*If we are at an intersection*/
   if (atIntersection_avg()) {
-    Serial.println("At intersection");
-    //adjust();
     /*stop so we have time to think*/
     halt();
     /*update the robots position and the surrounding coordinates*/
-//    if (first_run) {
-//      maze[0][0].explored = 1;
-//      first_run = false;
-//    }
-//    else {
-      update_position();
-//    }
-
+    update_position();
+    /*scan walls update GUI*/
     scan_walls();
     rf();
-
     /*push the surrounding unvisited nodes to the stack*/
     push_unvisited();
-
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
-      Serial.println("Stack not empty");
+      /*if v is explored we don't care so get it off the stack*/
       while (maze[v.x][v.y].explored) {
-      /*Coordinate v is the coordinate the robot is about to visit*/
+        /*Coordinate v is the coordinate the robot is about to visit*/
         v = stack.pop();
       }
-      /*If the robot has NOT BEEN TO v,*/
-                Serial.print("c.x: ");
-                Serial.println(x);
-                Serial.print("c.y: ");
-                Serial.println(y);
-                Serial.print("v.x: ");
-                Serial.println(v.x);
-                Serial.print("v.y: ");
-                Serial.println(v.y);
-        //        Serial.print("Right: ");
-        //        Serial.print(right.x);
-        //        Serial.print(" ");
-        //        Serial.println(right.y);
-        /*If v is the front coordinate*/
-        if (is_in_bounds(front) && v.x == front.x && v.y == front.y && !check_front()) {
-          /*send relevant information to GUI, go straight*/
-          //          scan_walls();
-          //          rf();
-          Serial.println("f");
-          adjust();
-          
-        }
-        /*else if v is the left coordinate*/
-        else if (is_in_bounds(left) && v.x == left.x && v.y == left.y && !check_left()) {
-          /*send relevant information to GUI, turn left*/
-          //          scan_walls();
-          //          rf();
-          Serial.println("l");
-          adjust();
-          turn_left_linetracker();
-          
-        }
-        /*else if v is the right coordinate*/
-        else if (is_in_bounds(right) && v.x == right.x && v.y == right.y && !check_right()) {
-          /*send relevant information to GUI, turn right*/
-          //          scan_walls();
-          //          rf();
-          Serial.println("r");
-          adjust();
-          turn_right_linetracker();
-        }
-        /*else if v is the coordinate behind*/
-        else if (is_in_bounds(back) && v.x == back.x && v.y == back.y) {
-          /*send relevant information to GUI, turn around*/
-          //          scan_walls();
-          //          rf();
-          Serial.println("b");
-          adjust();
-          turn_around();
-        }
-        /*else if v is neither the front, left, or right coordinate
-          of the robot we have explored a whole branch and need to go
-          back to the coordinate where the robot branched from.*/
-        else {
-          Serial.println("Entered else");
-          //          scan_walls();
-          //          rf();
-          find_path(v);
-          //          error(); // did not get here
-          traverse_path(copy);
-        }
-        /*Mark v as visited*/
-        maze[v.x][v.y].explored = 1;
-        counter++;
-        //         Serial.print("Count: ");
-        // Serial.println(counter);
+      /*If v is the front coordinate*/
+      if (is_in_bounds(front) && v.x == front.x && v.y == front.y && !check_front()) {
+        /*go straight*/
+        adjust();
       }
+      /*else if v is the left coordinate*/
+      else if (is_in_bounds(left) && v.x == left.x && v.y == left.y && !check_left()) {
+        /*turn left*/
+        adjust();
+        turn_left_linetracker();
+      }
+      /*else if v is the right coordinate*/
+      else if (is_in_bounds(right) && v.x == right.x && v.y == right.y && !check_right()) {
+        /*turn right*/
+        adjust();
+        turn_right_linetracker();
+      }
+      /*else if v is the coordinate behind*/
+      else if (is_in_bounds(back) && v.x == back.x && v.y == back.y) {
+        /*send relevant information to GUI, turn around*/
+        adjust();
+        turn_around();
+      }
+      /*else if v is neither the front, left, or right coordinate
+        of the robot we have explored a whole branch and need to go
+        back to the coordinate where the robot branched from.*/
+      else {
+        find_path(v);
+        traverse_path(path);
+      }
+      /*Mark v as visited*/
+      maze[v.x][v.y].explored = 1;
     }
-    // else stack is empty
-    // halt when all nodes are explored
-    // can easily be removed
-    // else {
-    //      while (1) halt();
-    //    }
+  }
   /*If we are NOT at an intersection we linefollow*/
   linefollow();
 }
@@ -968,9 +880,6 @@ void maze_traversal_dfs() {
 void setup() {
   Serial.begin(115200); // use the serial port
   servo_setup(); //setup the servos
-
-  /*Setup LEDS for testing*/
-  pinMode(7, OUTPUT);
 
   /*Setup MUX Select Pins*/
   pinMode(4, OUTPUT); //S2 - MSB
@@ -1002,25 +911,8 @@ void setup() {
 
   /*ADD AUDIO CODE HERE*/
 
-  /*This function adjusts robot to traverse the maze from the get go under the
-    assumption the robot must start at the relative bottom right of the maze facing
-    relative up. Also updates GUI accordingly and begins DFS accordingly.*/
-  //  robot_start();
-        maze[0][0].explored = 1;
-        data = data | 0x0100;
-        data = data | 0x0200;
-        scan_walls();
-//        if (check_left()) data = data | 0x0400;
-        if (!check_front()) {
-          maze[1][0].explored = 1;
-        } else {
-          maze[0][1].explored = 1;
-//          data = data | 0x0800;
-          turn_left_linetracker();
-        }
-        rf();
-//        push_unvisited();
-        Serial.println("Start");
+  /*Setup Maze information accordingly for GUI*/
+  robot_start();
 }
 
 
@@ -1028,28 +920,5 @@ void setup() {
 void loop() {
   maze_traversal_dfs();
 }
-
-//  Serial.print("Left: ");
-//  Serial.println(analogRead(A2));
-//  Serial.print("Middle: ");
-//  Serial.println(analogRead(A1));
-//  Serial.print("Right: ");
-//  Serial.println(analogRead(A0));
-//  delay(1000);
-
-//int c_int = 0;
-//  if (atIntersection_test()) {
-//
-//    adjust();
-//    c_int++;
-//    if (c_int == 2) {
-//      c_int = 0;
-//      Serial.println();
-//      turn_around();
-//    }
-//
-//  } else {
-//    linefollow();
-//  }
 
 
