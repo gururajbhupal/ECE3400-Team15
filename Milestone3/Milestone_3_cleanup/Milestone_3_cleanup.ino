@@ -78,7 +78,11 @@ typedef struct coordinate Coordinate;
 /*Info contains information at an x,y coordinate. Information includes
   whether the coordinate has been explored as well as wall information*/
 struct info {
+  /*all coordinates of the maze are unexplored initially*/
   bool explored = 0;
+  /*all walls of a maze of type info are initialized to be there.
+    this insures that we cannot plan a path through unexplored coordinates
+    when traversing*/
   bool n_wall = 1;
   bool e_wall = 1;
   bool s_wall = 1;
@@ -101,10 +105,10 @@ Coordinate right;
 /*Coordinate behind the robot (no initial coordinate)*/
 Coordinate back;
 
-/*This is the coordinate the robot is about to go to. Declared globally so both goTo() and maze_traversal_dfs() can access its information*/
+/*This is the coordinate the robot is about to go to. Declared globally so multiple functions can access its information*/
 Coordinate v;
 
-/*m is the maximum index of the 2d maze array*/
+/*mx, my are the maximum indices of the 2d maze array*/
 int mx = 8;
 int my = 8;
 
@@ -112,7 +116,7 @@ int my = 8;
   index of the maze (maze[x][y]) contains the wall information
   at that coordinate, as well as if that coordinate has been explored.
 
-  Size of 2d array is (mx+1)x(my+1) so indexes range from maze[0][0] to maze[mx][my]
+  Size of 2d array is (mx+1)x(my+1) so indices range from maze[0][0] to maze[mx][my]
   If at location maze[x][y], depth = x*/
 Info maze[9][9];
 
@@ -148,6 +152,7 @@ void turn_left() {
   servo_right.write(70);
 }
 
+
 /*Simple right turn adjust for linefollow*/
 void turn_right() {
   servo_left.write(110);
@@ -172,7 +177,7 @@ void turn_place_right() {
 /*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
 void turn_right_linetracker() {
   turn_place_right();
-  delay(300); //delay to get off the line - used to be 300 tried reducing it
+  delay(100); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the right of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
@@ -185,7 +190,7 @@ void turn_right_linetracker() {
 /*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
 void turn_left_linetracker() {
   turn_place_left();
-  delay(300); //delay to get off the line - used to be 300 tried reducing it
+  delay(100); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the left of us*/
   while (analogRead(sensor_middle) < line_thresh);
   while (analogRead(sensor_middle) > line_thresh);
@@ -194,11 +199,13 @@ void turn_left_linetracker() {
   if (heading == -1) heading = 3;
 }
 
+
 /*Time it takes for wheels to reach intersection from the time the sensors detect the intersection*/
 void adjust() {
   go();
   delay(600); //delay value to reach specification
 }
+
 
 /*Pulls a U-turn, updates heading accordinglyy*/
 void turn_around() {
@@ -206,7 +213,8 @@ void turn_around() {
   turn_right_linetracker();
 }
 
-/* Periodically switches rotation to help debug */
+
+/*Periodically switches rotation to help debug*/
 void error() {
   int d = 500;
   while (1) {
@@ -270,14 +278,9 @@ bool check_right() {
   }
 }
 
+
 /* Updates the position of the robot assuming the robot starts at {0,0} facing towards {m,0}.
    Also updates the coordinates surrounding the robot.
-   FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
-   Note: Robot can't go more North then x = 0
-         Robot can't go more South then x = mx
-         Robot can't go more West then y = 0
-         Robot can't go more East then y = my
-
    Note: We don't know any information about the surrounding
          coordinates walls at the time of updating, but that
          will be updated as soon as the robot reaches that coordinate
@@ -317,7 +320,8 @@ void update_position() {
 
 
 /*Scans for surrounding walls and updates data accordingly.
-  Also updates wall info in Maze for the current {x,y} coordinate*/
+  Also updates wall info in Maze for the current {x,y} coordinate,
+  and adjacent coordinate which we sometimes know the info of*/
 void scan_walls() {
   switch (heading) {
     case 0: //NORTH
@@ -487,13 +491,19 @@ bool atIntersection_avg() {
   return flag;
 }
 
-/*True if v is in the bounds of the maze*/
+/*True if v is in the bounds of the maze
+   FOLLOWING CONDITIONS MATTER FOR INDEXING THE ARRAY
+   Note: Robot can't go more North then x = 0
+         Robot can't go more South then x = mx
+         Robot can't go more West then y = 0
+         Robot can't go more East then y = my*/
 bool is_in_bounds(Coordinate v) {
   if ((0 <= v.x && v.x <= mx) && (0 <= v.y && v.y <= my)) {
     return true;
   }
   return false;
 }
+
 
 /* Pushes the unvisited intersections w from current intersection v
    Pushes in reverse order of the way we visit!*/
@@ -519,7 +529,9 @@ void push_unvisited() {
 }
 
 
-Coordinate move_coord(Coordinate a, int h) {
+/*given a coordinate and heading, determine what the next coordinate
+  will be based on heading*/
+Coordinate calculate_coord(Coordinate a, int h) {
   switch (h) {
     case 0:
       a.x = a.x - 1;
@@ -537,6 +549,9 @@ Coordinate move_coord(Coordinate a, int h) {
   return a;
 }
 
+
+/*function which clears our queue for memory purposes since the QueueList library
+  apparently doesn't do that when you pop*/
 QueueList <Coordinate> clear_queue() {
   QueueList <Coordinate> empty;
   return empty;
@@ -582,7 +597,7 @@ void find_path(Coordinate b) {
       GOING WEST  -> Y--
       GOING EAST  -> Y++*/
 
-
+    /*calculate left, front, and right coordinates for each coordinate that gets added to our path*/
     switch (h) {
       case 0: //NORTH
         l = {next.x, next.y - 1};
@@ -605,102 +620,101 @@ void find_path(Coordinate b) {
         r = {next.x - 1, next.y};
         break;
     }
-
-    // add is_in_bounds to ifs
-    /*Choose next coordinate*/
+    
+    /*Choose next coordinate to add based on heading and wall information*/
     switch (h) {
       case 0: //NORTH (reject South)
         /*if there is no wall to the north at the current coordinate and v coordinate is north of us*/
         if (!n && northof && is_in_bounds(f)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate and v is west of us*/
         else if (!w && westof && is_in_bounds(l)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate and v is to the east of us*/
         else if (!e && eastof && is_in_bounds(r)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
         else if (!n && is_in_bounds(f)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         }
         /*else if there is no wall to the west at the current coordinate*/
         else if (!w && is_in_bounds(l)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         }
         /*else if there is no wall to the east at the current coordinate*/
         else if (!e && is_in_bounds(r)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         }
         /*else there is a wall at all surrounding coordinates and we need to go to south*/
         else {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         }
         break;
       case 1: //EAST (reject West)
         /*if there is no wall to the east at the current coordinate and v is east of us*/
         if (!e && eastof && is_in_bounds(f)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate and v is to the north of us*/
         else if (!n && northof && is_in_bounds(l)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         }
         /*else if there is no wall to the south of us at the current coordinate and v is south of us*/
         else if (!s && southof && is_in_bounds(r)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         }
         /*else if there is no wall to the east at the current coordinate*/
         else if (!e && is_in_bounds(f)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         }
         /*else if there is no wall to the north at the current coordinate*/
         else if (!n && is_in_bounds(l)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         }
         /*else if there is no wall to the south at the current coordinate*/
         else if (!s && is_in_bounds(r)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         }
         /*else there is a wall to the north, south, and east at the current coordinate and we need to go west*/
         else {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         }
         break;
       case 2: //SOUTH (reject North)
         if (!s && southof && is_in_bounds(f)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         } else if (!e && eastof && is_in_bounds(l)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         } else if (!w && westof && is_in_bounds(r)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         } else if (!s && is_in_bounds(f)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         } else if (!e && is_in_bounds(l)) {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         } else if (!w && is_in_bounds(r)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         } else {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         }
         break;
       case 3: //WEST (reject East)
         if (!w && westof && is_in_bounds(f)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         } else if (!s && southof && is_in_bounds(l)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         } else if (!n && northof && is_in_bounds(r)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         } else if (!w && is_in_bounds(f)) {
-          next = move_coord(next, 3);
+          next = calculate_coord(next, 3);
         } else if (!s && is_in_bounds(l)) {
-          next = move_coord(next, 2);
+          next = calculate_coord(next, 2);
         } else if (!n && is_in_bounds(r)) {
-          next = move_coord(next, 0);
+          next = calculate_coord(next, 0);
         } else {
-          next = move_coord(next, 1);
+          next = calculate_coord(next, 1);
         }
         break;
     }
@@ -722,9 +736,12 @@ void find_path(Coordinate b) {
   }
 }
 
+
 /*traverses the given path*/
 void traverse_path(QueueList <Coordinate> route) {
   Coordinate p;
+  /*local boolean variable which helps us not update position the first time since we stop on an 
+    intersection in maze_traversal_dfs()*/
   bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
@@ -767,7 +784,7 @@ void traverse_path(QueueList <Coordinate> route) {
         adjust();
         turn_around();
       }
-      /*else given bad path*/
+      /*else given bad path so freak out*/
       else {
         error();
       }
@@ -775,11 +792,13 @@ void traverse_path(QueueList <Coordinate> route) {
     /*if we are not at an intersection we line follow*/
     linefollow();
   }
-  /*MUST CLEAR THE PATH WHEN WE ARE DONE BECAUSE ARDUINO IS AN IDIOT*/
+  /*MUST CLEAR THE PATH WHEN WE ARE DONE BECAUSE POP DOESN"T DO SO*/
   path = clear_queue();
 }
 
 
+/*Set the initial conditions for the robot assuming we start at the northwestern most corner facing
+  north*/
 void robot_start(){
   /*set {0,0} to explored*/
   maze[0][0].explored = 1;
