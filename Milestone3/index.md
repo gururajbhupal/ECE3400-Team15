@@ -57,7 +57,7 @@ Every time we reach an intersection we update wall information and send it to th
 
 
 MODIFIED DFS ALGORITHM
-
+```
 If at an intersection
 	If this is the first time running the algorithm
 		First_run = false
@@ -83,7 +83,7 @@ Else if not at an intersection
 		Line follow
 	Else If every node has been explored
 		Celebrate 
-
+```
 Most of the algorithm is pretty self explanatory except for planning our path to V. Essentially since we have all the information of coordinates already explored we traverse to V via the shortest route. So from where we are we push to the queue in the order we traverse back. Then we have another function which traverses a given queue.
 
 We highly recommend you check out our code - Milestone_3_final. It is well commented and easy to follow!
