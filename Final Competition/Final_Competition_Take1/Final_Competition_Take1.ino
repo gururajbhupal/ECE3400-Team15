@@ -664,9 +664,11 @@ QueueList <Coordinate> clear_queue() {
   return empty;
 }
 
+
 /*path is the path to return*/
 QueueList <Coordinate> path;
-/*Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking */
+/*Searches for and builds a path to given coordinate, following FLR order and deprioritizing backtracking. This works but it is very
+  cumbersome to map out in your head*/
 void find_path(Coordinate b) {
   /*set next and prev to current coordinate*/
   Coordinate next = {x, y};
@@ -964,6 +966,7 @@ void maze_traversal() {
       /*find a path to v and traverse it*/
       find_path(v);
       traverse_path(path);
+      maze[v.x][v.y].explored = 1;
     }
   }
   /*If we are NOT at an intersection we linefollow*/
