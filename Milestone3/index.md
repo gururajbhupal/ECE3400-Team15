@@ -105,7 +105,7 @@ Four videos of random maze traversals have been added below for TA enjoyment.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/of2bVynUP4U" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-PS : the robot needed a push in some of the videos because, the floor was untidy and hd marks on them.
+### PS : the robot needed a push in some of the videos because, the floor was untidy and had marks on them.
 
 ## Conclusion
 Everything seems to be wrapping up so quickly! Now we just need to clean up our robot, add the camera, and win the final competition. 
