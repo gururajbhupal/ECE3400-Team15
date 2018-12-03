@@ -436,7 +436,7 @@ void scan_walls() {
       maze[x][y].e_wall = 0;
       break;
   }
-  Coordinate current = {x, y};
+//  Coordinate current = {x, y};
 //  if (has_two_exits(current)) {
 //    if (count == 1) {
 //      out.x = x;
@@ -871,7 +871,7 @@ bool find_path(Coordinate b) {
     Serial.print("n.y: ");
     Serial.println(next.y);
     path.push(next);
-    if (path.count() > 15) {
+    if (path.count() > 10) {
       path = clear_queue();
       Serial.println("Dumped path");
       return false;
@@ -1000,7 +1000,8 @@ void maze_traversal() {
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
       /*Coordinate v is the top of the stack - the next location to go to*/
-      v = stack.pop();
+
+//      v = stack.pop();
       /*if v is explored we don't care so get it off the stack and keep doin so until
         v is unexplored*/
       while (maze[v.x][v.y].explored) {
@@ -1009,12 +1010,13 @@ void maze_traversal() {
       }
       // After popping v from stack in maze_traversal
       bool valid_path = find_path(v);
-      while (!valid_path) {
+//      while (!valid_path) {
         // if a valid path is not found
-        find_path(out);
-        traverse_path(path);
-        valid_path = find_path(v);
-      }
+        if (!valid_path) {
+          find_path(out);
+//          traverse_path(path);
+        }
+//      }
       //      /*find a path to v*/
       //      find_path(v);
       /*traverse the path to v*/
