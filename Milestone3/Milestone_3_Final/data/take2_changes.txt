@@ -1,0 +1,50 @@
+Coordinate out;
+
+/*Returns true if given coordinate has two exits*/
+bool has_two_exits(Coordinate c) {
+  Info i = maze[c.x][c.y];
+  bool b1 = i.n_wall;
+  bool b2 = i.e_wall;
+  bool b3 = i.s_wall;
+  bool b4 = i.w_wall;
+  int sum = b1 + b2 + b3 + b4;
+  if (sum == 2) return true;
+  return false;
+}
+
+
+void scan_walls() {
+// At end
+// Helps get out of infinite loops
+  if (has_two_exits({x, y})) {
+    out.x = x;
+    out.y = y;
+  }
+}
+
+
+// Returns true if successful
+bool find_path(Coordinate b)
+
+
+
+// end of find_path
+  if (path.count() > 20) {
+    path = clear_queue();
+    return false;
+  }
+  return true;
+  
+// traverse_path change back to back and current
+else if ( (p.x == back.x && p.y == back.y) || (p.x == x && p.y == y) )
+    
+    
+    
+    // After popping v from stack in maze_traversal
+          bool valid_path = find_path(v);
+     while (!valid_path) {
+        // if a valid path is not found
+        find_path(out);
+        traverse_path(path);
+        valid_path = find_path(v);
+      }

@@ -64,7 +64,7 @@ int sensor_middle = A4;
 int sensor_right = A5;
 
 /*Initialize sensor threshold values*/
-int line_thresh = 440; //if BELOW this we detect a white line
+int line_thresh = 420; //if BELOW this we detect a white line
 int wall_thresh = 150; //if ABOVE this we detect a wall
 int IR_threshold = 80; //if ABOVE this we detect IR hat
 
@@ -108,6 +108,9 @@ Coordinate back;
 
 /*This is the coordinate the robot is about to go to. Declared globally so multiple functions can access its information*/
 Coordinate v;
+
+/*Coordinate out is the coordinate out of a portion of the maze*/
+Coordinate out;
 
 /*mx, my are the maximum indices of the 2d maze array*/
 int mx = 8;
@@ -958,14 +961,19 @@ void maze_traversal() {
     push_unvisited();
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
-      /*if v is explored we don't care so get it off the stack*/
+      /*Coordinate v is the top of the stack - the next location to go to*/
+      v = stack.pop();
+      /*if v is explored we don't care so get it off the stack and keep doin so until
+        v is unexplored*/
       while (maze[v.x][v.y].explored) {
         /*Coordinate v is the coordinate the robot is about to visit*/
         v = stack.pop();
       }
-      /*find a path to v and traverse it*/
+      /*find a path to v*/
       find_path(v);
+      /*traverse the path to v*/
       traverse_path(path);
+      /*set v to explored*/
       maze[v.x][v.y].explored = 1;
     }
   }
@@ -1008,9 +1016,9 @@ void setup() {
   radio.openReadingPipe(1, pipes[1]);
 
   /*Don't do anything unless you hear 660Hz OR we manually override via pressing the shiny red button*/
-  while (!detects_audio || !button_pressed) {
-    audio_detection();
-  }
+//  while (!detects_audio || !button_pressed) {
+//    audio_detection();
+//  }
   /*Setup Maze information accordingly for GUI*/
   robot_start();
 }
