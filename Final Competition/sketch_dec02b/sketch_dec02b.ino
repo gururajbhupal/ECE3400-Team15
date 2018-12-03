@@ -110,7 +110,7 @@ Coordinate back;
 Coordinate v;
 
 /*Coordinate out is the coordinate out of a portion of the maze*/
-Coordinate out = {3, 2};
+Coordinate out;
 
 /*mx, my are the maximum indices of the 2d maze array*/
 int mx = 8;
@@ -957,6 +957,8 @@ void robot_start() {
   if (!check_front()) {
     maze[front.x][front.y].explored = 1;
     maze[0][0].s_wall = 0;
+    v.x = 1;
+    v.y = 0;
     /*if there was no wall in front of you and no wall to the left of you the left coordinate must
       be pushed to the stack*/
     if (!check_left()) {
@@ -969,10 +971,28 @@ void robot_start() {
     /*left is the starting intersection so you must set it to explored*/
     maze[0][0].e_wall = 0;
     maze[left.x][left.y].explored = 1;
+    v.x = 0;
+    v.y = 1;
     turn_left_linetracker();
   }
   /*update GUI with correct initial conditions*/
   rf();
+}
+
+// If a valid path is not found to v, find path to adjacent explored tile, otherwise error()
+void find_out() {
+  Info i = maze[v.x][v.y];
+  if (!i.n_wall) {
+    out = calculate_coord(v, 0);
+  } else if (!i.e_wall) {
+    out = calculate_coord(v, 1);
+  } else if (!i.s_wall) {
+    out = calculate_coord(v, 2);
+  } else if (!i.w_wall) {
+    out = calculate_coord(v, 3);
+  } else {
+    error();
+  }
 }
 
 
@@ -1000,7 +1020,7 @@ void maze_traversal() {
     /*if the stack is NOT empty*/
     if (!stack.isEmpty()) {
       /*Coordinate v is the top of the stack - the next location to go to*/
-
+      if (v.x == x && v.y == y) maze[v.x][v.y].explored = 1;
 //      v = stack.pop();
       /*if v is explored we don't care so get it off the stack and keep doin so until
         v is unexplored*/
@@ -1013,6 +1033,7 @@ void maze_traversal() {
 //      while (!valid_path) {
         // if a valid path is not found
         if (!valid_path) {
+          find_out();
           find_path(out);
 //          traverse_path(path);
         }
@@ -1022,7 +1043,7 @@ void maze_traversal() {
       /*traverse the path to v*/
       traverse_path(path);
       /*set v to explored*/
-      maze[v.x][v.y].explored = 1;
+//      maze[v.x][v.y].explored = 1;
     }
   }
   /*If we are NOT at an intersection we linefollow*/
@@ -1075,6 +1096,7 @@ void setup() {
 /*Run main code*/
 void loop() {
   maze_traversal();
+//go();
 }
 
 
