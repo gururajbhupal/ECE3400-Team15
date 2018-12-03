@@ -506,60 +506,6 @@ bool is_in_bounds(Coordinate v) {
   return false;
 }
 
-/*Sets mux_select to audio information, and sets detects_audio to true if we detect a 660Hz signal. mux_select
-  is then set to an empty signal on the mux to avoid noise from FFT interfering with servos.*/
-void audio_detection() {
-  mux_select(0, 0, 0); //select correct mux output
-
-  /*Set temporary values for relevant registers*/
-  int temp1 = TIMSK0;
-  int temp2 = ADCSRA;
-  int temp3 = ADMUX;
-  int temp4 = DIDR0;
-
-
-  /*Set register values to required values for IR detection*/
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 256 ; i += 2) { // save 128 samples
-    while (!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i + 1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
-
-  /*When audio is detected, detects_audio is set to true. Once detected
-    this value is never set back to false*/
-  for (byte i = 0; i < FFT_N / 2; i++) {
-    if (i == 5 && fft_log_out[i] > 135 / 2) {
-      detects_audio = true;
-    }
-  }
-
-  /*Restore the register values*/
-  TIMSK0 = temp1;
-  ADCSRA = temp2;
-  ADMUX = temp3;
-  DIDR0 =  temp4;
-
-  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
-}
-
-
 /*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
   mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
 void IR_detection() {
@@ -1015,10 +961,6 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-  /*Don't do anything unless you hear 660Hz OR we manually override via pressing the shiny red button*/
-//  while (!detects_audio || !button_pressed) {
-//    audio_detection();
-//  }
   /*Setup Maze information accordingly for GUI*/
   robot_start();
 }
