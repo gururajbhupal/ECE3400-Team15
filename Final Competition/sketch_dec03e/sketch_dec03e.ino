@@ -1,5 +1,5 @@
-#define LOG_OUT 1 // use the log output function
-#define FFT_N 128 // set to 128 point fft
+//#define LOG_OUT 1 // use the log output function
+//#define FFT_N 128 // set to 128 point fft
 
 #include <Servo.h>
 #include <SPI.h>
@@ -7,7 +7,7 @@
 #include "RF24.h"
 #include <StackArray.h>
 #include <QueueList.h>
-#include <FFT.h> // include the library
+//#include <FFT.h> // include the library
 
 /*Set up nRF24L01 radio on SPI bus plus pins 9 & 10*/
 RF24 radio(9, 10);
@@ -265,7 +265,7 @@ void mux_select(int s2, int s1, int s0) {
   digitalWrite(4, s0); //LSB s0
   /*small delay allows mux enough time to select appropriate input before
     relevant code executes*/
-  delay(50);
+  delay(45);
 }
 
 
@@ -446,7 +446,7 @@ void scan_walls() {
 }
 
 
-/*Turns the information into data and starts listening*/
+///*Turns the information into data and starts listening*/
 void rf() {
   /* format info into data*/
   data = data | y;
@@ -462,64 +462,63 @@ void rf() {
 
   /*Now, continue listening*/
   radio.startListening();
-
-  /*Clear the data*/
+ /*Clear the data*/
   data = data & 0x0000;
 }
-
-/*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
-  mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
-void IR_detection() {
-  mux_select(1, 0, 0); //select correct mux output
-
-  /*Set temporary values for relevant registers*/
-  int t1 = TIMSK0;
-  int t2 = ADCSRA;
-  int t3 = ADMUX;
-  int t4 = DIDR0;
-
-  /*Set register values to required values for IR detection*/
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 256 ; i += 2) { // save 256 samples
-    while (!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i + 1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
-
-  for (byte i = 0 ; i < FFT_N / 2 ; i++) {
-    /*If there is a robot*/
-    if (i == 43 && fft_log_out[i] > IR_threshold) {
-      sees_robot = true;
-    }
-    /*If there is no robot detected (care about not seeing IR case because in our implementation we need to exit our lock)*/
-    if (i == 43 && fft_log_out[i] < IR_threshold) {
-      sees_robot = false;
-    }
-  }
-
-  /*Restore the register values*/
-  TIMSK0 = t1;
-  ADCSRA = t2;
-  ADMUX = t3;
-  DIDR0 =  t4;
-  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
-}
+//
+///*Sets mux_select to IR information. Sets sees_Robot to true if there is a robot, else sees_robot = false
+//  mux_select is then set to an empty signal to avoid FFT noise interfering with servos.*/
+//void IR_detection() {
+//  mux_select(1, 0, 0); //select correct mux output
+//
+//  /*Set temporary values for relevant registers*/
+//  int t1 = TIMSK0;
+//  int t2 = ADCSRA;
+//  int t3 = ADMUX;
+//  int t4 = DIDR0;
+//
+//  /*Set register values to required values for IR detection*/
+//  TIMSK0 = 0; // turn off timer0 for lower jitter
+//  ADCSRA = 0xe5; // set the adc to free running mode
+//  ADMUX = 0x40; // use adc0
+//  DIDR0 = 0x01; // turn off the digital input for adc0
+//
+//  cli();  // UDRE interrupt slows this way down on arduino1.0
+//  for (int i = 0 ; i < 256 ; i += 2) { // save 256 samples
+//    while (!(ADCSRA & 0x10)); // wait for adc to be ready
+//    ADCSRA = 0xf5; // restart adc
+//    byte m = ADCL; // fetch adc data
+//    byte j = ADCH;
+//    int k = (j << 8) | m; // form into an int
+//    k -= 0x0200; // form into a signed int
+//    k <<= 6; // form into a 16b signed int
+//    fft_input[i] = k; // put real data into even bins
+//    fft_input[i + 1] = 0; // set odd bins to 0
+//  }
+//  fft_window(); // window the data for better frequency response
+//  fft_reorder(); // reorder the data before doing the fft
+//  fft_run(); // process the data in the fft
+//  fft_mag_log(); // take the output of the fft
+//  sei();
+//
+//  for (byte i = 0 ; i < FFT_N / 2 ; i++) {
+//    /*If there is a robot*/
+//    if (i == 43 && fft_log_out[i] > IR_threshold) {
+//      sees_robot = true;
+//    }
+//    /*If there is no robot detected (care about not seeing IR case because in our implementation we need to exit our lock)*/
+//    if (i == 43 && fft_log_out[i] < IR_threshold) {
+//      sees_robot = false;
+//    }
+//  }
+//
+//  /*Restore the register values*/
+//  TIMSK0 = t1;
+//  ADCSRA = t2;
+//  ADMUX = t3;
+//  DIDR0 =  t4;
+//  mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
+//}
 
 void find_line() {
   int max = 500;
@@ -564,7 +563,8 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
-    halt();
+    //    halt();
+    find_line();
   }
 }
 
@@ -1058,15 +1058,6 @@ void traverse_path(QueueList <Coordinate> route) {
   bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
-    // Check IR
-    IR_detection();
-    if (sees_robot) {
-      /*Backtrack to last intersection*/
-      while (!atIntersection_avg()) reverse();
-      /*Get off intersection so coordinates are correct*/
-      adjust();
-    }
-
     /*if we are at an intersection*/
     if (atIntersection_avg()) {
       /*halt*/
@@ -1168,15 +1159,6 @@ void robot_start() {
   Have to remember all of this is in a while loop
 */
 void maze_traversal() {
-//  // Check IR
-//  IR_detection();
-//  if (sees_robot) {
-//    /*Backtrack to last intersection*/
-//    while (!atIntersection_avg()) reverse();
-//    /*Get off intersection so coordinates are correct*/
-//    adjust();
-//  }
-
   /*If we are at an intersection*/
   if (atIntersection_avg()) {
     /*stop so we have time to think*/
@@ -1248,11 +1230,9 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-   while (digitalRead(8) == HIGH);
-
+  while (digitalRead(8) == HIGH);
   /*Setup Maze information accordingly for GUI*/
   robot_start();
-//  find_line(1500);
 }
 
 
@@ -1260,7 +1240,7 @@ void setup() {
 
 /*Run main code*/
 void loop() {
-   maze_traversal();
+  maze_traversal();
 }
 
 

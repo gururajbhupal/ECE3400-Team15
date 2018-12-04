@@ -140,7 +140,7 @@ void loop(void)
 
 
 
-      OppRobot = (data >> 12) & 0x1000;
+      OppRobot = (data >> 12) & 0x0008;
       if (OppRobot) {
         Serial.print(",");
         Serial.print("robot=true");
