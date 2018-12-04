@@ -1,9 +1,13 @@
+#define LOG_OUT 1 // use the log output function
+#define FFT_N 128 // set to 128 point fft
+
 #include <Servo.h>
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <StackArray.h>
 #include <QueueList.h>
+#include <FFT.h> // include the library
 
 /*Set up nRF24L01 radio on SPI bus plus pins 9 & 10*/
 RF24 radio(9, 10);
@@ -138,6 +142,12 @@ void go() {
   servo_right.write(80);
 }
 
+/*Go Backwards*/
+void reverse() {
+  servo_left.write(80);
+  servo_right.write(100);
+}
+
 
 /*Stop*/
 void halt() {
@@ -152,11 +162,22 @@ void turn_left() {
   servo_right.write(70);
 }
 
+/*Turns towards the robot's back left*/
+void turn_left_reverse() {
+  servo_left.write(70);
+  servo_right.write(93);  
+}
 
 /*Simple right turn adjust for linefollow*/
 void turn_right() {
   servo_left.write(110);
   servo_right.write(87);
+}
+
+/*Turns towards the robot's back right*/
+void turn_right_reverse() {
+  servo_left.write(87);
+  servo_right.write(110);
 }
 
 
@@ -459,6 +480,23 @@ void linefollow() {
     turn_right();
   }
   if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+    halt();
+  }
+}
+
+/*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
+void linefollow_reverse() {
+  if (analogRead(sensor_middle) < line_thresh) {
+    reverse();
+  }
+  if (analogRead(sensor_left) < line_thresh) {
+    turn_left_reverse();
+  }
+  if (analogRead(sensor_right) < line_thresh) {
+    turn_right_reverse();
+  }
+  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+      // change to reverse()?
     halt();
   }
 }
@@ -936,6 +974,14 @@ void traverse_path(QueueList <Coordinate> route) {
   bool first_run2 = true;
   /*while the path to traverse is not empty*/
   while (!route.isEmpty()) {
+      // Check IR
+if (sees_robot) {
+        /*Backtrack to last intersection*/
+        while (!atIntersection_avg()) linefollow_reverse();
+        /*Get off intersection so coordinates are correct*/
+        adjust();
+}
+
     /*if we are at an intersection*/
     if (atIntersection_avg()) {
       /*halt*/
@@ -1037,6 +1083,14 @@ void robot_start() {
   Have to remember all of this is in a while loop
 */
 void maze_traversal() {
+    // Check IR
+if (sees_robot) {
+        /*Backtrack to last intersection*/
+        while (!atIntersection_avg()) linefollow_reverse();
+        /*Get off intersection so coordinates are correct*/
+        adjust();
+}
+
   /*If we are at an intersection*/
   if (atIntersection_avg()) {
     /*stop so we have time to think*/
@@ -1083,6 +1137,7 @@ void setup() {
   pinMode(4, OUTPUT); //S2 - MSB
   pinMode(2, OUTPUT); //S1
   pinMode(3, OUTPUT); //S0 - LSB
+  pinMode(8, INPUT_PULLUP); // Override button
 
   /* Setup and configure rf radio*/
   radio.begin();
@@ -1106,9 +1161,11 @@ void setup() {
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
+    
+  while (digitalRead(8) == LOW);
 
   /*Setup Maze information accordingly for GUI*/
-  //robot_start();
+  robot_start();
 }
 
 
@@ -1117,5 +1174,6 @@ void loop() {
   //maze_traversal();
   Serial.println(analogRead(sensor_left));
 }
+
 
 
