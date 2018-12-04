@@ -1,0 +1,57 @@
+// At top of file
+#include <FFT.h> // include the library
+#define LOG_OUT 1 // use the log output function
+#define FFT_N 128 // set to 128 point fft
+
+
+// setup
+pinMode(8, INPUT_PULLUP); // Override button
+    // right before robot start
+    while (digitalRead(8) == LOW);
+
+/*Go Backwards*/
+void reverse() {
+  servo_left.write(80);
+  servo_right.write(100);
+}
+
+/*Turns towards the robot's back left*/
+void turn_left_reverse() {
+  servo_left.write(70);
+  servo_right.write(93);  
+}
+
+/*Turns towards the robot's back right*/
+void turn_right_reverse() {
+  servo_left.write(87);
+  servo_right.write(110);
+}
+
+
+change halt to go/reverse in linefollows?
+
+/*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
+void linefollow_reverse() {
+  if (analogRead(sensor_middle) < line_thresh) {
+    reverse();
+  }
+  if (analogRead(sensor_left) < line_thresh) {
+    turn_left_reverse();
+  }
+  if (analogRead(sensor_right) < line_thresh) {
+    turn_right_reverse();
+  }
+  if (analogRead(sensor_right) > line_thresh && analogRead(sensor_left) > line_thresh && analogRead(sensor_middle) > line_thresh) {
+      // change to reverse()?
+    halt();
+  }
+}
+
+// Put in maze_traversal and traverse_path
+// Check IR
+if (sees_robot) {
+        /*Backtrack to last intersection*/
+        while (!atIntersection_avg()) linefollow_reverse();
+        /*Get off intersection so coordinates are correct*/
+        adjust();
+}
