@@ -55,3 +55,33 @@ if (sees_robot) {
         /*Get off intersection so coordinates are correct*/
         adjust();
 }
+
+
+
+void find_line(int i) {
+  int c = 0;
+  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
+    turn_place_left();
+    c++;
+  }
+  halt();
+  c = 0;
+  while ( (analogRead(sensor_middle) > line_thresh) && c < 2*i) {
+    turn_place_right();
+    c++;
+  }
+  halt();
+  c = 0;
+  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
+    turn_place_left();
+    c++;
+  }
+  halt();
+  c = 0;
+  if (analogRead(sensor_middle) > line_thresh) {
+    go();
+    delay(100);
+    halt();
+    find_line(i + 1000);
+  }
+}
