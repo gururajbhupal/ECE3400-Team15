@@ -1138,14 +1138,14 @@ void robot_start() {
   Have to remember all of this is in a while loop
 */
 void maze_traversal() {
-  // Check IR
-  IR_detection();
-  if (sees_robot) {
-    /*Backtrack to last intersection*/
-    while (!atIntersection_avg()) reverse();
-    /*Get off intersection so coordinates are correct*/
-    adjust();
-  }
+//  // Check IR
+//  IR_detection();
+//  if (sees_robot) {
+//    /*Backtrack to last intersection*/
+//    while (!atIntersection_avg()) reverse();
+//    /*Get off intersection so coordinates are correct*/
+//    adjust();
+//  }
 
   /*If we are at an intersection*/
   if (atIntersection_avg()) {
@@ -1256,7 +1256,7 @@ void setup() {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1, pipes[1]);
 
-//  while (digitalRead(8) == HIGH);
+   while (digitalRead(8) == HIGH);
 
   /*Setup Maze information accordingly for GUI*/
   robot_start();
