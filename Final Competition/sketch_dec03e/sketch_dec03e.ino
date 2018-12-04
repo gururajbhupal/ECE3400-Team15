@@ -55,9 +55,9 @@ int heading = 2;
 int counter = 0;
 
 /*Line sensors*/
-int sensor_left = A3;
-int sensor_middle = A4;
-int sensor_right = A5;
+int sensor_left = A1;
+int sensor_middle = A3;
+int sensor_right = A2;
 
 /*Initialize sensor threshold values*/
 int line_thresh = 420; //if BELOW this we detect a white line
@@ -229,29 +229,29 @@ void error() {
 /*
   Select output of mux based on select bits.
   Order is s2 s1 s0 from 000 to 111
-  000 is audio
-  001 is IR
+  000 is front wall sensor
+  001 is left wall sensor
   010
   011 is right wall sensor
   100
-  101 is left wall sensor
+  101 is 
   110
-  111 is middle wall sensor
+  111 is 
 */
 void mux_select(int s2, int s1, int s0) {
-  digitalWrite(4, s2); //MSB s2
-  digitalWrite(2, s1); //s1
-  digitalWrite(3, s0); //LSB s0
+  digitalWrite(2, s2); //MSB s2
+  digitalWrite(3, s1); //s1
+  digitalWrite(4, s0); //LSB s0
   /*small delay allows mux enough time to select appropriate input before
     relevant code executes*/
-  delay(55);
+  delay(10);
 }
 
 
 /*Sets mux_select to left wall sensor information, and returns true if there is a wall to the left*/
 bool check_left() {
-  //mux_select(1, 0, 1);
-  if (analogRead(A2) > wall_thresh) {
+  mux_select(0, 1, 1);
+  if (analogRead(A0) > wall_thresh) {
     return true;
   } else {
     return false;
@@ -261,8 +261,8 @@ bool check_left() {
 
 /*Sets mux_select to front wall sensor information, and returns true and turns on LED if there is a wall in front. */
 bool check_front() {
-  // mux_select(1, 1, 1);
-  if (analogRead(A1) > wall_thresh) {
+  mux_select(0, 0, 0);
+  if (analogRead(A0) > wall_thresh) {
     return true;
   } else {
     return false;
@@ -271,7 +271,7 @@ bool check_front() {
 
 /*Sets mux_select to right wall sensor information, and returns true and turns on LED if there is a wall to the right. */
 bool check_right() {
-  //mux_select(0, 1, 1);
+  mux_select(0, 0, 1);
   if (analogRead(A0) > wall_thresh) {
     return true;
   } else {
@@ -1108,13 +1108,14 @@ void setup() {
   radio.openReadingPipe(1, pipes[1]);
 
   /*Setup Maze information accordingly for GUI*/
-  robot_start();
+  //robot_start();
 }
 
 
 /*Run main code*/
 void loop() {
-  maze_traversal();
+  //maze_traversal();
+  Serial.println(analogRead(sensor_left));
 }
 
 
