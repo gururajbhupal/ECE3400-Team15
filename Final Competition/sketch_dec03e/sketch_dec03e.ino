@@ -27,6 +27,9 @@ bool detects_audio = false;
 /*boolean which is true if the override button has been pressed, false otherwise*/
 bool button_pressed = false;
 
+bool was_turning_right = false;
+bool was_turning_left = false;
+
 /* The rf message*/
 unsigned int data;
 
@@ -197,6 +200,7 @@ void turn_place_right() {
 
 /*Turns to the right until the middle sensor finds a line (allows for 90 degree turns)*/
 void turn_right_linetracker() {
+  was_turning_right = true;
   turn_place_right();
   //delay(100); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the right of us*/
@@ -205,11 +209,13 @@ void turn_right_linetracker() {
   /*After we turn right our heading changes. N->E, E->S, S->W, W->N*/
   heading++;
   if (heading == 4) heading = 0;
+  was_turning_right = false;
 }
 
 
 /*Turns to the left until a middle sensor finds a line (allows for 90 degree turns)*/
 void turn_left_linetracker() {
+  was_turning_left = true;
   turn_place_left();
   //delay(100); //delay to get off the line - used to be 300 tried reducing it
   /*Following while loops keep the robot turning until we find the line to the left of us*/
@@ -218,6 +224,7 @@ void turn_left_linetracker() {
   /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/
   heading--;
   if (heading == -1) heading = 3;
+  was_turning_right = false;
 }
 
 
@@ -524,6 +531,13 @@ void find_line() {
   int max = 500;
   int c = 0;
   bool flag = false;
+  if (was_turning_left) {
+      turn_left_linetracker();
+      return;
+  } else if (was_turning_right) {
+      turn_right_linetracker();
+      return;
+  }
   while (!flag) {
     while (!flag && c < max) {
       if (analogRead(sensor_middle) < line_thresh) flag = true;
@@ -546,7 +560,7 @@ void find_line() {
     }
     halt();
     c = 0;
-    max = max + 500;
+    max = max + 1000;
   }
 }
 
