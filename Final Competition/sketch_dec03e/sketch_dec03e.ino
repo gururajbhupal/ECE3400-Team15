@@ -521,6 +521,36 @@ void IR_detection() {
   mux_select(0, 1, 0); //SET TO BLANK OUTPUT TO AVOID FFT NOISE WITH SERVOS
 }
 
+void find_line() {
+  int max = 500;
+  int c = 0;
+  bool flag = false;
+  while (!flag) {
+    while (!flag && c < max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_left();
+      c++;
+    }
+    halt();
+    c = 0;
+    while (!flag && c < 2 * max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_right();
+      c++;
+    }
+    halt();
+    c = 0;
+    while (!flag && c < max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_left();
+      c++;
+    }
+    halt();
+    c = 0;
+    max = max + 500;
+  }
+}
+
 
 /*Follows the line if a line sensor is on one. Halts movement if all three sensors are not on a line*/
 void linefollow() {
@@ -1181,44 +1211,6 @@ void maze_traversal() {
   }
   /*If we are NOT at an intersection we linefollow*/
   linefollow();
-}
-
-void find_line(int i) {
-  int c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
-    turn_place_left();
-    c++;
-  }
-  halt();
-  c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < 2*i) {
-    turn_place_right();
-    c++;
-  }
-  halt();
-  c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
-    turn_place_left();
-    c++;
-  }
-  halt();
-  c = 0;
-  if (analogRead(sensor_middle) > line_thresh) {
-    go();
-    delay(100);
-    halt();
-    find_line(i + 1000);
-  }
-}
-
-void find_line2() {
-  int max = 1000;
-  while (analogRead(sensor_middle)) {
-//      while ()
-
-
-    
-  }
 }
 
 
