@@ -533,10 +533,10 @@ void find_line() {
   bool flag = false;
   if (was_turning_left) {
       turn_left_linetracker();
-      return;
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
   } else if (was_turning_right) {
       turn_right_linetracker();
-      return;
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
   }
   while (!flag) {
     while (!flag && c < max) {
