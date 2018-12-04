@@ -224,7 +224,7 @@ void turn_left_linetracker() {
   /*After we turn left our heading changes. N->W, E->N, S->E, W->S*/
   heading--;
   if (heading == -1) heading = 3;
-  was_turning_right = false;
+  was_turning_left = false;
 }
 
 
