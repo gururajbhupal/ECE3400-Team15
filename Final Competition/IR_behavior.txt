@@ -58,30 +58,34 @@ if (sees_robot) {
 
 
 
-void find_line(int i) {
+void find_line() {
+  int max = 500;
   int c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
-    turn_place_left();
-    c++;
-  }
-  halt();
-  c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < 2*i) {
-    turn_place_right();
-    c++;
-  }
-  halt();
-  c = 0;
-  while ( (analogRead(sensor_middle) > line_thresh) && c < i) {
-    turn_place_left();
-    c++;
-  }
-  halt();
-  c = 0;
-  if (analogRead(sensor_middle) > line_thresh) {
-    go();
-    delay(100);
+  bool flag = false;
+  while (!flag) {
+    while (!flag && c < max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_left();
+      c++;
+    }
     halt();
-    find_line(i + 1000);
+    c = 0;
+    while (!flag && c < 2 * max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_right();
+      c++;
+    }
+    halt();
+    c = 0;
+    while (!flag && c < max) {
+      if (analogRead(sensor_middle) < line_thresh) flag = true;
+      turn_place_left();
+      c++;
+    }
+    halt();
+    c = 0;
+    max = max + 500;
   }
 }
+
+
